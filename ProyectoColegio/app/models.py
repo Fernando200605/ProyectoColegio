@@ -101,7 +101,30 @@ class asistencia (models.Model):
         verbose_name_plural = "asistencias"
         db_table = "asistencia"
 
- 
+ class Acudiente(models.Model):
+    usuario = models.OneToOneField(Usuario,on_delete=models.CASCADE,primary_key=True)
+    telefono = models.TextField(max_length=10, null=True, blank=True, verbose_name="Telefono")
+    direccion = models.TextField(max_length=150, null=True, blank=True, verbose_name="Direccion")
+
+    def __str__(self):
+        return self.usuario.nombre
+    
+    class Meta:
+        verbose_name = "Acudiente"
+        verbose_name_plural = "Acudientes" 
+        db_table = "Acudiente"
+
+class Estudianteacudiente(models.Model):
+    estudianteId = models.ForeignKey(Estudiante,on_delete=models.CASCADE)
+    acudienteId = models.ForeignKey(Acudiente,on_delete=models.CASCADE)
+    
+    def __str__(self):
+        return self.estudianteId.usuario.nombre, self.acudienteId.usuario.nombre
+    
+    class Meta:
+        verbose_name = "Estudianteacudiente"
+        verbose_name_plural = "Estudianteacudientes" 
+        db_table = "Estudianteacudiente"
 class categoria(models.Model):
     nombre = models.CharField(max_length=50)
 
@@ -134,32 +157,5 @@ class marca(models.Model):
 
     def __str__(self):
         return self.nombre
-
-
-
-class Acudiente(models.Model):
-    usuario = models.OneToOneField(Usuario,on_delete=models.CASCADE,primary_key=True)
-    telefono = models.TextField(max_length=10, null=True, blank=True, verbose_name="Telefono")
-    direccion = models.TextField(max_length=150, null=True, blank=True, verbose_name="Direccion")
-
-    def __str__(self):
-        return self.usuario.nombre
-    
-    class Meta:
-        verbose_name = "Acudiente"
-        verbose_name_plural = "Acudientes" 
-        db_table = "Acudiente"
-
-class Estudianteacudiente(models.Model):
-    estudianteId = models.ForeignKey(Estudiante,on_delete=models.CASCADE)
-    acudienteId = models.ForeignKey(Acudiente,on_delete=models.CASCADE)
-    
-    def __str__(self):
-        return self.estudianteId.usuario.nombre, self.acudienteId.usuario.nombre
-    
-    class Meta:
-        verbose_name = "Estudianteacudiente"
-        verbose_name_plural = "Estudianteacudientes" 
-        db_table = "Estudianteacudiente"
 
 
