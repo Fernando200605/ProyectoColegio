@@ -47,7 +47,7 @@ class Eventos(models.Model):
     def __str__(self):
         return self.titulo
 class docente (models.Model):
-    id =models.OneToOneField(usuario, on_delete=models.CASCADE)
+    id =models.OneToOneField(Usuario, on_delete=models.CASCADE,primary_key=True)
     especialidad = models.TextField()
     class Meta:
         verbose_name = "docente"
@@ -91,7 +91,7 @@ class Estudiante(models.Model):
 #creacion de modelo asistencia 
 class asistencia (models.Model):
     id =models.AutoField(primary_key=True)
-    estudianteid = models.ForeignKey(estudiante, on_delete=models.CASCADE)
+    estudianteid = models.ForeignKey(Estudiante, on_delete=models.CASCADE)
     fecha = models.DateTimeField(auto_now=True)
     horaentrada = models.TimeField ()
     horasalida = models.TimeField()
@@ -102,7 +102,7 @@ class asistencia (models.Model):
         verbose_name_plural = "asistencias"
         db_table = "asistencia"
 
- class Acudiente(models.Model):
+class Acudiente(models.Model):
     usuario = models.OneToOneField(Usuario,on_delete=models.CASCADE,primary_key=True)
     telefono = models.TextField(max_length=10, null=True, blank=True, verbose_name="Telefono")
     direccion = models.TextField(max_length=150, null=True, blank=True, verbose_name="Direccion")
@@ -176,7 +176,7 @@ class Elemento(models.Model):
     tipoElementoId = models.ForeignKey(tipoelemento, on_delete=models.CASCADE)
     categoriaId = models.ForeignKey(categoria, on_delete=models.CASCADE)
     marcaId = models.ForeignKey(marca, on_delete=models.CASCADE)
-    unidadMedidaId = models.ForeignKey(Unidadmedida, on_delete=models.CASCADE)
+    unidadMedidaId = models.ForeignKey(UnidadMedida, on_delete=models.CASCADE)
     ubicacion = models.CharField(max_length=100)
     fechaCreacion = models.DateTimeField(auto_now_add=True)
     fechaActualizacion = models.DateTimeField(auto_now=True)
