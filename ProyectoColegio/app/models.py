@@ -17,17 +17,20 @@ class Movimiento(models.Model):
 
     def __str__(self):
         return self.tipo
-class Evento(models.Model):
-    titulo = models.CharField(max_length=100)
-    descripcion = models.TextField()
-    fechaInicio = models.DateTimeField()
-    fechaFin = models.DateTimeField()
-    creadoPorUsuarioId = models.ForeignKey(Usuario,on_delete=models.CASCADE)
+class notificacion(models.Model):
+    titulo = models.CharField(max_length=200)
+    mensaje = models.TextField()
+    fecha_envio = models.DateTimeField(auto_now_add=True)
+    estado = models.BooleanField(default=False)
+    tipo = models.CharField(max_length=50)
+    receptor = models.ForeignKey(Usuario, on_delete=models.CASCADE)
+    evento = models.ForeignKey(Eventos, on_delete=models.CASCADE, null=True, blank=True)
 
     class Meta:
-        verbose_name = 'Evento'
-        verbose_name_plural = 'Eventos'
-        db_table = 'evento'
+        verbose_name = "Notificación"
+        verbose_name_plural = "Notificaciones"
+        db_table = "notificacion"
 
     def __str__(self):
         return self.titulo
+
