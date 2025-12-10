@@ -1,0 +1,272 @@
+:root {
+    --primary-color: #f6f6f6;
+    --secondary-color: #fab5b5;
+    --secondary-hover: #ff4d6d;
+    --text-font: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    --text-size: 16px;
+    --input-border: #ccc;
+    --input-focus: #007bff;
+    --error-color: #eb4545;
+}
+
+/* RESET */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* BODY */
+body {
+    font-family: var(--text-font);
+    background: white;
+    height: 100vh;
+    max-height: 1000px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px;
+}
+
+/* LOGIN CONTAINER */
+.login {
+    display: flex;
+    width: 100%;
+    max-width: 950px;
+    height: 650px;
+    background-color: var(--primary-color);
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    overflow: hidden;
+    position: relative;
+}
+
+/* ASIDE (PANEL IZQUIERDO) */
+.aside {
+    position: relative;
+    width: 50%;
+    background-image: url('../Img/Colegio.jpeg'); /* Ajusta la ruta según tu proyecto */
+    background-size: cover;
+    background-position: center;
+    filter: brightness(0.7);
+    border-top-left-radius: 12px;
+    border-bottom-left-radius: 12px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.aside .bubble {
+    position: relative;
+    padding: 20px 25px;
+    border-radius: 15px;
+    text-align: center;
+    top: -150px;
+    left: 100%;
+
+}
+
+.aside .bubble h1 {
+    font-size: 22px;
+    color:  #007bff;
+}
+
+/* LOGO */
+.logo {
+    position: relative;
+    display: block;
+    width: 200px;
+    margin: 20px auto;
+    top: -50px;
+}
+
+/* FORMULARIO (PANEL DERECHO) */
+form {
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 20px;
+    justify-content: center;
+}
+
+/* INPUT CONTAINER */
+.input-container {
+    position: relative;
+    width: 80%;
+    margin-bottom: 40px;
+}
+
+.input-container input {
+    width: 100%;
+    padding: 12px 40px;
+    font-size: var(--text-size);
+    border: 1px solid var(--input-border);
+    transition: border-color 0.3s, box-shadow 0.3s , border-bottom 0s;
+    border: none;
+}
+
+.input-container input:focus {
+    outline: none;
+    border-bottom: 1px solid;
+    border-color: var(--input-focus);
+    box-shadow: 0 0 8px rgba(0,123,255,0.3);
+}
+
+.input-container i {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #aaa;
+    transition: color 0.3s;
+}
+
+.input-container:focus-within i {
+    color: var(--input-focus);
+}
+#eye{
+ position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  left: 90%;
+  cursor: pointer;
+  color: #aaa;
+}
+#eye:hover {
+  color: black;
+}
+/* BOTÓN RECUPERAR */
+.btn-recuperar {
+    width: 60%;
+    padding: 12px;
+    font-size: 16px;
+    border-radius: 8px;
+    border: none;
+    color: #fff;
+    background-color: var(--secondary-color);
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+    margin-top: 20px;
+}
+
+.btn-recuperar:hover {
+    background-color: var(--secondary-hover);
+    transform: translateY(-2px);
+}
+
+/* PLACEHOLDER */
+input::placeholder {
+    color: #aaa;
+
+}
+
+input:focus::placeholder {
+    color: black;
+}
+.pass{
+  position: absolute;
+  top: 28%;
+  background-color: #34d399; /* verde éxito */
+  color: #fff;
+  padding: 12px 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  font-size: 0.95rem;
+  z-index: 1000;
+  animation: successSlide 4s forwards;
+}
+
+.pass.error{
+  background-color: #f44336;   /* rojo error */
+  color: white;    
+}
+.error {
+    color: red;
+    position:absolute;
+    display: flex;
+    margin: 5px 0 5px 0;
+}
+/* Animación: entra desde la derecha, se mantiene, luego sube y se desvanece */
+@keyframes successSlide {
+  0% {
+    opacity: 0;
+    transform: translateY(-100px);
+  }
+  10% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  80% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-50px);
+  }
+}
+p a {
+  display: inline-block;
+  text-decoration: none;               /* quita el subrayado clásico */
+  background-color: var(--secondary-color); /* color base */
+  color: #fff;                         /* texto blanco por defecto */
+  padding: 8px 16px;                   /* un poco más de espacio para mejor clic */
+  border-radius: 8px;                  /* esquinas más suaves */
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1); /* sombra sutil */
+  transition: all 0.3s ease;           /* animación suave */
+  text-align: center;
+}
+
+p a:hover {
+  background-color: var(--secondary-hover); /* color hover definido en tu tema */
+  transform: translateY(-2px);              /* efecto de levantamiento */
+  box-shadow: 0 6px 10px rgba(0,0,0,0.15); /* sombra más marcada al pasar mouse */
+}
+
+/* RESPONSIVE */
+@media screen and (max-width: 1024px){
+    .login {
+        flex-direction: column;
+        height: auto;
+    }
+
+    .aside, form {
+        width: 100%;
+        border-radius: 12px 12px 0 0;
+    }
+
+    .aside {
+        height: 250px; /* un poco más alta que en 768px */
+    }
+
+    .logo{
+        top: -60px;
+    }
+    
+    .aside .bubble{
+        left: 0;
+        top: 240px;
+    }
+
+    form {
+
+        padding: 30px;
+    }
+
+    .input-container {
+        width: 90%;
+    }
+
+    .btn-recuperar {
+        width: 90%;
+    }
+
+    .pass{
+        padding: 12px 20px;
+    }    
+}
+
+
+
