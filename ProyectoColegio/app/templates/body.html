@@ -1,0 +1,93 @@
+{% extends "index.html" %}
+{% load static %}
+{% block body %}
+<body>
+  <!-- Botón hamburguesa (fuera de la sidebar para que siempre sea visible) -->
+  <button class="hamburger" id="hamburger">
+    <i class="fa-solid fa-bars"></i>
+  </button>
+
+  <!-- Sidebar -->
+{% include "sidebar.html" %}
+
+  <!-- Contenido principal -->
+  <div class="main-content">
+    {% include "header.html" %}
+    <div class="content-wrapper">
+      <!-- Información rápida -->
+      <div class="info-section">
+        <h2>Información rápida</h2>
+        <div class="info-container">
+          <div class="info-card">
+            <img src="../img/slogan.jpeg" alt="Estudiantes">
+            <div class="text">
+              <p class="title">Estudiantes Registrados</p>
+              <p class="value">2.000</p>
+            </div>
+          </div>
+          <div class="info-card">
+            <img src="../img/slogan.jpeg" alt="Bienes">
+            <div class="text">
+              <p class="title">Bienes Registrados</p>
+              <p class="value">3.000</p>
+            </div>
+          </div>
+          <div class="info-card">
+            <img src="../img/slogan.jpeg" alt="Inasistencias">
+            <div class="text">
+              <p class="title">Inasistencias</p>
+              <p class="value">50</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Guía del menú -->
+      <div class="guide-section">
+        <h2>Guía para manejo del menú</h2>
+        <div class="guia">
+          <div class="guia-item">
+            <i class="fa-solid fa-check"></i>
+            <div>
+              <h3>Asistencia</h3>
+              <p>Aquí va una descripción</p>
+              <p>Tú me quieres alba, me quieres de espumas, me quieres de nácar...</p>
+            </div>
+          </div>
+          <div class="guia-item">
+            <i class="fa-solid fa-tv"></i>
+            <div>
+              <h3>Inventario</h3>
+              <p>Aquí va una descripción</p>
+              <p>Tú me quieres alba, me quieres de espumas, me quieres de nácar...</p>
+            </div>
+          </div>
+          <div class="guia-item">
+            <i class="fa-regular fa-file"></i>
+            <div>
+              <h3>Reportes</h3>
+              <p>Aquí va una descripción</p>
+              <p>Tú me quieres alba, me quieres de espumas, me quieres de nácar...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Botón de accesibilidad -->
+    <button id="accessibility-toggle" class="accessibility-button" aria-label="Abrir menú de accesibilidad">
+      <i class="fas fa-universal-access"></i>
+    </button>
+
+    <!-- Panel de accesibilidad -->
+    <div id="accessibility-panel" class="accessibility-panel">
+      <button class="accessibility-option" title="Alto contraste"><i class="fas fa-adjust"></i></button>
+      <button class="accessibility-option" title="Texto grande"><i class="fas fa-text-height"></i></button>
+    </div>
+  </div>
+  <script src="{% static 'js/main.js' %}">
+    
+  </script>
+
+</body>
+{% endblock %}
