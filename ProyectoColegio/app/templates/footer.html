@@ -1,21 +1,24 @@
+{% load static %}
 <div class="info-footer">
   <footer>
     <h3>C.A.T.S Proyect</h3>
-    <h4>contactanos</h4>
-    <br />
+    <h4>Contáctanos</h4>
+
     <div class="iconos">
       <button class="tiktok">
-        <img src="../img/slogan.jpeg" alt="TikTok" />
+        <img src="{% static 'img/tiktok.jpeg' %}" alt="TikTok">
       </button>
+
       <button class="instagram">
-        <img src="../img/slogan.jpeg" alt="Instagram" />
+        <img src="{% static 'img/instagram.jpeg' %}" alt="Instagram">
       </button>
+
       <button class="youtube">
-        <img src="../img/slogan.jpeg" alt="Youtube" />
+        <img src="{% static 'img/youtube.jpeg' %}" alt="Youtube">
       </button>
     </div>
+
     <div class="copyrigth">
-      <br />
       <h4>----------Todos los derechos reservados---------</h4>
     </div>
   </footer>
