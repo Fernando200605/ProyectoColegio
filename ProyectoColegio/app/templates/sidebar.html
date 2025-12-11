@@ -1,18 +1,30 @@
-{%load static %}
+{% load static %}
 <!-- Sidebar -->
-  <div id="sidebar" class="sidebar">
-    <div class="profile">
-      <img src="../Img/User.jpg" alt="Miku Dayo">
-      <a href="#" class="edit-profile"><i class="fa-solid fa-pencil"></i></a>
-      <p class="name"></p>
-      <p class="role"></p>
-    </div>
-    <ul>
-      <li><a href="index.php"><i class="fa-solid fa-house"></i> Inicio</a></li>
-      <li><a href="../Asistencias/asistencia.php"><i class="fa-solid fa-check"></i> Asistencia</a></li>
-      <li><a href="../Inventario/inventario.php"><i class="fa-solid fa-tv"></i> Inventario</a></li>
-      <li><a href="../Reportes/reportes.php"><i class="fa-regular fa-file"></i> Reportes</a></li>
-      <li><a href="../cerrarsesion.php" id=""><i class="fa-solid fa-right-from-bracket"></i> Cerrar Sesión</a></li>
-      <li><a href="#"><i class="fa-solid fa-question"></i> Ayuda</a></li>
-    </ul>
+<div id="sidebar" class="sidebar">
+  <div class="profile">
+    <img src="{% static 'img/User.jpg' %}" alt="Miku Dayo" />
+    <a href="#" class="edit-profile"><i class="fa-solid fa-pencil"></i></a>
+    <p class="name"></p>
+    <p class="role"></p>
   </div>
+  <ul>
+    <li>
+      <a href="index.php"><i class="fa-solid fa-house"></i> Inicio</a>
+    </li>
+    <li>
+      <a href="../Asistencias/asistencia.php"><i class="fa-solid fa-check"></i> Asistencia</a>
+    </li>
+    <li>
+      <a href="../Inventario/inventario.php"><i class="fa-solid fa-tv"></i> Inventario</a>
+    </li>
+    <li>
+      <a href="../Reportes/reportes.php"><i class="fa-regular fa-file"></i> Reportes</a>
+    </li>
+    <li>
+      <a href="../cerrarsesion.php" id=""><i class="fa-solid fa-right-from-bracket"></i> Cerrar Sesión</a>
+    </li>
+    <li>
+      <a href="#"><i class="fa-solid fa-question"></i> Ayuda</a>
+    </li>
+  </ul>
+</div>
