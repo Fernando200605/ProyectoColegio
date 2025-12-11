@@ -246,6 +246,48 @@ header > * {
   flex-wrap: wrap;
 }
 
+/*propiedades para el footer*/
+.info-footer {
+  justify-content: center;
+  align-items: center;
+  background-color: #1C2E4A;
+  color: #d1e7f2;
+  height: 150%;
+  width: 100%;
+}
+.info-footer h3,h4 {
+  text-align:center;
+}
+.copyrigth{
+  text-align: center;
+}
+.iconos{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2%;
+  width: 100%;
+  padding: 10 px 0;
+}
+.iconos button{
+  background-color:#0F1A2B;
+  color: #d1e7f2;
+  border: 2px solid #ccc;
+  cursor: pointer;
+  width: 50px; 
+  height: 50px;
+  border-radius: 50%;
+  padding: 0%;
+  transition: all 0.3s ease;
+}
+.iconos button:hover {
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); 
+    transform: scale(1.05); 
+    border-color: #f0f0f0; 
+}
+.sidebar.open ~ .info-footer {
+  margin-left: 250px;
+}
 /* ================================
    INFORMACIÓN RÁPIDA
 ================================ */
