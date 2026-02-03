@@ -9,8 +9,13 @@
     {% include 'sidebar.html' %}
 
     <!-- Contenido principal -->
-    {% include 'main.html' %}
+    <div class="main-content">
+      {% include "header.html" %}
+      {% block main %}
+        {% include 'main.html' %}
+      {% endblock %}
+    </div>
     <script src="{% static 'js/main.js' %}"></script>
-    {% include "footer.html" %}
+    {% include 'footer.html' %}
   </body>
 {% endblock %}
