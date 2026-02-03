@@ -1,0 +1,33 @@
+{% extends 'body.html' %}
+{% load static %}
+{% block title %}
+  <title>Listado de Usuarios</title>
+{% endblock %}
+{% block main %}
+  <table class="table">
+    <thead>
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Nombre</th>
+        <th scope="col">Estado</th>
+        <th scope="col">Opciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for usuario in usuarios  %}
+        <tr>
+          <td>{{ usuario.id }}</td>
+          <td>{{ usuario.nombre }}</td>
+          <td>{{ usuario.estado }}</td>
+          <td>
+            <a type="button" class="btn btn-danger"><i class="fa-solid fa-pen-to-square"></i></a>
+            <a type="button" class="btn btn-warning"><i class="fa-solid fa-trash"></i></a>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}
+{% block js %}
+
+{% endblock %}
