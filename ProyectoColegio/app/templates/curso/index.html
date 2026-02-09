@@ -1,0 +1,100 @@
+{% extends 'body.html' %}
+{% load static %}
+{% block title %}
+  <title>Listado de Cursos</title>
+{% endblock %}
+
+{% block main %}
+<div class="container-fluid">
+    <h2 class="text-info-custom mb-4">{{ titulo }}</h2>
+
+    <div class="card card-custom mb-4 p-3">
+        <div class="d-flex justify-content-between align-items-center flex-wrap">
+            <h5 class="card-title mb-0" style="color: #1C2E4A; font-weight: 600;">
+                <i class="fas fa-graduation-cap me-2"></i>Gestión de Cursos
+            </h5>
+            <div class="mt-2 mt-md-0">
+                <a href="{{ crear_url }}" class="btn btn-create me-2">
+                    <i class="fas fa-plus-circle me-1"></i> Nuevo Registro
+                </a>
+                <form action="{% url 'app:limpiar_curso' %}" method="post" style="display:inline;" id="Eliminar_Todo">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-outline-danger border-2" style="border-radius: 10px; font-weight: 600;">
+                        <i class="fas fa-trash-alt me-1"></i> Vaciar Lista
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="table-responsive" style="padding: 10px;">
+        <table class="table" id="Tabla">
+            <thead>
+                <tr>
+                    <th><i class="fas fa-hashtag me-2"></i>ID</th>
+                    <th><i class="fas fa-book me-2"></i>Nombre del Curso</th>
+                    <th><i class="fas fa-clock me-2"></i>Jornada</th>
+                    <th class="text-center"><i class="fas fa-tools me-2"></i>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for curso in cursos %}
+                <tr>
+                    <td class="fw-bold">#{{ curso.id }}</td>
+                    <td>{{ curso.nom }}</td>
+                    <td>
+                        <span class="badge" style="background-color: #d1e7f2; color: #1C2E4A; padding: 8px 12px; border-radius: 8px;">
+                            {{ curso.jornada }}
+                        </span>
+                    </td>
+                    <td class="text-center">
+                        <a href="{% url 'app:editar_curso' curso.id %}" class="btn btn-sm me-1" style="background-color: #FFD1DC; color: #1C2E4A; border-radius: 8px;">
+                            <i class="fa-solid fa-pen-to-square"></i>
+                        </a>
+                        <a href="{% url 'app:eliminar_curso' curso.id %}" class="btn btn-sm" style="background-color: #ff4d4d; color: white; border-radius: 8px;">
+                            <i class="fa-solid fa-trash"></i>
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block js %}
+<script src="{% static 'lib/jquery/jquery-3.6.0.min.js' %}"></script>
+<script src="{% static 'lib/datatables-1.10.20/js/jquery.dataTables.js' %}"></script>
+<script src="{% static 'lib/datatables-1.10.20/js/dataTables.bootstrap4.min.js' %}"></script>
+<script src="{% static 'lib/datatables-1.10.20/plugins/responsive-2.2.3/js/dataTables.responsive.min.js' %}"></script>
+<script src="{% static 'lib/datatables-1.10.20/plugins/responsive-2.2.3/js/responsive.bootstrap4.min.js' %}"></script>
+
+<script>
+$(document).ready(function () {
+    $('#Tabla').DataTable({
+        responsive: true,
+        autoWidth: false
+    });
+});
+
+// SweetAlert para eliminar todos
+document.getElementById('Eliminar_Todo').addEventListener('submit', function (e) {
+    e.preventDefault();
+    Swal.fire({
+        title: '¿Estás seguro de eliminar todos los cursos?',
+        text: 'Esta acción no se puede deshacer',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Sí, eliminar',
+        cancelButtonText: 'Cancelar',
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6'
+    }).then((result) => {
+        if (result.value) {
+            this.submit();
+        }
+    });
+});
+</script>
+{% endblock %}
