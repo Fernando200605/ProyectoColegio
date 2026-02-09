@@ -1,0 +1,29 @@
+{% extends 'body.html' %}
+{% block main %}
+  <h2>{{ titulo }} {{ object }}</h2>
+
+  <form method="post" action="" class="mt-4" id="Eliminar">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger btn-xs"><i class="fas fa-trash"></i> Confirmar Eliminación</button>
+    <a href="{% url 'app:index_curso' %}" class="btn btn-secondary btn-xs"><i class="fas fa-ban"></i> Cancelar</a>
+  </form>
+  <script>
+    document.getElementById('Eliminar').addEventListener('submit', function (e) {
+      e.preventDefault()
+    
+      Swal.fire({
+        title: '¿Estás seguro?',
+        text: 'Esta acción no se puede deshacer',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Sí, eliminar',
+        cancelButtonText: 'Cancelar',
+        confirmButtonColor: '#d33'
+      }).then((result) => {
+        if (result.value) {
+          this.submit()
+        }
+      })
+    })
+  </script>
+{% endblock %}
