@@ -10,12 +10,45 @@
 
     <!-- Contenido principal -->
     <div class="main-content">
-      {% include "header.html" %}
+      {% include 'header.html' %}
       {% block main %}
         {% include 'main.html' %}
       {% endblock %}
     </div>
-    <script src="{% static 'js/main.js' %}"></script>
+    <script src="{% static 'lib/jquery/jquery-3.6.0.min.js' %}"></script>
+    <script src="{% static 'lib/bootstrap-4.4.1-dist/js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'lib/adminlte-3.0.4/js/adminlte.min.js' %}"></script>
+    <script src="{% static 'lib/sweetalert2/sweetalert2.all.min.js' %}"></script>
+
+    <!-- TU JS SIEMPRE AL FINAL -->
+    <script>
+      const hamburger = document.getElementById('hamburger')
+      const sidebar = document.getElementById('sidebar')
+      
+      hamburger.addEventListener('click', () => {
+        sidebar.classList.toggle('open')
+        hamburger.classList.toggle('active')
+      })
+    </script>
+    {% if messages %}
+      <script>
+        document.addEventListener('DOMContentLoaded', function () {
+          {% for message in messages %}
+            Swal.fire({
+              title: "{{ message }}",
+              icon: "{{ message.tags }}",
+              showConfirmButton: false,
+              timer: 2000,
+              timerProgressBar: true
+            });
+          {% endfor %}
+        });
+      </script>
+    {% endif %}
+
     {% include 'footer.html' %}
+    {% block js %}
+
+    {% endblock %}
   </body>
 {% endblock %}
