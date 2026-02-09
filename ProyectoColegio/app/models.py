@@ -58,11 +58,11 @@ class docente (models.Model):
   #creacion de modelo curso
 class Curso (models.Model):
     id = models.AutoField(primary_key=True)
-    nom = models.CharField(max_length=100)
+    nom = models.CharField(max_length=100 )
     jornada =models.CharField(max_length=200)
-    codigo = models.CharField(max_length=50)
+    codigo = models.CharField(max_length=50 , unique=True)
     capacidad = models.IntegerField()
-    fechainicio = models.DateTimeField(auto_now_add=True)
+    fechainicio = models.DateTimeField(auto_now=True)
     fechafin = models.DateTimeField(auto_now=True)
     docenteid = models.ForeignKey(docente, on_delete=models.CASCADE)
     class Meta:
@@ -127,7 +127,7 @@ class Estudianteacudiente(models.Model):
         verbose_name_plural = "Estudianteacudientes" 
         db_table = "Estudianteacudiente"
 class categoria(models.Model):
-    nombre = models.CharField(max_length=50)
+    nombre = models.CharField(max_length=50 , unique=True)
 
     class Meta:
         verbose_name = "Categoría"
