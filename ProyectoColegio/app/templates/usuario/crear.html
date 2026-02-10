@@ -1,0 +1,53 @@
+{% extends 'create_generic.html' %}
+{% load widget_tweaks %}
+
+{% block titulo %}
+  {{ titulo }}
+{% endblock %}
+{% block form %}
+  {% csrf_token %}
+
+  {% for field in form.visible_fields %}
+    <div class="mb-4">
+      <label class="form-label fw-bold" style="color: #1C2E4A;">{{ field.label }}</label>
+
+      {{ field|add_class:'form-control form-control-custom'|attr:'autocomplete:on' }}
+
+      {% if field.help_text %}
+        <div class="form-text">{{ field.help_text }}</div>
+      {% endif %}
+
+      {% if field.errors %}
+        {% for error in field.errors %}
+          <div class="text-danger mt-1 small animated fadeIn">
+            <i class="fas fa-exclamation-circle me-1"></i> {{ error }}
+          </div>
+        {% endfor %}
+      {% endif %}
+    </div>
+  {% endfor %}
+  <label for="">Rol</label>
+    <select name="rol" class="form-control">
+        <option value="">Seleccione un rol</option>
+
+        <option value="administrador"
+            {% if rol_actual == 'administrador' %}selected{% endif %}>
+            Administrador
+        </option>
+
+        <option value="docente"
+            {% if rol_actual == 'docente' %}selected{% endif %}>
+            Docente
+        </option>
+
+        <option value="estudiante"
+            {% if rol_actual == 'estudiante' %}selected{% endif %}>
+            Estudiante
+        </option>
+
+        <option value="acudiente"
+            {% if rol_actual == 'acudiente' %}selected{% endif %}>
+            Acudiente
+        </option>
+    </select>
+{% endblock %}

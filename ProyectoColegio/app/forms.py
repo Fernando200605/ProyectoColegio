@@ -1,6 +1,6 @@
 from dataclasses import field
 from django import forms
-from app.models import Curso
+from app.models import Curso , Usuario
 
 class CursoForm(forms.ModelForm):
     class Meta:
@@ -29,3 +29,22 @@ class CursoForm(forms.ModelForm):
         if capacidad <= 0:
             raise forms.ValidationError("La capacidad debe ser un numero positivo.")
         return capacidad
+    
+class UsuarioForm(forms.ModelForm):
+    class Meta:
+        model = Usuario
+        fields = ['nombre','email','contraseña','estado']
+        widgets = {
+            'nombre': forms.TextInput(attrs={
+                'class':'form-control'
+            }),
+            'email':forms.EmailInput(attrs={
+                'class':'form-control'
+            }),
+            'contraseña':forms.PasswordInput(attrs={
+                'class':'form-control'
+            }),
+            'estado':forms.Select(attrs={
+                'class':'form-control'
+            }),
+        }

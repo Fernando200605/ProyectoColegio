@@ -3,12 +3,16 @@ from django.db import models
 
 
 # Create your models here.
+estado_usuario = [
+    (True, 'Activo'),
+    (False, 'Inactivo'),
+]
 
 class Usuario(models.Model):
     nombre = models.CharField(max_length=100)
     email = models.EmailField(unique=True)
     contraseña = models.CharField(max_length=100)
-    estado = models.BooleanField(default=True)
+    estado = models.BooleanField(default=True,choices=estado_usuario)
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     fecha_actualizacion = models.DateTimeField(auto_now=True)
     
@@ -16,7 +20,17 @@ class Usuario(models.Model):
         verbose_name = "Usuario"
         verbose_name_plural = "Usuarios"
         db_table = "usuario"
-
+    
+    def get_rol(self):
+        if hasattr(self,'administrador'):
+            return 'Administrador'
+        elif hasattr(self,'docente'):
+            return 'Docente'
+        elif hasattr(self,'estudiante'):
+            return 'Estudiante'
+        elif hasattr(self,'acudiente'):
+            return 'Acudiente'
+        return 'Desconocido'
     def __str__(self):
         return self.nombre
 
@@ -47,14 +61,14 @@ class Eventos(models.Model):
     def __str__(self):
         return self.titulo
 class docente (models.Model):
-    id =models.OneToOneField(Usuario, on_delete=models.CASCADE,primary_key=True)
+    usuario =models.OneToOneField(Usuario, on_delete=models.CASCADE,primary_key=True)
     especialidad = models.TextField()
     class Meta:
         verbose_name = "docente"
         verbose_name_plural = "docentes"
         db_table = "docente"
     def __str__ (self):
-        return self.id.nombre
+        return self.usuario.nombre
   #creacion de modelo curso
 class Curso (models.Model):
     id = models.AutoField(primary_key=True)
@@ -62,8 +76,8 @@ class Curso (models.Model):
     jornada =models.CharField(max_length=200)
     codigo = models.CharField(max_length=50 , unique=True)
     capacidad = models.IntegerField()
-    fechainicio = models.DateTimeField(auto_now=True)
-    fechafin = models.DateTimeField(auto_now=True)
+    fechainicio = models.DateTimeField(auto_now_add=True , editable=False)
+    fechafin = models.DateTimeField(auto_now_add=True, editable=False)
     docenteid = models.ForeignKey(docente, on_delete=models.CASCADE)
     class Meta:
         verbose_name = "curso"

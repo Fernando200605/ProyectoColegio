@@ -1,33 +1,41 @@
-{% extends 'body.html' %}
-{% load static %}
-{% block title %}
-  <title>Listado de Usuarios</title>
+{% extends 'list_generic.html' %}
+{% block titulo %}
+  {{ titulo }}
 {% endblock %}
-{% block main %}
-  <table class="table">
-    <thead>
-      <tr>
-        <th scope="col">#</th>
-        <th scope="col">Nombre</th>
-        <th scope="col">Estado</th>
-        <th scope="col">Opciones</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for usuario in usuarios  %}
-        <tr>
-          <td>{{ usuario.id }}</td>
-          <td>{{ usuario.nombre }}</td>
-          <td>{{ usuario.estado }}</td>
-          <td>
-            <a type="button" class="btn btn-danger"><i class="fa-solid fa-pen-to-square"></i></a>
-            <a type="button" class="btn btn-warning"><i class="fa-solid fa-trash"></i></a>
-          </td>
-        </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-{% endblock %}
-{% block js %}
 
+{% block subtitulo %}
+  {{ subtitulo }}
+{% endblock %}
+
+{% block columns %}
+  <th>
+    <i class="fas fa-hashtag me-2"></i>ID
+  </th>
+  <th>
+    <i class="fas fa-user me-2"></i>Nombre del Usuario
+  </th>
+  <th>
+    <i class="fas fa-envelope me-2"></i>Email
+  </th>
+    <th class="text-center">
+      <i class="fas fa-user-shield me-2"></i>Rol
+    </th>
+  <th class="text-center">
+    <i class="fas fa-tools me-2"></i>Acciones
+  </th>
+{% endblock %}
+
+{% block rows %}
+  {% for usuario in object_list %}
+    <tr>
+      <td>{{ usuario.id }}</td>
+      <td>{{ usuario.nombre }}</td>
+      <td>{{ usuario.email }}</td>
+      <td class="text-center">{{ usuario.get_rol }}</td>
+      <td class="text-center">
+        <a href="{% url "app:editar_usuario" usuario.id %}" class="btn btn-sm me-1" style="background-color: #3054f7; color: #ffffff; border-radius: 8px;"><i class="fa-solid fa-pen-to-square"></i></a>
+        <a href="#" class="btn btn-sm" style="background-color: #ff4d4d; color: white; border-radius: 8px;"><i class="fa-solid fa-trash"></i></a>
+      </td>
+    </tr>
+  {% endfor %}
 {% endblock %}
