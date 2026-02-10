@@ -86,12 +86,18 @@ class Curso (models.Model):
     def __str__ (self):
         return self.nom 
 
-
+Estado_Matricula = [
+    ('Matriculado', 'Matriculado'),
+    ('No Matriculado', 'No Matriculado'),
+    ('Retirado', 'Retirado'),
+    ('Graduado', 'Graduado'),
+    ('Sancionado', 'Sancionado'),
+]
 class Estudiante(models.Model):
     usuario = models.OneToOneField(Usuario,on_delete=models.CASCADE,primary_key=True)
     codigo = models.TextField(max_length=50, null=True, blank=True, verbose_name="Codigo")
     fechaNacimiento = models.DateField(verbose_name="Fecha de nacimiento")
-    estadoMatricula = models.TextField(max_length=20, null=True, blank=True, verbose_name="Estado de Matricula")
+    estadoMatricula = models.TextField(max_length=20, null=True, blank=True, verbose_name="Estado de Matricula" , choices=Estado_Matricula)
     fechaIngreso = models.DateField(verbose_name="Fecha de Ingreso")
     cursoId = models.ForeignKey(Curso,on_delete=models.CASCADE)
     

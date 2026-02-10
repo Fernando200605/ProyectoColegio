@@ -1,8 +1,11 @@
+from django.http import JsonResponse
+from django.utils import timezone
+from django.db import connection
 from django.views.generic import CreateView
 from django.shortcuts import redirect
 from django.shortcuts import render, redirect
 from django.views import View
-from django.views.generic import ListView, UpdateView
+from django.views.generic import ListView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from django.contrib import messages
 from django.db import transaction
@@ -11,6 +14,7 @@ from app.models import Usuario, Administrador, docente, Estudiante, Acudiente
 from app.forms import UsuarioForm, UsuarioUpdateForm, AdministradorForm, DocenteForm, EstudianteForm, AcudienteForm
 
 # --- FUNCIONES DE APOYO ---
+
 
 def validar_formulario_rol(rol, data, instance=None):
     """
@@ -27,15 +31,17 @@ def validar_formulario_rol(rol, data, instance=None):
         form = AcudienteForm(data, instance=instance)
     else:
         return False, None
-    
+
     return form.is_valid(), form
+
 
 def guardar_perfil_rol(usuario, rol, data):
     """Crea un perfil nuevo."""
     if rol == 'administrador':
         Administrador.objects.create(usuario=usuario, cargo=data.get('cargo'))
     elif rol == 'docente':
-        docente.objects.create(usuario=usuario, especialidad=data.get('especialidad'))
+        docente.objects.create(
+            usuario=usuario, especialidad=data.get('especialidad'))
     elif rol == 'estudiante':
         Estudiante.objects.create(
             usuario=usuario,
@@ -46,12 +52,11 @@ def guardar_perfil_rol(usuario, rol, data):
             cursoId_id=data.get('cursoId')
         )
     elif rol == 'acudiente':
-        Acudiente.objects.create(usuario=usuario, telefono=data.get('telefono'), direccion=data.get('direccion'))
+        Acudiente.objects.create(usuario=usuario, telefono=data.get(
+            'telefono'), direccion=data.get('direccion'))
+
 
 # --- VISTAS ---
-from django.db import connection
-from django.utils import timezone
-from django.http import JsonResponse
 
 
 class UsuarioListView(ListView):
@@ -61,9 +66,12 @@ class UsuarioListView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['titulo'] = 'Listado de Usuarios'
+        context['subtitulo'] = 'Bienvenido al listado de usuarios'
         context['crear_url'] = reverse_lazy('app:crear_usuario')
         context['limpiar_url'] = reverse_lazy('app:limpiar_usuario')
+        context['table'] = "Usuarios" 
         return context
+
 
 class UsuarioCreateView(View):
     template_name = 'usuario/crear.html'
@@ -84,7 +92,7 @@ class UsuarioCreateView(View):
 
         elif rol == 'docente':
             docente.objects.create(usuario=usuario
-            )
+                                   )
         elif rol == 'acudiente':
             Acudiente.objects.create(usuario=usuario)
 
@@ -104,7 +112,8 @@ class UsuarioCreateView(View):
             'btn_name': 'Guardar'
         }
         context.update(kwargs)
-        if 'usuario_form' in context: context['form'] = context['usuario_form']
+        if 'usuario_form' in context:
+            context['form'] = context['usuario_form']
         return context
 
     def get(self, request):
@@ -123,6 +132,7 @@ class UsuarioCreateView(View):
             return redirect('app:index_usuario')
 
         return render(request, self.template_name, self.get_context(usuario_form=usuario_form, rol_actual=rol))
+
 
 class UsuarioUpdateView(UpdateView):
     model = Usuario
@@ -146,17 +156,25 @@ class UsuarioUpdateView(UpdateView):
 
         # Cargar perfiles existentes para mostrar datos en los campos
         admin = Administrador.objects.filter(usuario=usuario).first()
-        if admin: context.update({'rol_actual': 'administrador', 'admin_form': AdministradorForm(instance=admin)})
-        
+        if admin:
+            context.update({'rol_actual': 'administrador',
+                           'admin_form': AdministradorForm(instance=admin)})
+
         doc = docente.objects.filter(usuario=usuario).first()
-        if doc: context.update({'rol_actual': 'docente', 'docente_form': DocenteForm(instance=doc)})
+        if doc:
+            context.update(
+                {'rol_actual': 'docente', 'docente_form': DocenteForm(instance=doc)})
 
         est = Estudiante.objects.filter(usuario=usuario).first()
-        if est: context.update({'rol_actual': 'estudiante', 'estudiante_form': EstudianteForm(instance=est)})
+        if est:
+            context.update({'rol_actual': 'estudiante',
+                           'estudiante_form': EstudianteForm(instance=est)})
 
         acu = Acudiente.objects.filter(usuario=usuario).first()
-        if acu: context.update({'rol_actual': 'acudiente', 'acudiente_form': AcudienteForm(instance=acu)})
-            
+        if acu:
+            context.update({'rol_actual': 'acudiente',
+                           'acudiente_form': AcudienteForm(instance=acu)})
+
         return context
 
     def form_valid(self, form):
@@ -168,18 +186,23 @@ class UsuarioUpdateView(UpdateView):
         p_doc = docente.objects.filter(usuario=usuario).first()
         p_est = Estudiante.objects.filter(usuario=usuario).first()
         p_acu = Acudiente.objects.filter(usuario=usuario).first()
-        
+
         perfil_previo = p_admin or p_doc or p_est or p_acu
 
         # Identificar la instancia que coincide con el rol seleccionado
         instancia_a_validar = None
-        if nuevo_rol == 'administrador': instancia_a_validar = p_admin
-        elif nuevo_rol == 'docente': instancia_a_validar = p_doc
-        elif nuevo_rol == 'estudiante': instancia_a_validar = p_est
-        elif nuevo_rol == 'acudiente': instancia_a_validar = p_acu
+        if nuevo_rol == 'administrador':
+            instancia_a_validar = p_admin
+        elif nuevo_rol == 'docente':
+            instancia_a_validar = p_doc
+        elif nuevo_rol == 'estudiante':
+            instancia_a_validar = p_est
+        elif nuevo_rol == 'acudiente':
+            instancia_a_validar = p_acu
 
         # Validar pasando la instancia para que Django sepa que es una EDICIÓN
-        valido, rol_form = validar_formulario_rol(nuevo_rol, self.request.POST, instance=instancia_a_validar)
+        valido, rol_form = validar_formulario_rol(
+            nuevo_rol, self.request.POST, instance=instancia_a_validar)
 
         if not valido:
             messages.error(self.request, 'Errores en los campos del perfil.')
@@ -198,3 +221,46 @@ class UsuarioUpdateView(UpdateView):
 
         messages.success(self.request, 'Usuario actualizado correctamente')
         return redirect(self.success_url)
+
+
+class UsuarioDetailView(View):
+    def get(self, request, pk):
+        usuario = Usuario.objects.get(pk=pk)
+
+        data = {
+            'nombre': usuario.nombre,
+            'email': usuario.email,
+            'rol': str(usuario.get_rol()),
+            'estado': 'Activo' if usuario.estado else 'Inactivo',
+        }
+
+        return JsonResponse(data)
+
+
+class UsuarioCleandView(View):
+    def post(self, request, *args, **kwargs):
+        Usuario.objects.all().delete()
+        with connection.cursor() as cursor:
+            nombre_tabla = Usuario._meta.db_table
+            cursor.execute(
+                f"DELETE FROM sqlite_sequence WHERE name='{nombre_tabla}';")
+
+        messages.success(
+            self.request, "Todos los Usuarios han sido eliminados y el ID reiniciado.")
+        return redirect(reverse_lazy('app:index_usuario'))
+
+
+class UsuarioDeleteView(DeleteView):
+    model = Usuario
+    template_name = 'usuario/eliminar.html'
+    success_url = reverse_lazy('app:index_usuario')
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['titulo'] = 'Eliminar Usuario'
+        context['subtitulo'] = '¿Está seguro de eliminar este usuario?'
+        context['listar_url'] = reverse_lazy('app:index_usuario')
+        return context
+
+    def form_valid(self, form):
+        messages.success(self.request, 'Usuario eliminado exitosamente.')
+        return super().form_valid(form)

@@ -63,7 +63,7 @@ class EstudianteForm(forms.ModelForm):
         widgets = {
             'codigo': forms.TextInput(attrs={'class': 'form-control'}),
             'fechaNacimiento': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
-            'estadoMatricula': forms.TextInput(attrs={'class': 'form-control'}),
+            'estadoMatricula': forms.Select(attrs={'class': 'form-control'}),
             'fechaIngreso': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'cursoId': forms.Select(attrs={'class': 'form-control'})
         }
