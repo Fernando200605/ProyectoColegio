@@ -69,7 +69,7 @@ $(document).ready(function () {
 document.getElementById('Eliminar_Todo').addEventListener('submit', function (e) {
     e.preventDefault();
     Swal.fire({
-        title: '¿Estás seguro de eliminar todos los cursos?',
+        title: '¿Estás seguro de eliminar todos los {{table}} ?',
         text: 'Esta acción no se puede deshacer',
         icon: 'warning',
         showCancelButton: true,
