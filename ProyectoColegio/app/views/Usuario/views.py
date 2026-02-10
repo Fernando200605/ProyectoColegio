@@ -1,3 +1,5 @@
+from django.views.generic import CreateView
+from django.shortcuts import redirect
 from django.shortcuts import render, redirect
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, View
 from django.utils.decorators import method_decorator
@@ -9,6 +11,7 @@ from django.urls import reverse_lazy
 from django.contrib import messages
 from django.db import connection
 from django.utils import timezone
+from django.http import JsonResponse
 
 
 class UsuarioListView(ListView):
@@ -20,7 +23,7 @@ class UsuarioListView(ListView):
         context['titulo'] = 'Listado de Usuarios'
         context['subtitulo'] = 'Bienvenido al listado de usuarios'
         context['crear_url'] = reverse_lazy('app:crear_usuario')
-        print(context)
+        context['limpiar_url'] = reverse_lazy('app:limpiar_usuario')
         return context
 
 
@@ -33,18 +36,24 @@ class UsuarioCreateView(CreateView):
     def form_valid(self, form):
         usuario = form.save(commit=False)
         usuario.contraseña = form.cleaned_data['contraseña']
+
         usuario.save()
 
         rol = self.request.POST.get('rol')
+
         if rol == 'administrador':
             Administrador.objects.create(
-                usuario=usuario, cargo='Administrador')
+                usuario=usuario, cargo='Administrador'
+            )
+
         elif rol == 'docente':
-            docente.objects.create(usuario=usuario)
+            docente.objects.create(usuario=usuario
+            )
         elif rol == 'acudiente':
             Acudiente.objects.create(usuario=usuario)
+
         messages.success(self.request, 'Usuario creado exitosamente.')
-        return super().form_valid(form)
+        return redirect(self.success_url)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -53,6 +62,12 @@ class UsuarioCreateView(CreateView):
         context['listar_url'] = reverse_lazy('app:index_usuario')
         return context
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['titulo'] = 'Crear Usuario'
+        context['subtitulo'] = 'Complete el formulario para crear un nuevo usuario'
+        context['listar_url'] = reverse_lazy('app:index_usuario')
+        return context
 
 
 class UsuarioUpdateView(UpdateView):
@@ -77,7 +92,8 @@ class UsuarioUpdateView(UpdateView):
         Acudiente.objects.filter(usuario=usuario).delete()
 
         if rol == 'administrador':
-            Administrador.objects.create(usuario=usuario, cargo='Administrador')
+            Administrador.objects.create(
+                usuario=usuario, cargo='Administrador')
         elif rol == 'docente':
             docente.objects.create(usuario=usuario)
         elif rol == 'acudiente':
@@ -86,23 +102,60 @@ class UsuarioUpdateView(UpdateView):
         messages.success(self.request, 'Usuario actualizado exitosamente.')
         return super().form_valid(form)
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        usuario = self.object
+
+        if Administrador.objects.filter(usuario=usuario).exists():
+            context['rol_actual'] = 'administrador'
+        elif docente.objects.filter(usuario=usuario).exists():
+            context['rol_actual'] = 'docente'
+        elif Acudiente.objects.filter(usuario=usuario).exists():
+            context['rol_actual'] = 'acudiente'
+        else:
+            context['rol_actual'] = ''
+
+        context['titulo'] = 'Editar Usuario'
+        context['subtitulo'] = 'Complete el formulario para editar el usuario'
+        context['listar_url'] = reverse_lazy('app:index_usuario')
+        return context
+
+
+class UsuarioDeleteView(DeleteView):
+    model = Usuario
+    template_name = 'usuario/eliminar.html'
+    success_url = reverse_lazy('app:index_usuario')
 
     def get_context_data(self, **kwargs):
-            context = super().get_context_data(**kwargs)
-            usuario = self.object
+        context = super().get_context_data(**kwargs)
+        context['titulo'] = 'Eliminar Usuario'
+        context['subtitulo'] = '¿Está seguro de eliminar este usuario?'
+        context['listar_url'] = reverse_lazy('app:index_usuario')
+        return context
 
-            if Administrador.objects.filter(usuario=usuario).exists():
-                context['rol_actual'] = 'administrador'
-            elif docente.objects.filter(usuario=usuario).exists():
-                context['rol_actual'] = 'docente'
-            elif Estudiante.objects.filter(usuario=usuario).exists():
-                context['rol_actual'] = 'estudiante'
-            elif Acudiente.objects.filter(usuario=usuario).exists():
-                context['rol_actual'] = 'acudiente'
-            else:
-                context['rol_actual'] = ''
+    def form_valid(self, form):
+        messages.success(self.request, 'Usuario eliminado exitosamente.')
+        return super().form_valid(form)
 
-            context['titulo'] = 'Editar Usuario'
-            context['subtitulo'] = 'Complete el formulario para editar el usuario'
-            context['listar_url'] = reverse_lazy('app:index_usuario')
-            return context
+class UsuarioDetailView(View):
+    def get(self, request, pk):
+        usuario = Usuario.objects.get(pk=pk)
+
+        data = {
+            'nombre': usuario.nombre,
+            'email': usuario.email,
+            'rol': str(usuario.get_rol()),
+            'estado': 'Activo' if usuario.estado else 'Inactivo',
+        }
+
+        return JsonResponse(data)
+
+class UsuarioCleandView(View):
+       def post(self, request, *args, **kwargs):
+        Usuario.objects.all().delete()
+        with connection.cursor() as cursor:
+            nombre_tabla = Usuario._meta.db_table
+            cursor.execute(f"DELETE FROM sqlite_sequence WHERE name='{nombre_tabla}';")
+        
+        messages.success(self.request, "Todos los Usuarips han sido eliminados y el ID reiniciado.")
+        return redirect(reverse_lazy('app:index_usuario'))

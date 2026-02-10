@@ -26,28 +26,22 @@
       {% endif %}
     </div>
   {% endfor %}
-  <label for="">Rol</label>
-    <select name="rol" class="form-control">
-        <option value="">Seleccione un rol</option>
+  <label class="form-label fw-bold" style="color: #1C2E4A;">Rol</label>
+        <select name="rol" class="form-control" id="rol">
+            <option value="">Seleccione un rol</option>
 
-        <option value="administrador"
-            {% if rol_actual == 'administrador' %}selected{% endif %}>
-            Administrador
-        </option>
+            <option value="administrador"
+                {% if rol_actual == 'administrador' %}selected{% endif %}>
+                Administrador
+            </option>
 
-        <option value="docente"
-            {% if rol_actual == 'docente' %}selected{% endif %}>
-            Docente
-        </option>
-
-        <option value="estudiante"
-            {% if rol_actual == 'estudiante' %}selected{% endif %}>
-            Estudiante
-        </option>
-
-        <option value="acudiente"
-            {% if rol_actual == 'acudiente' %}selected{% endif %}>
-            Acudiente
-        </option>
-    </select>
+            <option value="docente"
+                {% if rol_actual == 'docente' %}selected{% endif %}>
+                Docente
+            </option>
+            <option value="acudiente"
+                {% if rol_actual == 'acudiente' %}selected{% endif %}>
+                Acudiente
+            </option>
+        </select>
 {% endblock %}
