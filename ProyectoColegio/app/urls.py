@@ -14,4 +14,7 @@ urlpatterns = [
     path('usuario/',UsuarioListView.as_view(),name="index_usuario"),
     path('usuario/crear/',UsuarioCreateView.as_view(),name="crear_usuario"),
     path('usuario/editar/<int:pk>/',UsuarioUpdateView.as_view(),name="editar_usuario"),
+    path('usuario/eliminar/<int:pk>/',UsuarioDeleteView.as_view(),name="eliminar_usuario"),
+    path('usuario/detalle/<int:pk>/',UsuarioDetailView.as_view(),name="detalle_usuario"),
+    path('usuario/limpiar/',UsuarioCleandView.as_view(),name="limpiar_usuario"),
 ]
