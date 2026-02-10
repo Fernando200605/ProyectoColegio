@@ -18,7 +18,7 @@
                 <a href="{{ crear_url }}" class="btn btn-create me-2">
                     <i class="fas fa-plus-circle me-1"></i> Nuevo Registro
                 </a>
-                <form action="{% url 'app:limpiar_curso' %}" method="post" style="display:inline;" id="Eliminar_Todo">
+                <form action="{{ limpiar_url }}" method="post" style="display:inline;" id="Eliminar_Todo">
                     {% csrf_token %}
                     <button type="submit" class="btn btn-outline-danger border-2" style="border-radius: 10px; font-weight: 600;">
                         <i class="fas fa-trash-alt me-1"></i> Vaciar Lista
@@ -84,4 +84,7 @@ document.getElementById('Eliminar_Todo').addEventListener('submit', function (e)
     });
 });
 </script>
+
 {% endblock %}
+{% block js_aditional %}
+{% endblock js_aditional %}

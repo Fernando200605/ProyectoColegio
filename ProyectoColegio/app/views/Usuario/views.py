@@ -1,3 +1,5 @@
+from django.views.generic import CreateView
+from django.shortcuts import redirect
 from django.shortcuts import render, redirect
 from django.views import View
 from django.views.generic import ListView, UpdateView
@@ -47,6 +49,10 @@ def guardar_perfil_rol(usuario, rol, data):
         Acudiente.objects.create(usuario=usuario, telefono=data.get('telefono'), direccion=data.get('direccion'))
 
 # --- VISTAS ---
+from django.db import connection
+from django.utils import timezone
+from django.http import JsonResponse
+
 
 class UsuarioListView(ListView):
     model = Usuario
@@ -56,10 +62,34 @@ class UsuarioListView(ListView):
         context = super().get_context_data(**kwargs)
         context['titulo'] = 'Listado de Usuarios'
         context['crear_url'] = reverse_lazy('app:crear_usuario')
+        context['limpiar_url'] = reverse_lazy('app:limpiar_usuario')
         return context
 
 class UsuarioCreateView(View):
     template_name = 'usuario/crear.html'
+    success_url = reverse_lazy('app:index_usuario')
+
+    def form_valid(self, form):
+        usuario = form.save(commit=False)
+        usuario.contraseña = form.cleaned_data['contraseña']
+
+        usuario.save()
+
+        rol = self.request.POST.get('rol')
+
+        if rol == 'administrador':
+            Administrador.objects.create(
+                usuario=usuario, cargo='Administrador'
+            )
+
+        elif rol == 'docente':
+            docente.objects.create(usuario=usuario
+            )
+        elif rol == 'acudiente':
+            Acudiente.objects.create(usuario=usuario)
+
+        messages.success(self.request, 'Usuario creado exitosamente.')
+        return redirect(self.success_url)
 
     def get_context(self, **kwargs):
         context = {
