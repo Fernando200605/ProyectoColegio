@@ -32,7 +32,7 @@ class Administrador(models.Model):
     def __str__(self):
         return self.usuario.nombre
     
-class Eventos(models.Model):
+class Evento(models.Model):
     titulo = models.CharField(max_length=200)
     descripcion = models.TextField()
     fecha_inicio = models.DateTimeField()
@@ -203,17 +203,17 @@ class Movimiento(models.Model):
 
     def __str__(self):
         return self.tipo
-class notificacion(models.Model):
+class Notificacion(models.Model):
     titulo = models.CharField(max_length=200)
     mensaje = models.TextField()
     fecha_envio = models.DateTimeField(auto_now_add=True)
     estado = models.BooleanField(default=False)
     tipo = models.CharField(max_length=50)
     receptor = models.ForeignKey(Usuario, on_delete=models.CASCADE)
-    evento = models.ForeignKey(Eventos, on_delete=models.CASCADE, null=True, blank=True)
+    evento = models.ForeignKey(Evento, on_delete=models.CASCADE, null=True, blank=True)
 
     class Meta:
-        verbose_name = "Notificación"
+        verbose_name = "Notificacion"
         verbose_name_plural = "Notificaciones"
         db_table = "notificacion"
 
