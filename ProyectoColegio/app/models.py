@@ -89,14 +89,15 @@ class Estudiante(models.Model):
         verbose_name_plural = "Estudiantes" 
         db_table = "Estudiante"
 #creacion de modelo asistencia 
-class asistencia (models.Model):
+choice = [("Tarde","Tarde"),("Atiempo", "Atiempo"),("Nollego","Nollego")]
+class Asistencia (models.Model):
     id =models.AutoField(primary_key=True)
     estudianteid = models.ForeignKey(Estudiante, on_delete=models.CASCADE)
     fecha = models.DateTimeField(auto_now=True)
     horaentrada = models.TimeField ()
     horasalida = models.TimeField()
-    estado = models.CharField(max_length=50)
-    odsevaciones = models.TextField()
+    estado = models.CharField(max_length=50,choices=choice)
+    obsevaciones = models.TextField()
     class Meta:
         verbose_name = "asistencia"
         verbose_name_plural = "asistencias"
@@ -203,7 +204,7 @@ class Movimiento(models.Model):
 
     def __str__(self):
         return self.tipo
-class notificacion(models.Model):
+class Notificacion(models.Model):
     titulo = models.CharField(max_length=200)
     mensaje = models.TextField()
     fecha_envio = models.DateTimeField(auto_now_add=True)
