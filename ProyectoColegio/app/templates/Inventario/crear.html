@@ -1,0 +1,64 @@
+{% extends 'Create_generic.html' %}
+{% load widget_tweaks %}
+{% load static %}
+
+{% block titulo %}
+Registrar Elemento
+{% endblock %}
+
+{% block form %}
+  {% csrf_token %}
+
+  {% for field in form.visible_fields %}
+    <div class="mb-4">
+      <label class="form-label fw-bold" style="color: #1C2E4A;">
+        {{ field.label }}
+      </label>
+
+      {{ field|add_class:'form-control form-control-custom'|attr:'autocomplete:on' }}
+
+      {% if field.help_text %}
+        <div class="form-text">{{ field.help_text }}</div>
+      {% endif %}
+
+      {% if field.errors %}
+        {% for error in field.errors %}
+          <div class="text-danger mt-1 small animated fadeIn">
+            <i class="fas fa-exclamation-circle me-1"></i> {{ error }}
+          </div>
+        {% endfor %}
+      {% endif %}
+
+      <!-- 🔹 BOTONES EXCLUSIVOS DE INVENTARIO (SIN MODAL) -->
+
+      {% if field.name == "tipoElementoId" %}
+        <a href="{% url 'app:crear_tipoelemento' %}"
+           class="btn btn-sm btn-outline-primary mt-2">
+          ➕ Crear Tipo de Elemento
+        </a>
+      {% endif %}
+
+      {% if field.name == "marcaId" %}
+        <a href="{% url 'app:crear_marca' %}"
+           class="btn btn-sm btn-outline-success mt-2">
+          ➕ Crear Marca
+        </a>
+      {% endif %}
+
+      {% if field.name == "categoriaId" %}
+        <a href="{% url 'app:crear_categoria' %}"
+           class="btn btn-sm btn-outline-secondary mt-2">
+          ➕ Crear Categoría
+        </a>
+      {% endif %}
+
+      {% if field.name == "unidadMedidaId" %}
+        <a href="{% url 'app:crear_unidad' %}"
+           class="btn btn-sm btn-outline-warning mt-2">
+          ➕ Crear Unidad de Medida
+        </a>
+      {% endif %}
+
+    </div>
+  {% endfor %}
+{% endblock %}

@@ -1,5 +1,10 @@
 from django import forms
 from app.models import Curso, Usuario, Estudiante, docente, Acudiente, Administrador
+from app.models import Curso
+from app.models import categoria
+from app.models import Elemento
+from django import forms
+from app.models import marca, tipoelemento, UnidadMedida, Elemento
 
 # Formulario para Cursos
 class CursoForm(forms.ModelForm):
@@ -76,3 +81,40 @@ class AcudienteForm(forms.ModelForm):
             'telefono': forms.TextInput(attrs={'class': 'form-control', 'maxlength': '10'}),
             'direccion': forms.Textarea(attrs={'class': 'form-control', 'rows': 2})
         }
+
+    
+         
+
+
+class marcaForm(forms.ModelForm):
+    class Meta:
+        model = marca
+        fields = '__all__'
+
+class TipoElementoForm(forms.ModelForm):
+    class Meta:
+        model = tipoelemento
+        fields = '__all__'
+
+class UnidadMedidaForm(forms.ModelForm):
+    class Meta:
+        model = UnidadMedida
+        fields = '__all__'
+
+class ElementoForm(forms.ModelForm):
+    class Meta:
+        model = Elemento
+        fields = '__all__'
+        widgets = {
+            'nombre': forms.TextInput(attrs={'class': 'form-control'}),
+            'marca': forms.Select(attrs={'class': 'form-control'}),
+            'tipo': forms.Select(attrs={'class': 'form-control'}),
+            'unidad_medida': forms.Select(attrs={'class': 'form-control'}),
+            'cantidad': forms.NumberInput(attrs={'class': 'form-control'}),
+        }
+
+class CategoriaForm(forms.ModelForm):
+    class Meta:
+        model = categoria
+        fields = ['nombre']
+
