@@ -16,6 +16,8 @@ urlpatterns = [
     path('curso/editar/<int:pk>/',CursoupdateView.as_view(),name="editar_curso"),
     path('curso/eliminar/<int:pk>/',CursoDeleteView.as_view(),name="eliminar_curso"),
     path('curso/limpiar/',CursoCleandView.as_view(),name="limpiar_curso"),
+    
+    #Inventario
     path('inventario/',InventarioListView.as_view(),name="index_inventario"),
     path('inventario/crear/',ElementoCreateView.as_view(),name="crear_elemento"),
     path('inventario/editar/<int:pk>/',ElementoUpdateView.as_view(),name="editar_elemento"),

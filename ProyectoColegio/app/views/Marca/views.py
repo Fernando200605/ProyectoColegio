@@ -26,7 +26,7 @@ class marcaCreateView(CreateView):
     model = marca
     form_class = marcaForm
     template_name = 'Marca/crear.html'
-    success_url = reverse_lazy('app:index_marca')
+    success_url = reverse_lazy('app:crear_elemento')
 
     def form_valid(self, form):
         messages.success(self.request, "Marca creada correctamente")
