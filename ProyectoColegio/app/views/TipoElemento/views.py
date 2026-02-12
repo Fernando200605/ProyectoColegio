@@ -14,11 +14,16 @@ class TipoElementoListView(ListView):
         context = super().get_context_data(**kwargs)
         context['titulo'] = 'Tipos de Elemento'
         context['subtitulo'] = 'Clasificación de inventario'
-        context['crear_url'] = reverse_lazy('app:crear_tipo')
+        context['crear_url'] = reverse_lazy('app:crear_elemento')
         return context
 
 class TipoElementoCreateView(CreateView):
     model = tipoelemento
     form_class = TipoElementoForm
     template_name = 'TipoElemento/crear.html'
-    success_url = reverse_lazy('app:index_tipo')
+    success_url = reverse_lazy('app:crear_elemento')
+    
+    def get_context_data(self,**kwargs):
+        context = super().get_context_data(**kwargs)
+        context['listar_url'] = reverse_lazy('app:crear_elemento')
+        return context

@@ -14,21 +14,25 @@
                     <th><i class="fas fa-box me-2"></i>Nombre</th>
                     <th><i class="fas fa-warehouse me-2"></i>Ubicación</th>
                     <th><i class="fas fa-chart-line me-2"></i>Stock</th>
+                    <th><i class="fas fa-chart-line me-2"></i>Descripción</th>
                     <th class="text-center"><i class="fas fa-tools me-2"></i>Acciones</th>
                 </tr>
 {% endblock columns %}
 
 {% block rows %}
-    {% for curso in object_list %}
+    {% for elemento in object_list %}
     <tr>
-        <td>{{ elemeto.id }}</td>
-        <td>{{ elemento.nom }}</td>
+        <td>{{ elemento.id }}</td>
+        <td>{{ elemento.nombre }}</td>
         <td>{{ elemento.ubicacion }}</td>
+        <td>{{ elemento.stockActual }}</td>
+        <td>{{ elemento.descripcion }}</td>
+
         <td class="text-center">
-            <a href="{% url 'app:editar_elemento' elemto.id %}" class="btn btn-sm me-1" style="background-color: #3054f7; color: #ffffff; border-radius: 8px;">
+            <a href="{% url 'app:editar_elemento' elemento.id %}" class="btn btn-sm me-1" style="background-color: #3054f7; color: #ffffff; border-radius: 8px;">
                             <i class="fa-solid fa-pen-to-square"></i>
             </a>
-            <a href="{% url 'app:eliminar_elemento' elemto.id %}" class="btn btn-sm" style="background-color: #ff4d4d; color: white; border-radius: 8px;">
+            <a href="{% url 'app:eliminar_elemento' elemento.id %}" class="btn btn-sm" style="background-color: #ff4d4d; color: white; border-radius: 8px;">
                             <i class="fa-solid fa-trash"></i>
             </a>
         </td>
