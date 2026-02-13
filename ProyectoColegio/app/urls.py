@@ -6,6 +6,8 @@ from app.views.Marca.views import *
 from app.views.TipoElemento.views import *  
 from app.views.UnidadMedida.views import *
 from app.views.Categoria.views import CategoriaCreateView 
+from app.views.Asistencia.views import *
+
 app_name = 'app'
 urlpatterns = [
     #path('Curso/',listar_curso,name="listar_curso" ),
@@ -44,4 +46,9 @@ urlpatterns = [
     path('unidad/crear/', UnidadMedidaCreateView.as_view(), name='crear_unidad'),
     path('categoria/crear/', CategoriaCreateView.as_view(), name='crear_categoria'),
 
+    path("asistencia/", AsistenciaListView.as_view(), name="index_asistencia"),
+    path('asistencia/crear/', AsistenciaCreateView.as_view(), name="crear_asistencia"),
+    path("asistencia/editar/<int:pk>/", AsistenciaupdateView.as_view(), name="editar_asistencia"),
+    path('asistencia/eliminar/<int:pk>/',AsistenciaDeleteView.as_view(),name="eliminar_asistencia"),
+    path('asistencia/limpiar/',AsistenciaCleandView.as_view(),name="limpiar_asistencia"),
 ]
