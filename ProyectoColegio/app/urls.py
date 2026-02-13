@@ -38,6 +38,8 @@ urlpatterns = [
     # TIPO DE ELEMENTO
     path('tipo/', TipoElementoListView.as_view(), name='index_tipo'),
     path('tipo/crear/', TipoElementoCreateView.as_view(), name='crear_tipo'),
+    path('tipo/editar/<int:pk>/', TipoElementoUpdateView.as_view(),name="actualizar_tipo"),
+    path('tipo/eliminar/<int:pk>/',TipoElementoDeleteView.as_view(),name="eliminar_tipo"),
 
     # UNIDAD DE MEDIDA
     path('unidad/', UnidadMedidaListView.as_view(), name='index_unidad'),
@@ -46,7 +48,6 @@ urlpatterns = [
     path('unidad/eliminar/<int:pk>/', UnidadMedidaDeleteView.as_view(), name='eliminar_unidad'),
     path('tipo/crear/', TipoElementoCreateView.as_view(), name='crear_tipoelemento'),
     path('marca/crear/', marcaCreateView.as_view(), name='crear_marca'),
-    path('unidad/crear/', UnidadMedidaCreateView.as_view(), name='crear_unidad'),
     path('categoria/crear/', CategoriaCreateView.as_view(), name='crear_categoria'),
     path("asistencia/", AsistenciaListView.as_view(), name="index_asistencia"),
     path('asistencia/crear/', AsistenciaCreateView.as_view(), name="crear_asistencia"),
