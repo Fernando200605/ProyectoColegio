@@ -22,15 +22,15 @@ def listar_usuario(request):
     return render(request, 'usuario/index.html', {'usuarios': usuario})
 
 
-def listar_curso(request):
-    curso = Curso.objects.all()
-    return render(request, 'curso/index.html', {'cursos': curso})
+def listar_asistencia(request):
+    asistencia = Asistencia.objects.all()
+    return render(request, 'asistencia/index.html', {'asistencias': asistencia})
 
 
-class CursoListView(ListView):
-    model = Curso
-    template_name = 'curso/index.html'
-    context_object_name = 'cursos'
+class AsistenciaListView(ListView):
+    model = Asistencia
+    template_name = 'asistencia/index.html'
+    context_object_name = 'asistencias'
     # Uso de DICCIONARIOS
     # Metodo Dispatch
     # @method_decorator(login_required)
@@ -46,72 +46,74 @@ class CursoListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)  # Herencia por medio de super
-        context['titulo'] = 'Listado de Cursos'
-        context['subtitulo'] = 'Bienvenido al listado de cursos'
-        context['crear_url'] = reverse_lazy('app:crear_curso')
+        context['titulo'] = 'Listado de Asistencias'
+        context['subtitulo'] = 'Bienvenido al listado de asistencias'
+        context['crear_url'] = reverse_lazy('app:crear_asistencia')
+        context['limpiar_url'] = reverse_lazy('app:limpiar_asistencia')
+        context['table'] = "Asistencias"  
         return context
 
 
-class CursoCreateView(CreateView):
-    model = Curso
-    form_class = CursoForm
-    template_name = 'curso/crear.html'
+class AsistenciaCreateView(CreateView):
+    model = Asistencia
+    form_class = AsistenciaForm
+    template_name = 'asistencia/crear.html'
 
-    success_url = reverse_lazy('app:index_curso')
+    success_url = reverse_lazy('app:index_asistencia')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['titulo'] = "Crear Curso"
-        context['listar_url'] = reverse_lazy('app:index_curso')
+        context['titulo'] = "Crear Asistencia"
+        context['listar_url'] = reverse_lazy('app:index_asistencia')
         context['btn_name'] = "Guardar"
         return context
 
     def form_valid(self, form):
-        messages.success(self.request, "Curso creado correctamente")
+        messages.success(self.request, "Asistencia creada correctamente")
         return super().form_valid(form)
 
 
-class CursoupdateView(UpdateView):
-    model = Curso
-    form_class = CursoForm
-    template_name = 'curso/crear.html'
-    success_url = reverse_lazy('app:index_curso')
+class AsistenciaupdateView(UpdateView):
+    model = Asistencia
+    form_class = AsistenciaForm
+    template_name = 'asistencia/crear.html'
+    success_url = reverse_lazy('app:index_asistencia')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['titulo'] = "Actualizar Curso"
-        context['listar_url'] = reverse_lazy('app:index_curso')
+        context['titulo'] = "Actualizar Asistencia"
+        context['listar_url'] = reverse_lazy('app:index_asistencia')
         context['btn_name'] = "Actualizar"
         return context
     
     def form_valid(self, form):
-        messages.success(self.request,"Curso actualizado correctamente")
+        messages.success(self.request,"Asistencia actualizada correctamente")
         return super().form_valid(form)
 
 
-class CursoDeleteView(DeleteView):
-    model = Curso
-    template_name = 'curso/eliminar.html'
-    success_url = reverse_lazy('app:index_curso')
+class AsistenciaDeleteView(DeleteView):
+    model = Asistencia
+    template_name = 'asistencia/eliminar.html'
+    success_url = reverse_lazy('app:index_asistencia')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['titulo'] = "Eliminar Curso"
-        context['listar_url'] = reverse_lazy('app:index_curso')
+        context['titulo'] = "Eliminar Asistencia"
+        context['listar_url'] = reverse_lazy('app:index_asistencia')
         return context
 
 
     def form_valid(self, form):
-        messages.success(self.request, "Curso eliminado correctamente")
+        messages.success(self.request, "Asistencia eliminada correctamente")
         return super().form_valid(form)
 
-class CursoCleandView(View):
+class AsistenciaCleandView(View):
    def post(self, request, *args, **kwargs):
-        Curso.objects.all().delete()
+        Asistencia.objects.all().delete()
         with connection.cursor() as cursor:
-            nombre_tabla = Curso._meta.db_table
+            nombre_tabla = Asistencia._meta.db_table
             print(nombre_tabla)
             cursor.execute(f"DELETE FROM sqlite_sequence WHERE name='{nombre_tabla}';")
         
-        messages.success(self.request, "Todos los cursos han sido eliminados y el ID reiniciado.")
-        return redirect(reverse_lazy('app:index_curso'))
+        messages.success(self.request, "Todas las asistencias han sido eliminadas y el ID reiniciado.")
+        return redirect(reverse_lazy('app:index_asistencia'))

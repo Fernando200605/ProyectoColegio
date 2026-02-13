@@ -1,0 +1,205 @@
+{% extends 'create_generic.html' %}
+{% load widget_tweaks %}
+
+{% block titulo %}
+  {{ titulo }}
+{% endblock %}
+
+{% block form %}
+  {% csrf_token %}
+
+  {# ===== FORMULARIO DE USUARIO ===== #}
+  {% for field in usuario_form.visible_fields %}
+    <div class="mb-4">
+      <label class="form-label fw-bold" style="color: #1C2E4A;">
+        {{ field.label }}
+      </label>
+      {{ field|add_class:'form-control form-control-custom' }}
+      {% if field.errors %}
+        {% for error in field.errors %}
+          <div class="text-danger mt-1 small">
+            <i class="fas fa-exclamation-circle me-1"></i> {{ error }}
+          </div>
+        {% endfor %}
+      {% endif %}
+    </div>
+  {% endfor %}
+
+  {# ===== SELECT DE ROL ===== #}
+  <div class="mb-4">
+    <label class="form-label fw-bold" style="color: #1C2E4A;">Rol</label>
+    <select id="rol-select" name="rol" class="form-control" required>
+      <option value="">Seleccione un rol</option>
+      <option value="administrador" {% if rol_actual == 'administrador' %}selected{% endif %}>Administrador</option>
+      <option value="docente" {% if rol_actual == 'docente' %}selected{% endif %}>Docente</option>
+      <option value="estudiante" {% if rol_actual == 'estudiante' %}selected{% endif %}>Estudiante</option>
+      <option value="acudiente" {% if rol_actual == 'acudiente' %}selected{% endif %}>Acudiente</option>
+    </select>
+  </div>
+
+  {# ===== ADMINISTRADOR ===== #}
+  <div id="administrador-form" class="rol-form" style="display:none;">
+    <div class="mb-4">
+      <label class="form-label fw-bold" style="color: #1C2E4A;">Cargo</label>
+      {{ admin_form.cargo|add_class:'form-control'|attr:"name:cargo" }}
+      {% if admin_form.cargo.errors %}
+        {% for error in admin_form.cargo.errors %}
+          <div class="text-danger mt-1 small">
+            <i class="fas fa-exclamation-circle me-1"></i> {{ error }}
+          </div>
+        {% endfor %}
+      {% endif %}
+    </div>
+  </div>
+
+  {# ===== DOCENTE ===== #}
+  <div id="docente-form" class="rol-form" style="display:none;">
+    <div class="mb-4">
+      <label class="form-label fw-bold" style="color: #1C2E4A;">Especialidad</label>
+      {{ docente_form.especialidad|add_class:'form-control'|attr:"name:especialidad" }}
+      {% if docente_form.especialidad.errors %}
+        {% for error in docente_form.especialidad.errors %}
+          <div class="text-danger mt-1 small">
+            <i class="fas fa-exclamation-circle me-1"></i> {{ error }}
+          </div>
+        {% endfor %}
+      {% endif %}
+    </div>
+  </div>
+
+  {# ===== ESTUDIANTE ===== #}
+  <div id="estudiante-form" class="rol-form" style="display:none;">
+    <div class="mb-4">
+      <label class="form-label fw-bold">Código</label>
+      {{ estudiante_form.codigo|add_class:'form-control'|attr:"name:codigo" }}
+      {% if estudiante_form.codigo.errors %}
+        {% for error in estudiante_form.codigo.errors %}
+          <div class="text-danger mt-1 small">
+            <i class="fas fa-exclamation-circle me-1"></i> {{ error }}
+          </div>
+        {% endfor %}
+      {% endif %}
+    </div>
+    <div class="mb-4">
+      <label class="form-label fw-bold">Fecha de Nacimiento</label>
+      {{ estudiante_form.fechaNacimiento|add_class:'form-control'|attr:'type:date'|attr:"name:fechaNacimiento" }}
+      {% if estudiante_form.fechaNacimiento.errors %}
+        {% for error in estudiante_form.fechaNacimiento.errors %}
+          <div class="text-danger mt-1 small">
+            <i class="fas fa-exclamation-circle me-1"></i> {{ error }}
+          </div>
+        {% endfor %}
+      {% endif %}
+    </div>
+    <div class="mb-4">
+      <label class="form-label fw-bold">Estado de Matrícula</label>
+      {{ estudiante_form.estadoMatricula|add_class:'form-control'|attr:"name:estadoMatricula" }}
+      {% if estudiante_form.estadoMatricula.errors %}
+        {% for error in estudiante_form.estadoMatricula.errors %}
+          <div class="text-danger mt-1 small">
+            <i class="fas fa-exclamation-circle me-1"></i> {{ error }}
+          </div>
+        {% endfor %}
+      {% endif %}
+    </div>
+    <div class="mb-4">
+      <label class="form-label fw-bold">Fecha de Ingreso</label>
+      {{ estudiante_form.fechaIngreso|add_class:'form-control'|attr:'type:date'|attr:"name:fechaIngreso" }}
+      {% if estudiante_form.fechaIngreso.errors %}
+        {% for error in estudiante_form.fechaIngreso.errors %}
+          <div class="text-danger mt-1 small">
+            <i class="fas fa-exclamation-circle me-1"></i> {{ error }}
+          </div>
+        {% endfor %}
+      {% endif %}
+    </div>
+    <div class="mb-4">
+      <label class="form-label fw-bold">Curso</label>
+      {{ estudiante_form.cursoId|add_class:'form-control'|attr:"name:cursoId" }}
+      {% if estudiante_form.cursoId.errors %}
+        {% for error in estudiante_form.cursoId.errors %}
+          <div class="text-danger mt-1 small">
+            <i class="fas fa-exclamation-circle me-1"></i> {{ error }}
+          </div>
+        {% endfor %}
+      {% endif %}
+    </div>
+  </div>
+
+  {# ===== ACUDIENTE ===== #}
+  <div id="acudiente-form" class="rol-form" style="display:none;">
+    <div class="mb-4">
+      <label class="form-label fw-bold">Teléfono</label>
+      {{ acudiente_form.telefono|add_class:'form-control'|attr:"name:telefono" }}
+      {% if acudiente_form.telefono.errors %}
+        {% for error in acudiente_form.telefono.errors %}
+          <div class="text-danger mt-1 small">
+            <i class="fas fa-exclamation-circle me-1"></i> {{ error }}
+          </div>
+        {% endfor %}
+      {% endif %}
+    </div>
+    <div class="mb-4">
+      <label class="form-label fw-bold">Dirección</label>
+      {{ acudiente_form.direccion|add_class:'form-control'|attr:"name:direccion" }}
+      {% if acudiente_form.direccion.errors %}
+        {% for error in acudiente_form.direccion.errors %}
+          <div class="text-danger mt-1 small">
+            <i class="fas fa-exclamation-circle me-1"></i> {{ error }}
+          </div>
+        {% endfor %}
+      {% endif %}
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const rolSelect = document.getElementById('rol-select');
+      const rolForms = document.querySelectorAll('.rol-form');
+
+      function toggleRolForm() {
+        rolForms.forEach(div => {
+            div.style.display = 'none';
+            // Deshabilitar inputs ocultos para que no se envíen datos basura
+            div.querySelectorAll('input, select, textarea').forEach(input => {
+                input.disabled = true;
+            });
+        });
+
+        if (rolSelect.value) {
+          const formActivo = document.getElementById(rolSelect.value + '-form');
+          if (formActivo) {
+            formActivo.style.display = 'block';
+            // Habilitar solo los campos del rol seleccionado
+            formActivo.querySelectorAll('input, select, textarea').forEach(input => {
+                input.disabled = false;
+            });
+          }
+        }
+      }
+
+      rolSelect.addEventListener('change', toggleRolForm);
+      // Ejecutar al cargar para mostrar el formulario correcto en modo edición
+      toggleRolForm();
+    });
+  </script>
+{% endblock %}
+  <label class="form-label fw-bold" style="color: #1C2E4A;">Rol</label>
+        <select name="rol" class="form-control" id="rol">
+            <option value="">Seleccione un rol</option>
+
+            <option value="administrador"
+                {% if rol_actual == 'administrador' %}selected{% endif %}>
+                Administrador
+            </option>
+
+            <option value="docente"
+                {% if rol_actual == 'docente' %}selected{% endif %}>
+                Docente
+            </option>
+            <option value="acudiente"
+                {% if rol_actual == 'acudiente' %}selected{% endif %}>
+                Acudiente
+            </option>
+        </select>
+

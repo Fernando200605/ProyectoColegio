@@ -3,12 +3,16 @@ from django.db import models
 
 
 # Create your models here.
+estado_usuario = [
+    (True, 'Activo'),
+    (False, 'Inactivo'),
+]
 
 class Usuario(models.Model):
     nombre = models.CharField(max_length=100)
     email = models.EmailField(unique=True)
     contraseña = models.CharField(max_length=100)
-    estado = models.BooleanField(default=True)
+    estado = models.BooleanField(default=True,choices=estado_usuario)
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     fecha_actualizacion = models.DateTimeField(auto_now=True)
     
@@ -16,7 +20,17 @@ class Usuario(models.Model):
         verbose_name = "Usuario"
         verbose_name_plural = "Usuarios"
         db_table = "usuario"
-
+    
+    def get_rol(self):
+        if hasattr(self,'administrador'):
+            return 'Administrador'
+        elif hasattr(self,'docente'):
+            return 'Docente'
+        elif hasattr(self,'estudiante'):
+            return 'Estudiante'
+        elif hasattr(self,'acudiente'):
+            return 'Acudiente'
+        return 'Desconocido'
     def __str__(self):
         return self.nombre
 
@@ -32,7 +46,7 @@ class Administrador(models.Model):
     def __str__(self):
         return self.usuario.nombre
     
-class Eventos(models.Model):
+class Evento(models.Model):
     titulo = models.CharField(max_length=200)
     descripcion = models.TextField()
     fecha_inicio = models.DateTimeField()
@@ -47,14 +61,14 @@ class Eventos(models.Model):
     def __str__(self):
         return self.titulo
 class docente (models.Model):
-    id =models.OneToOneField(Usuario, on_delete=models.CASCADE,primary_key=True)
+    usuario =models.OneToOneField(Usuario, on_delete=models.CASCADE,primary_key=True)
     especialidad = models.TextField()
     class Meta:
         verbose_name = "docente"
         verbose_name_plural = "docentes"
         db_table = "docente"
     def __str__ (self):
-        return self.id.nombre
+        return self.usuario.nombre
   #creacion de modelo curso
 class Curso (models.Model):
     id = models.AutoField(primary_key=True)
@@ -62,8 +76,8 @@ class Curso (models.Model):
     jornada =models.CharField(max_length=200)
     codigo = models.CharField(max_length=50 , unique=True)
     capacidad = models.IntegerField()
-    fechainicio = models.DateTimeField(auto_now=True)
-    fechafin = models.DateTimeField(auto_now=True)
+    fechainicio = models.DateTimeField(auto_now_add=True , editable=False)
+    fechafin = models.DateTimeField(auto_now_add=True, editable=False)
     docenteid = models.ForeignKey(docente, on_delete=models.CASCADE)
     class Meta:
         verbose_name = "curso"
@@ -72,12 +86,18 @@ class Curso (models.Model):
     def __str__ (self):
         return self.nom 
 
-
+Estado_Matricula = [
+    ('Matriculado', 'Matriculado'),
+    ('No Matriculado', 'No Matriculado'),
+    ('Retirado', 'Retirado'),
+    ('Graduado', 'Graduado'),
+    ('Sancionado', 'Sancionado'),
+]
 class Estudiante(models.Model):
     usuario = models.OneToOneField(Usuario,on_delete=models.CASCADE,primary_key=True)
     codigo = models.TextField(max_length=50, null=True, blank=True, verbose_name="Codigo")
     fechaNacimiento = models.DateField(verbose_name="Fecha de nacimiento")
-    estadoMatricula = models.TextField(max_length=20, null=True, blank=True, verbose_name="Estado de Matricula")
+    estadoMatricula = models.TextField(max_length=20, null=True, blank=True, verbose_name="Estado de Matricula" , choices=Estado_Matricula)
     fechaIngreso = models.DateField(verbose_name="Fecha de Ingreso")
     cursoId = models.ForeignKey(Curso,on_delete=models.CASCADE)
     
@@ -89,14 +109,15 @@ class Estudiante(models.Model):
         verbose_name_plural = "Estudiantes" 
         db_table = "Estudiante"
 #creacion de modelo asistencia 
-class asistencia (models.Model):
+choice = [("Tarde","Tarde"),("Atiempo", "Atiempo"),("Nollego","Nollego")]
+class Asistencia (models.Model):
     id =models.AutoField(primary_key=True)
     estudianteid = models.ForeignKey(Estudiante, on_delete=models.CASCADE)
     fecha = models.DateTimeField(auto_now=True)
     horaentrada = models.TimeField ()
     horasalida = models.TimeField()
-    estado = models.CharField(max_length=50)
-    odsevaciones = models.TextField()
+    estado = models.CharField(max_length=50,choices=choice)
+    obsevaciones = models.TextField()
     class Meta:
         verbose_name = "asistencia"
         verbose_name_plural = "asistencias"
@@ -203,17 +224,17 @@ class Movimiento(models.Model):
 
     def __str__(self):
         return self.tipo
-class notificacion(models.Model):
+class Notificacion(models.Model):
     titulo = models.CharField(max_length=200)
     mensaje = models.TextField()
     fecha_envio = models.DateTimeField(auto_now_add=True)
     estado = models.BooleanField(default=False)
     tipo = models.CharField(max_length=50)
     receptor = models.ForeignKey(Usuario, on_delete=models.CASCADE)
-    evento = models.ForeignKey(Eventos, on_delete=models.CASCADE, null=True, blank=True)
+    evento = models.ForeignKey(Evento, on_delete=models.CASCADE, null=True, blank=True)
 
     class Meta:
-        verbose_name = "Notificación"
+        verbose_name = "Notificacion"
         verbose_name_plural = "Notificaciones"
         db_table = "notificacion"
 
