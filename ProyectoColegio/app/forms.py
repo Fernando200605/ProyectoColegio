@@ -5,25 +5,57 @@ from app.models import categoria
 from app.models import Elemento
 from django import forms
 from app.models import marca, tipoelemento, UnidadMedida, Elemento
+from app.models import Asistencia
 
 # Formulario para Cursos
+
+
 class CursoForm(forms.ModelForm):
     class Meta:
         model = Curso
         fields = '__all__'
         widgets = {
-            'nom': forms.TextInput(attrs={'class':'form-control'}),
-            'jornada':forms.TextInput(attrs={'class':'form-control'}),
-            'codigo':forms.TextInput(attrs={'class':'form-control'}),
-            'capacidad':forms.NumberInput(attrs={'class':'form-control'}),
-            'docenteid':forms.Select(attrs={'class':'form-control'})
+            'nom': forms.TextInput(attrs={'class': 'form-control'}),
+            'jornada': forms.TextInput(attrs={'class': 'form-control'}),
+            'codigo': forms.TextInput(attrs={'class': 'form-control'}),
+            'capacidad': forms.NumberInput(attrs={'class': 'form-control'}),
+            'docenteid': forms.Select(attrs={'class': 'form-control'})
         }
-    
-    def clean_capacidad(self):
-        capacidad = self.cleaned_data.get('capacidad')
-        if capacidad <= 0:
-            raise forms.ValidationError("La capacidad debe ser un número positivo.")
-        return capacidad
+        def clean_capacidad(self):
+            capacidad = self.cleaned_data.get('capacidad')
+            if capacidad <= 0:
+                raise forms.ValidationError(
+                    "La capacidad debe ser un número positivo.")
+            return capacidad
+
+
+class AsistenciaForm(forms.ModelForm):
+    class Meta:
+        model = Asistencia
+        fields = '__all__'
+        widgets = {
+            'estudiante': forms.TextInput(attrs={
+                'class': 'form-control'
+            }),
+            'horaentrada': forms.TextInput(attrs={
+                'class': 'form-control'
+            }),
+            'horasalida': forms.TextInput(attrs={
+                'class': 'form-control'
+            }),
+            'estado': forms.Select(attrs={
+                'class': 'form-control'
+            }),
+            'observaciones': forms.Select(attrs={
+                'class': 'form-control'
+            }),
+            'fecha': forms.Select(attrs={
+                'class': 'form-control'
+            })
+        }
+
+    # Validación personalizada para el campo capacidad
+
 
 # Formulario para Crear Usuario (Con Contraseña)
 class UsuarioForm(forms.ModelForm):
@@ -38,6 +70,8 @@ class UsuarioForm(forms.ModelForm):
         }
 
 # Formulario para Editar Usuario (Sin Contraseña)
+
+
 class UsuarioUpdateForm(forms.ModelForm):
     class Meta:
         model = Usuario
@@ -49,22 +83,29 @@ class UsuarioUpdateForm(forms.ModelForm):
         }
 
 # Formularios de Roles
+
+
 class AdministradorForm(forms.ModelForm):
     class Meta:
         model = Administrador
         fields = ['cargo']
-        widgets = {'cargo': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Cargo'})}
+        widgets = {'cargo': forms.TextInput(
+            attrs={'class': 'form-control', 'placeholder': 'Cargo'})}
+
 
 class DocenteForm(forms.ModelForm):
     class Meta:
         model = docente
         fields = ['especialidad']
-        widgets = {'especialidad': forms.Textarea(attrs={'class': 'form-control', 'rows': 3})}
+        widgets = {'especialidad': forms.Textarea(
+            attrs={'class': 'form-control', 'rows': 3})}
+
 
 class EstudianteForm(forms.ModelForm):
     class Meta:
         model = Estudiante
-        fields = ['codigo', 'fechaNacimiento', 'estadoMatricula', 'fechaIngreso', 'cursoId']
+        fields = ['codigo', 'fechaNacimiento',
+                  'estadoMatricula', 'fechaIngreso', 'cursoId']
         widgets = {
             'codigo': forms.TextInput(attrs={'class': 'form-control'}),
             'fechaNacimiento': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
@@ -72,6 +113,7 @@ class EstudianteForm(forms.ModelForm):
             'fechaIngreso': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'cursoId': forms.Select(attrs={'class': 'form-control'})
         }
+
 
 class AcudienteForm(forms.ModelForm):
     class Meta:
@@ -82,24 +124,24 @@ class AcudienteForm(forms.ModelForm):
             'direccion': forms.Textarea(attrs={'class': 'form-control', 'rows': 2})
         }
 
-    
-         
-
 
 class marcaForm(forms.ModelForm):
     class Meta:
         model = marca
         fields = '__all__'
 
+
 class TipoElementoForm(forms.ModelForm):
     class Meta:
         model = tipoelemento
         fields = '__all__'
 
+
 class UnidadMedidaForm(forms.ModelForm):
     class Meta:
         model = UnidadMedida
         fields = '__all__'
+
 
 class ElementoForm(forms.ModelForm):
     class Meta:
@@ -113,8 +155,8 @@ class ElementoForm(forms.ModelForm):
             'cantidad': forms.NumberInput(attrs={'class': 'form-control'}),
         }
 
+
 class CategoriaForm(forms.ModelForm):
     class Meta:
         model = categoria
         fields = ['nombre']
-
