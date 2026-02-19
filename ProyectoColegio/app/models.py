@@ -109,14 +109,21 @@ class Estudiante(models.Model):
         verbose_name_plural = "Estudiantes" 
         db_table = "Estudiante"
 #creacion de modelo asistencia 
-choice = [("Tarde","Tarde"),("Atiempo", "Atiempo"),("Nollego","Nollego")]
 class Asistencia (models.Model):
+    choise = [
+        ('A tiempo', 'A tiempo'),
+        ('Tarde', 'Tarde'),
+        ('Inasistencia', 'Inasistencia'),
+    ]
     id =models.AutoField(primary_key=True)
     estudianteid = models.ForeignKey(Estudiante, on_delete=models.CASCADE)
     fecha = models.DateTimeField(auto_now=True)
     horaentrada = models.TimeField ()
     horasalida = models.TimeField()
-    estado = models.CharField(max_length=50,choices=choice)
+    estado = models.CharField(
+        max_length=20,
+        choices=choise
+    )
     obsevaciones = models.TextField()
     class Meta:
         verbose_name = "asistencia"
