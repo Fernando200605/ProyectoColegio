@@ -11,9 +11,12 @@ from app.views.Curso.views import *
 from app.views.Movimiento.views import *
 from app.views.Evento.views import *
 from app.views.Notificacion.views import *
-
+from app.views.login.views import *
+from app.views.Index.views import DashboardView
 app_name = 'app'
 urlpatterns = [
+    path('login/',CreLoginView.as_view(),name="login"),
+    path('dashboard/',DashboardView.as_view(),name="dashboard"),
     #path('Curso/',listar_curso,name="listar_curso" ),
     path('curso/',CursoListView.as_view(),name="index_curso"),
     path('curso/crear/',CursoCreateView.as_view(),name="crear_curso"),

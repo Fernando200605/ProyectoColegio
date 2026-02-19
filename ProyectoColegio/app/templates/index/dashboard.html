@@ -1,0 +1,70 @@
+{% extends 'body.html' %}
+{% load static %}
+
+{% block main %}
+<div class="container-fluid">
+  <!-- Saludo -->
+  <div class="row mt-3">
+    <div class="col-12">
+      <h2>Bienvenido, {{ usuario_nombre }}!</h2>
+      <p>Rol: {{ usuario_rol }} | Estado: {{ usuario_estado }}</p>
+    </div>
+  </div>
+
+  <!-- Estadísticas rápidas -->
+  <div class="row mt-4">
+    <div class="col-md-3 col-sm-6">
+      <div class="card text-white bg-primary mb-3">
+        <div class="card-body">
+          <h5 class="card-title">Usuarios</h5>
+          <p class="card-text">{{ total_usuarios }}</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 col-sm-6">
+      <div class="card text-white bg-success mb-3">
+        <div class="card-body">
+          <h5 class="card-title">Docentes</h5>
+          <p class="card-text">{{ total_docentes }}</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 col-sm-6">
+      <div class="card text-white bg-warning mb-3">
+        <div class="card-body">
+          <h5 class="card-title">Estudiantes</h5>
+          <p class="card-text">{{ total_estudiantes }}</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 col-sm-6">
+      <div class="card text-white bg-danger mb-3">
+        <div class="card-body">
+          <h5 class="card-title">Acudientes</h5>
+          <p class="card-text">{{ total_acudientes }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sección adicional -->
+  <div class="row mt-4">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          Últimas acciones
+        </div>
+        <div class="card-body">
+          <ul>
+            {% for accion in ultimas_acciones %}
+              <li>{{ accion }}</li>
+            {% empty %}
+              <li>No hay acciones recientes.</li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

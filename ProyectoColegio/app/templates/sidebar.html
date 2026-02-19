@@ -4,8 +4,8 @@
   <div class="profile">
     <img src="{% static 'img/User.jpg' %}" alt="Miku Dayo" />
     <a href="#" class="edit-profile"><i class="fa-solid fa-pencil"></i></a>
-    <p class="name"></p>
-    <p class="role"></p>
+    <p class="name">{{request.user.nombre}}</p>
+    <p class="role">{{request.user.get_rol}}</p>
   </div>
   <ul>
     <li>
