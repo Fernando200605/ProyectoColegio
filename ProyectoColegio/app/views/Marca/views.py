@@ -26,7 +26,7 @@ class marcaCreateView(CreateView):
     model = marca
     form_class = marcaForm
     template_name = 'Marca/crear.html'
-    success_url = reverse_lazy('app:index_marca')
+    success_url = reverse_lazy('app:crear_elemento')
 
     def form_valid(self, form):
         messages.success(self.request, "Marca creada correctamente")
@@ -36,7 +36,7 @@ class marcaUpdateView(UpdateView):
     model = marca
     form_class = marcaForm
     template_name = 'Marca/crear.html'
-    success_url = reverse_lazy('app:index_marca')
+    success_url = reverse_lazy('app:crear_elemento')
 
     def form_valid(self, form):
         messages.success(self.request, "Marca actualizada correctamente")
@@ -45,7 +45,7 @@ class marcaUpdateView(UpdateView):
 class marcaDeleteView(DeleteView):
     model = marca
     template_name = 'Marca/eliminar.html'
-    success_url = reverse_lazy('app:index_marca')
+    success_url = reverse_lazy('app:crear_elemento')
 
     def form_valid(self, form):
         messages.success(self.request, "Marca eliminada correctamente")
