@@ -20,7 +20,7 @@ class UnidadMedidaCreateView(CreateView):
     model = UnidadMedida
     form_class = UnidadMedidaForm
     template_name = 'UnidadMedida/crear.html'
-    success_url = reverse_lazy('app:index_unidad')
+    success_url = reverse_lazy('app:crear_elemento')
 
     def form_valid(self, form):
         messages.success(self.request, "Unidad de medida creada correctamente")
