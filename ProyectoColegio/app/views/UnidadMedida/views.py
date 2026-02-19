@@ -42,6 +42,12 @@ class UnidadMedidaDeleteView(DeleteView):
     model = UnidadMedida
     template_name = 'UnidadMedida/eliminar.html'
     success_url = reverse_lazy('app:index_unidad')
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['titulo'] = 'Eliminar Unidad de Medida'
+        context['subtitulo'] = '¿Está seguro de eliminar esta Unidad de medida?'
+        context['redirect'] = reverse_lazy('app:index_unidad')
+        return context
 
     def form_valid(self, form):
         messages.success(self.request, "Unidad de medida eliminada correctamente")
