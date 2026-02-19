@@ -32,21 +32,21 @@ Registrar Elemento
       <!-- 🔹 BOTONES EXCLUSIVOS DE INVENTARIO (SIN MODAL) -->
 
       {% if field.name == "tipoElementoId" %}
-        <a href="{% url 'app:crear_tipoelemento' %}"
+        <a href="{% url 'app:index_tipo' %}"
            class="btn btn-sm btn-outline-primary mt-2">
           ➕ Crear Tipo de Elemento
         </a>
       {% endif %}
 
       {% if field.name == "marcaId" %}
-        <a href="{% url 'app:crear_marca' %}"
+        <a href="{% url 'app:index_marca' %}"
            class="btn btn-sm btn-outline-success mt-2">
           ➕ Crear Marca
         </a>
       {% endif %}
 
       {% if field.name == "categoriaId" %}
-        <a href="{% url 'app:crear_categoria' %}"
+        <a href="{% url 'app:index_categoria' %}"
            class="btn btn-sm btn-outline-secondary mt-2">
           ➕ Crear Categoría
         </a>
