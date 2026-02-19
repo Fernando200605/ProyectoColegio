@@ -1,36 +1,44 @@
+from django.contrib.auth.models import AbstractUser, UserManager
 from django.db import models
 
-
-
-# Create your models here.
-estado_usuario = [
+estado_usuario = (
     (True, 'Activo'),
     (False, 'Inactivo'),
-]
+)
 
-class Usuario(models.Model):
-    nombre = models.CharField(max_length=100)
+class Usuario(AbstractUser):
+    nombre = models.CharField(max_length=100, unique=True) 
     email = models.EmailField(unique=True)
-    contraseña = models.CharField(max_length=100)
-    estado = models.BooleanField(default=True,choices=estado_usuario)
+    estado = models.BooleanField(default=True, choices=estado_usuario)
+
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     fecha_actualizacion = models.DateTimeField(auto_now=True)
-    
+
+    username = None  
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['nombre']
+
+    # Solo esto para que Django sepa que no hay username sin crear un Manager desde cero
+    objects = UserManager() 
+
     class Meta:
         verbose_name = "Usuario"
         verbose_name_plural = "Usuarios"
         db_table = "usuario"
-    
+
+    # Eliminamos el save() que asignaba username para evitar errores de base de datos
+
     def get_rol(self):
-        if hasattr(self,'administrador'):
+        if hasattr(self, 'administrador'):
             return 'Administrador'
-        elif hasattr(self,'docente'):
+        elif hasattr(self, 'docente'):
             return 'Docente'
-        elif hasattr(self,'estudiante'):
+        elif hasattr(self, 'estudiante'):
             return 'Estudiante'
-        elif hasattr(self,'acudiente'):
+        elif hasattr(self, 'acudiente'):
             return 'Acudiente'
         return 'Desconocido'
+
     def __str__(self):
         return self.nombre
 
