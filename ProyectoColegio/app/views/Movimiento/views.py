@@ -43,9 +43,10 @@ class MovimientoListView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)  # Herencia por medio de super
         context['titulo'] = 'Listado de Movimientos'
-        context['subtitulo'] = 'Bienvenido al listado de movimientos'
+        context['subtitulo'] = 'Bienvenido al listado de Movimientos'
         context['crear_url'] = reverse_lazy('app:crear_movimiento')
-        context['msg']='Movimientos'
+        context['limpiar_url'] = reverse_lazy('app:limpiar_movimiento')
+        context['table'] = "movimiento"  
         return context
 
 
