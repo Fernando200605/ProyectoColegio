@@ -31,8 +31,60 @@ class UsuarioForm(forms.ModelForm):
             'contraseña': forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Contraseña'}),
             'estado': forms.Select(attrs={'class': 'form-control'}),
         }
+    
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if not email: 
+            return email
+        
+        email = email.lower()
 
-# Formulario para Editar Usuario (Sin Contraseña)
+        existe = Usuario.objects.filter(email=email).exclude(pk=self.instance.pk).exists()
+        
+        if existe:
+            self.fields['email'].widget.attrs['class'] = 'form-control is-invalid'
+            raise forms.ValidationError("Este correo ya se encuentra registrado. Intenta con uno diferente.")
+
+        dominios_permitidos = ['gmail.com', 'hotmail.com', 'outlook.com', 'yahoo.com']
+        partes = email.split('@')
+        
+        if len(partes) > 1 and partes[1] not in dominios_permitidos:
+            self.fields['email'].widget.attrs['class'] = 'form-control is-invalid'
+            raise forms.ValidationError(f"Solo se permiten correos de: {', '.join(dominios_permitidos)}")
+        
+        return email
+        
+    def clean_contraseña(self):
+            password = self.cleaned_data.get('contraseña')
+            if not password:
+                return password
+
+            errores = []
+            if len(password) < 8:
+                errores.append("al menos 8 caracteres")
+            if not any(char.isupper() for char in password):
+                errores.append("una mayúscula")
+            if not any(char.isdigit() for char in password):
+                errores.append("un número")
+            
+            if errores:
+                self.fields['contraseña'].widget.attrs['class'] = 'form-control is-invalid'
+                raise forms.ValidationError(f"Falta: {', '.join(errores)}.")
+
+            return password
+    #Confirmar contraseña
+    def clean(self):
+        cleaned_data = super().clean()
+        password = cleaned_data.get('contraseña')
+        confirm_password = self.data.get('confirmar_contraseña')
+
+        if password and confirm_password and password != confirm_password:
+            self.fields['contraseña'].widget.attrs['class'] = 'form-control is-invalid'
+            raise forms.ValidationError("Las contraseñas no coinciden.")
+
+        return cleaned_data
+
+# Formulario para Editar Usuario 
 class UsuarioUpdateForm(forms.ModelForm):
     class Meta:
         model = Usuario
