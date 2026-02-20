@@ -54,7 +54,6 @@ urlpatterns = [
     # MARCA
     path('marca/', marcaListView.as_view(), name='index_marca'),
     path('marca/crear/', marcaCreateView.as_view(), name='crear_marca'),
-    path('categoria/crear/', CategoriaCreateView.as_view(), name='crear_categoria'),
     path('marca/editar/<int:pk>/', marcaUpdateView.as_view(), name='editar_marca'),
     path('marca/eliminar/<int:pk>/', marcaDeleteView.as_view(), name='eliminar_marca'),
     # CATEGORIA

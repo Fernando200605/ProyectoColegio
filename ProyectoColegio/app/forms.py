@@ -105,7 +105,7 @@ class EstudianteForm(forms.ModelForm):
     class Meta:
         model = Estudiante
         fields = ['codigo', 'fechaNacimiento',
-                  'estadoMatricula', 'fechaIngreso', 'cursoId']
+                    'estadoMatricula', 'fechaIngreso', 'cursoId']
         widgets = {
             'codigo': forms.TextInput(attrs={'class': 'form-control'}),
             'fechaNacimiento': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
@@ -135,12 +135,26 @@ class TipoElementoForm(forms.ModelForm):
     class Meta:
         model = tipoelemento
         fields = '__all__'
+    def clean_nombre(self):
+        nombre = self.cleaned_data.get("nombre") 
+        exist = tipoelemento.objects.filter(nombre=nombre).exclude(pk = self.instance.pk).exists()
+        if exist:
+            self.fields["nombre"].widget.attrs["class"] = "form-control-invalid"
+            raise forms.ValidationError("Este Tipo De Elemento ya se encuentra Registrado")
+        return nombre
 
 
 class UnidadMedidaForm(forms.ModelForm):
     class Meta:
         model = UnidadMedida
         fields = '__all__'
+    def clean_nombre(self):
+        nombre = self.cleaned_data.get("nombre") 
+        exist = UnidadMedida.objects.filter(nombre=nombre).exclude(pk = self.instance.pk).exists()
+        if exist:
+            self.fields["nombre"].widget.attrs["class"] = "form-control-invalid"
+            raise forms.ValidationError("Esta Unidad de Medida ya se encuentra Registrado")
+        return nombre
 
 
 class ElementoForm(forms.ModelForm):
