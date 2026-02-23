@@ -13,10 +13,12 @@ from app.views.Evento.views import *
 from app.views.Notificacion.views import *
 from app.views.login.views import *
 from app.views.Index.views import DashboardView
+from django.contrib.auth.views import LogoutView
 app_name = 'app'
 urlpatterns = [
     path('login/',CreLoginView.as_view(),name="login"),
     path('dashboard/',DashboardView.as_view(),name="dashboard"),
+    path('logout',LogoutView.as_view(next_page='app:login'),name = "logout"),
     #path('Curso/',listar_curso,name="listar_curso" ),
     path('curso/',CursoListView.as_view(),name="index_curso"),
     path('curso/crear/',CursoCreateView.as_view(),name="crear_curso"),
@@ -48,6 +50,8 @@ urlpatterns = [
     path('tipo/crear/', TipoElementoCreateView.as_view(), name='crear_tipo'),
     path('tipo/editar/<int:pk>/', TipoElementoUpdateView.as_view(),name="actualizar_tipo"),
     path('tipo/eliminar/<int:pk>/',TipoElementoDeleteView.as_view(),name="eliminar_tipo"),
+    path('tipo/limpiar/',TipoCleandView.as_view(),name="limpiar_tipo"),
+    
 
     # UNIDAD DE MEDIDA
     path('unidad/', UnidadMedidaListView.as_view(), name='index_unidad'),
