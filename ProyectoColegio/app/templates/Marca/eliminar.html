@@ -14,5 +14,10 @@
         {% csrf_token %}
         <button type="submit" class="btn btn-danger">Eliminar</button>
         <a href="{% url 'app:listar_marca' %}" class="btn btn-secondary">Cancelar</a>
+    <p>¿Estás seguro de que deseas eliminar la categoría "{{ object.nom }}"?</p>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Eliminar</button>
+        <a href="{% url 'app:listar_categoria' %}" class="btn btn-secondary">Cancelar</a>
     </form>
 {% endblock content %}

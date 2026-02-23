@@ -8,7 +8,7 @@ class UnidadMedidaListView(ListView):
     model = UnidadMedida
     template_name = 'UnidadMedida/index.html'
     context_object_name = 'unidades'
-
+    success_url = reverse_lazy('app:index_unidad')
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['titulo'] = 'Unidades de Medida'
@@ -20,11 +20,16 @@ class UnidadMedidaCreateView(CreateView):
     model = UnidadMedida
     form_class = UnidadMedidaForm
     template_name = 'UnidadMedida/crear.html'
-    success_url = reverse_lazy('app:crear_elemento')
-
+    success_url = reverse_lazy('app:index_unidad')
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['listar_url'] = reverse_lazy('app:index_unidad')
+        context['btn_name'] = "Guardar"
+        return context
     def form_valid(self, form):
         messages.success(self.request, "Unidad de medida creada correctamente")
         return super().form_valid(form)
+    
 
 
 class UnidadMedidaUpdateView(UpdateView):
@@ -32,7 +37,11 @@ class UnidadMedidaUpdateView(UpdateView):
     form_class = UnidadMedidaForm
     template_name = 'UnidadMedida/crear.html'
     success_url = reverse_lazy('app:index_unidad')
-
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['listar_url'] = reverse_lazy('app:index_unidad')
+        context['btn_name'] = "Actualizar"
+        return context
     def form_valid(self, form):
         messages.success(self.request, "Unidad de medida actualizada correctamente")
         return super().form_valid(form)
@@ -48,7 +57,6 @@ class UnidadMedidaDeleteView(DeleteView):
         context['subtitulo'] = '¿Está seguro de eliminar esta Unidad de medida?'
         context['redirect'] = reverse_lazy('app:index_unidad')
         return context
-
     def form_valid(self, form):
         messages.success(self.request, "Unidad de medida eliminada correctamente")
         return super().form_valid(form)

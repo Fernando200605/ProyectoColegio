@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView, View
 from app.models import marca
-from app.forms import marcaForm
+from app.forms import MarcaForm
 from django.urls import reverse_lazy
 from django.contrib import messages
 from django.db import connection
@@ -24,7 +24,7 @@ class marcaListView(ListView):
 
 class marcaCreateView(CreateView):
     model = marca
-    form_class = marcaForm
+    form_class = MarcaForm
     template_name = 'Marca/crear.html'
     success_url = reverse_lazy('app:crear_elemento')
 
@@ -34,7 +34,7 @@ class marcaCreateView(CreateView):
 
 class marcaUpdateView(UpdateView):
     model = marca
-    form_class = marcaForm
+    form_class = MarcaForm
     template_name = 'Marca/crear.html'
     success_url = reverse_lazy('app:crear_elemento')
 
