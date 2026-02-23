@@ -4,7 +4,7 @@ from app.views.Inventario.views import *
 from app.views.Marca.views import *
 from app.views.TipoElemento.views import *  
 from app.views.UnidadMedida.views import *
-from app.views.Categoria.views import CategoriaCreateView 
+from app.views.Categoria.views import * 
 
 app_name = 'app'
 urlpatterns = [
@@ -17,13 +17,7 @@ urlpatterns = [
     path('curso/eliminar/<int:pk>/',CursoDeleteView.as_view(),name="eliminar_curso"),
     path('curso/limpiar/',CursoCleandView.as_view(),name="limpiar_curso"),
     
-    #Inventario
-    path('usuario/',UsuarioListView.as_view(),name="index_usuario"),
-    path('usuario/crear/',UsuarioCreateView.as_view(),name="crear_usuario"),
-    path('usuario/editar/<int:pk>/',UsuarioUpdateView.as_view(),name="editar_usuario"),
-    path('usuario/eliminar/<int:pk>/',UsuarioDeleteView.as_view(),name="eliminar_usuario"),
-    path('usuario/detalle/<int:pk>/',UsuarioDetailView.as_view(),name="detalle_usuario"),
-    path('usuario/limpiar/',UsuarioCleandView.as_view(),name="limpiar_usuario"),
+
     # INVENTARIO
     path('inventario/',InventarioListView.as_view(),name="index_inventario"),
     path('inventario/crear/',ElementoCreateView.as_view(),name="crear_elemento"),
@@ -58,27 +52,7 @@ urlpatterns = [
     path('categoria/editar/<int:pk>/', CategoriaUpdateView.as_view(), name='editar_categoria'),
     path('categoria/eliminar/<int:pk>/', CategoriaDeleteView.as_view(), name='eliminar_categoria'),
     
-    # ASISTENCIA
-    path("asistencia/", AsistenciaListView.as_view(), name="index_asistencia"),
-    path('asistencia/crear/', AsistenciaCreateView.as_view(), name="crear_asistencia"),
-    path("asistencia/editar/<int:pk>/", AsistenciaupdateView.as_view(), name="editar_asistencia"),
-    path('asistencia/eliminar/<int:pk>/',AsistenciaDeleteView.as_view(),name="eliminar_asistencia"),
-    path('asistencia/limpiar/',AsistenciaCleandView.as_view(),name="limpiar_asistencia"),
-    path('movimiento/',MovimientoListView.as_view(),name="index_movimiento"),
-    path('movimiento/crear/',MovimientoCreateView.as_view(),name="crear_movimiento"),
-    path('movimiento/editar/<int:pk>/',MovimientoupdateView.as_view(),name="editar_movimiento"),
-    path('movimiento/eliminar/<int:pk>/',MovimientoDeleteView.as_view(),name="eliminar_movimiento"),
-    path('movimiento/limpiar/',MovimientoCleandView.as_view(),name="limpiar_movimiento"),
-    path('evento/',EventoListView.as_view(),name="index_evento"),
-    path('evento/crear/',EventoCreateView.as_view(),name="crear_evento"),
-    path('evento/editar/<int:pk>/',EventoupdateView.as_view(),name="editar_evento"),
-    path('evento/eliminar/<int:pk>/',EventoDeleteView.as_view(),name="eliminar_evento"),
-    path('evento/limpiar/',EventoCleandView.as_view(),name="limpiar_evento"),
-    path('notificacion/',NotificacionListView.as_view(),name="index_notificacion"),
-    path('notificacion/crear/',NotificacionCreateView.as_view(),name="crear_notificacion"),
-    path('notificacion/editar/<int:pk>/',NotificacionupdateView.as_view(),name="editar_notificacion"),
-    path('notificacion/eliminar/<int:pk>/',NotificacionDeleteView.as_view(),name="eliminar_notificacion"),
-    path('notificacion/limpiar/',NotificacionCleandView.as_view(),name="limpiar_notificacion"),
+    
+
+
 ]
-
-
