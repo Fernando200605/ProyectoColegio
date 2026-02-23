@@ -124,7 +124,7 @@ class Asistencia (models.Model):
         max_length=20,
         choices=choise
     )
-    obsevaciones = models.TextField()
+    observaciones = models.TextField()
     class Meta:
         verbose_name = "asistencia"
         verbose_name_plural = "asistencias"

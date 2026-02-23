@@ -9,6 +9,7 @@ from app.models import Asistencia
 from app.models import Movimiento
 from app.models import Evento
 from app.models import Notificacion
+from django.utils import timezone
 
 class CursoForm(forms.ModelForm):
     class Meta:
@@ -30,31 +31,79 @@ class CursoForm(forms.ModelForm):
 
 
 class AsistenciaForm(forms.ModelForm):
+    
     class Meta:
         model = Asistencia
         fields = '__all__'
         widgets = {
-            'estudiante': forms.TextInput(attrs={
+            'estudiante-id': forms.Select(attrs={
                 'class': 'form-control'
             }),
-            'horaentrada': forms.TextInput(attrs={
-                'class': 'form-control'
+            
+            'horaentrada': forms.TimeInput(attrs={
+                'class': 'form-control',
+                'type': 'time'
             }),
-            'horasalida': forms.TextInput(attrs={
-                'class': 'form-control'
+
+            'horasalida': forms.TimeInput(attrs={
+                'class': 'form-control',
+                'type': 'time'
             }),
+
             'estado': forms.Select(attrs={
                 'class': 'form-control'
             }),
-            'observaciones': forms.Select(attrs={
+
+            'observaciones': forms.TextInput(attrs={ 
                 'class': 'form-control'
             }),
-            'fecha': forms.Select(attrs={
-                'class': 'form-control'
+
+            'fecha': forms.DateInput(attrs={
+                'class': 'form-control',
+                'type': 'date'
             })
         }
 
-    # Validación personalizada para el campo capacidad
+    def clean_observaciones(self):
+        observaciones = self.cleaned_data.get('observaciones')
+
+        if len(observaciones) > 200:
+            raise forms.ValidationError("La descripción no puede superar los 200 caracteres.")
+
+        if len(observaciones) < 10:
+            raise forms.ValidationError("La descripción debe tener mínimo 10 caracteres.")
+
+        return observaciones
+    
+
+    def clean(self):
+        cleaned_data = super().clean()
+
+        estudiante = cleaned_data.get('estudianteid')
+        horaentrada = cleaned_data.get('horaentrada')
+        horasalida = cleaned_data.get('horasalida')
+        if estudiante:
+            fecha_hoy = timezone.now().date()
+
+            existe = Asistencia.objects.filter(
+                estudianteid=estudiante,
+                fecha__date=fecha_hoy
+            ).exclude(pk=self.instance.pk).exists()
+
+            if existe:
+                self.add_error(
+                    'estudianteid',
+                    'Este estudiante ya tiene asistencia registrada hoy.'
+                )
+
+        if horaentrada and horasalida:
+            if horaentrada >= horasalida:
+                self.add_error(
+                    'horasalida',
+                    'La hora de salida no puede ser igual o menor a la hora de entrada'
+                )
+
+        return cleaned_data
 
 
 # Formulario para Crear Usuario (Con Contraseña)
