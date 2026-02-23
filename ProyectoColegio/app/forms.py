@@ -9,6 +9,7 @@ from app.models import Asistencia
 from app.models import Movimiento
 from app.models import Evento
 from app.models import Notificacion
+import re
 
 class CursoForm(forms.ModelForm):
     class Meta:
@@ -137,11 +138,14 @@ class TipoElementoForm(forms.ModelForm):
         fields = '__all__'
     def clean_nombre(self):
         nombre = self.cleaned_data.get("nombre") 
+        patron = r"^[A-Za-zÁÉÍÓÚáéíóúÑñ ]+$"
         exist = tipoelemento.objects.filter(nombre=nombre).exclude(pk = self.instance.pk).exists()
         if exist:
             self.fields["nombre"].widget.attrs["class"] = "form-control-invalid"
             raise forms.ValidationError("Este Tipo De Elemento ya se encuentra Registrado")
-        return nombre
+        if not re.match(patron,nombre):
+            raise forms.ValidationError("El Nombre No es Valido (No se usan caracteres especiales ni numeros)")
+        return nombre 
 
 
 class UnidadMedidaForm(forms.ModelForm):
@@ -151,10 +155,15 @@ class UnidadMedidaForm(forms.ModelForm):
     def clean_nombre(self):
         nombre = self.cleaned_data.get("nombre") 
         exist = UnidadMedida.objects.filter(nombre=nombre).exclude(pk = self.instance.pk).exists()
+        patron = r"^[A-Za-zÁÉÍÓÚáéíóúÑñ ]+$"
         if exist:
             self.fields["nombre"].widget.attrs["class"] = "form-control-invalid"
             raise forms.ValidationError("Esta Unidad de Medida ya se encuentra Registrado")
-        return nombre
+        if not re.match(patron,nombre):
+            raise forms.ValidationError("El Nombre No es Valido (No se usan caracteres especiales ni numeros)")
+        if not len (nombre) <= 4 and len (nombre) >= 1:
+            raise forms.ValidationError("El Nombre de la Unidad debe ser una abreviacion de maximo 4 caracteres")
+        return nombre 
 
 
 class ElementoForm(forms.ModelForm):
@@ -168,7 +177,31 @@ class ElementoForm(forms.ModelForm):
             'unidad_medida': forms.Select(attrs={'class': 'form-control'}),
             'cantidad': forms.NumberInput(attrs={'class': 'form-control'}),
         }
-
+    def clean_nombre(self):
+            nombre = self.cleaned_data['nombre']
+            exist = Elemento.objects.filter(nombre=nombre).exclude(pk = self.instance.pk).exists()
+            patron = r"^[A-Za-zÁÉÍÓÚáéíóúÑñ ]+$"
+            if exist:
+                print('aqui')
+                self.fields["nombre"].widget.attrs["class"] = "form-control-invalid"
+                raise forms.ValidationError("Este Elemento ya se encuentra Registrado")
+            if not re.match(patron,nombre):
+                raise forms.ValidationError("El Nombre No es Valido (No se usan caracteres especiales ni numeros)")
+            return nombre 
+    def clean_stockActual(self):
+            stock = self.cleaned_data.get("stockActual")
+            if stock < 0:
+                raise forms.ValidationError("El stock no puede ser negativo ")
+            if not stock.is_integer():
+                raise forms.ValidationError("El stock no puede ser decimal ")
+            return stock
+    def clean_stockMinimo(self):
+            stock = self.cleaned_data.get("stockMinimo")
+            if stock < 0:
+                raise forms.ValidationError("El stock no puede ser negativo ")
+            if not stock.is_integer():
+                raise forms.ValidationError("El stock no puede ser decimal ")
+            return stock
 
 class CategoriaForm(forms.ModelForm):
     class Meta:
