@@ -1,7 +1,15 @@
 {% extends 'list_generic.html' %}
 
+{% block titulo %}
+{{titulo}}
+{% endblock titulo %}
+
+{% block subtitulo %}
+{{subtitulo}}
+{% endblock subtitulo%}
+
 {% block columns %}
-     <tr>
+    <tr>
                     <th><i class="fas fa-hashtag me-2"></i>ID</th>
                     <th><i class="fas fa-box me-2"></i>Nombre</th>
                     <th class="text-center"><i class="fas fa-tools me-2"></i>Acciones</th>

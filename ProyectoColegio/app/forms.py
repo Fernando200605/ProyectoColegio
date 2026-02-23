@@ -10,7 +10,7 @@ from app.models import (
     Evento,
     Asistencia,
     Usuario,
-    Administrador,Acudiente,
+    Administrador, Acudiente,
     Estudiante,
     docente,
     Notificacion
@@ -18,6 +18,8 @@ from app.models import (
 import re
 
 # CURSO
+
+
 class CursoForm(forms.ModelForm):
     class Meta:
         model = Curso
@@ -29,6 +31,7 @@ class CursoForm(forms.ModelForm):
             'capacidad': forms.NumberInput(attrs={'class': 'form-control'}),
             'docenteid': forms.Select(attrs={'class': 'form-control'})
         }
+
         def clean_capacidad(self):
             capacidad = self.cleaned_data.get('capacidad')
             if capacidad <= 0:
@@ -113,7 +116,7 @@ class EstudianteForm(forms.ModelForm):
     class Meta:
         model = Estudiante
         fields = ['codigo', 'fechaNacimiento',
-                  'estadoMatricula', 'fechaIngreso', 'cursoId']
+                    'estadoMatricula', 'fechaIngreso', 'cursoId']
         widgets = {
             'codigo': forms.TextInput(attrs={'class': 'form-control'}),
             'fechaNacimiento': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
@@ -133,22 +136,47 @@ class AcudienteForm(forms.ModelForm):
         }
 
 
-class marcaForm(forms.ModelForm):
-    class Meta:
-        model = marca
-        fields = '__all__'
-
-
 class TipoElementoForm(forms.ModelForm):
     class Meta:
         model = tipoelemento
         fields = '__all__'
+
+    def clean_nombre(self):
+        nombre = self.cleaned_data.get("nombre")
+        patron = r"^[A-Za-zÁÉÍÓÚáéíóúÑñ ]+$"
+        exist = tipoelemento.objects.filter(
+            nombre=nombre).exclude(pk=self.instance.pk).exists()
+        if exist:
+            self.fields["nombre"].widget.attrs["class"] = "form-control-invalid"
+            raise forms.ValidationError(
+                "Este Tipo De Elemento ya se encuentra Registrado")
+        if not re.match(patron, nombre):
+            raise forms.ValidationError(
+                "El Nombre No es Valido (No se usan caracteres especiales ni numeros)")
+        return nombre
 
 
 class UnidadMedidaForm(forms.ModelForm):
     class Meta:
         model = UnidadMedida
         fields = '__all__'
+
+    def clean_nombre(self):
+        nombre = self.cleaned_data.get("nombre")
+        exist = UnidadMedida.objects.filter(
+            nombre=nombre).exclude(pk=self.instance.pk).exists()
+        patron = r"^[A-Za-zÁÉÍÓÚáéíóúÑñ ]+$"
+        if exist:
+            self.fields["nombre"].widget.attrs["class"] = "form-control-invalid"
+            raise forms.ValidationError(
+                "Esta Unidad de Medida ya se encuentra Registrado")
+        if not re.match(patron, nombre):
+            raise forms.ValidationError(
+                "El Nombre No es Valido (No se usan caracteres especiales ni numeros)")
+        if not len(nombre) <= 4 and len(nombre) >= 1:
+            raise forms.ValidationError(
+                "El Nombre de la Unidad debe ser una abreviacion de maximo 4 caracteres")
+        return nombre
 
 
 class ElementoForm(forms.ModelForm):
@@ -163,12 +191,52 @@ class ElementoForm(forms.ModelForm):
             'cantidad': forms.NumberInput(attrs={'class': 'form-control'}),
         }
 
+    def clean_nombre(self):
+            nombre = self.cleaned_data['nombre']
+            exist = Elemento.objects.filter(nombre=nombre).exclude(
+                pk=self.instance.pk).exists()
+            patron = r"^[A-Za-z 0-9 ÁÉÍÓÚáéíóúÑñ ]+$"
+            if exist:
+                print('aqui')
+                self.fields["nombre"].widget.attrs["class"] = "form-control-invalid"
+                raise forms.ValidationError(
+                    "Este Elemento ya se encuentra Registrado")
+            if not re.match(patron, nombre):
+                raise forms.ValidationError(
+                    "El Nombre No es Valido (No se usan caracteres especiales ni numeros)")
+            return nombre
 
-class CategoriaForm(forms.ModelForm):
-    class Meta:
-        model = categoria
-        fields = ['nombre']
-    
+    def clean_stockActual(self):
+            stock = self.cleaned_data.get("stockActual")
+            if stock < 0:
+                raise forms.ValidationError("El stock no puede ser negativo ")
+            if not stock.is_integer():
+                raise forms.ValidationError("El stock no puede ser decimal ")
+            return stock
+
+    def clean_stockMinimo(self):
+            stock = self.cleaned_data.get("stockMinimo")
+            if stock < 0:
+                raise forms.ValidationError("El stock no puede ser negativo ")
+            if not stock.is_integer():
+                raise forms.ValidationError("El stock no puede ser decimal ")
+            return stock
+    def clean_ubicacion(self):
+        ubicacion = self.cleaned_data.get('ubicacion', '').strip()
+        ubicacion = re.sub(r'\s+', ' ', ubicacion)
+
+        if len(ubicacion) < 3:
+            raise forms.ValidationError(
+                "La ubicación debe tener al menos 3 caracteres."
+            )
+
+        patron = r'^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑüÜ\s\-]+$'
+        if not re.match(patron, ubicacion):
+            raise forms.ValidationError(
+                "La ubicación solo puede contener letras, números y guiones."
+            )
+
+        return ubicacion
 class MovimientoForm(forms.ModelForm):
     class Meta:
         model = Movimiento
@@ -297,98 +365,8 @@ class CategoriaForm(forms.ModelForm):
 
         return nombre
 
-# TIPO ELEMENTO
-
-
-class TipoElementoForm(forms.ModelForm):
-    class Meta:
-        model = tipoelemento
-        fields = '__all__'
-
-# UNIDAD DE MEDIDA
-
-class UnidadMedidaForm(forms.ModelForm):
-    class Meta:
-        model = UnidadMedida
-        fields = '__all__'
-
-
 # ELEMENTO
 
-class ElementoForm(forms.ModelForm):
-    class Meta:
-        model = Elemento
-        fields = '__all__'
-        widgets = {
-            'nombre': forms.TextInput(attrs={'class': 'form-control'}),
-            'descripcion': forms.Textarea(attrs={'class': 'form-control'}),
-            'stockActual': forms.NumberInput(attrs={'class': 'form-control'}),
-            'stockMinimo': forms.NumberInput(attrs={'class': 'form-control'}),
-            'tipoElementoId': forms.Select(attrs={'class': 'form-control'}),
-            'categoriaId': forms.Select(attrs={'class': 'form-control'}),
-            'marcaId': forms.Select(attrs={'class': 'form-control'}),
-            'unidadMedidaId': forms.Select(attrs={'class': 'form-control'}),
-            'ubicacion': forms.TextInput(attrs={'class': 'form-control'}),
-        }
-
-    # 🔹 Validación individual de ubicación
-    def clean_ubicacion(self):
-        ubicacion = self.cleaned_data.get('ubicacion', '').strip()
-        ubicacion = re.sub(r'\s+', ' ', ubicacion)
-
-        if len(ubicacion) < 3:
-            raise forms.ValidationError(
-                "La ubicación debe tener al menos 3 caracteres."
-            )
-
-        patron = r'^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑüÜ\s\-]+$'
-        if not re.match(patron, ubicacion):
-            raise forms.ValidationError(
-                "La ubicación solo puede contener letras, números y guiones."
-            )
-
-        return ubicacion
-
-    # 🔹 Validación cruzada profesional
-    def clean(self):
-        cleaned_data = super().clean()
-
-        stock_actual = cleaned_data.get('stockActual')
-        stock_minimo = cleaned_data.get('stockMinimo')
-
-        if stock_actual is not None and stock_actual < 0:
-            self.add_error(
-                'stockActual',
-                "El stock actual no puede ser negativo."
-            )
-
-        if stock_minimo is not None and stock_minimo < 0:
-            self.add_error(
-                'stockMinimo',
-                "El stock mínimo no puede ser negativo."
-            )
-
-        if (
-            stock_actual is not None and
-            stock_minimo is not None and
-            stock_minimo > stock_actual
-        ):
-            self.add_error(
-                'stockMinimo',
-                "El stock mínimo no puede ser mayor que el stock actual."
-            )
-
-        return cleaned_data
-
-
-# MOVIMIENTO
-
-class MovimientoForm(forms.ModelForm):
-    class Meta:
-        model = Movimiento
-        fields = '__all__'
-
-# EVENTO
 
 class EventoForm(forms.ModelForm):
     class Meta:

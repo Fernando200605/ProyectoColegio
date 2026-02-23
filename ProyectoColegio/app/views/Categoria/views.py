@@ -23,14 +23,12 @@ class CategoriaCreateView(CreateView):
     form_class = CategoriaForm
     template_name = 'Categoria/crear.html'
     success_url = reverse_lazy('app:index_categoria')  # cambia si tu listado tiene otro nombre
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['titulo'] = "Crear Categoría"
         context['listar_url'] = reverse_lazy('app:index_categoria')
         context['btn_name'] = "Guardar"
         return context
-
     def form_valid(self, form):
         messages.success(self.request, "Categoría creada correctamente")
         return super().form_valid(form)
@@ -41,14 +39,12 @@ class CategoriaUpdateView(UpdateView):
     form_class = CategoriaForm
     template_name = 'Categoria/crear.html'
     success_url = reverse_lazy('app:index_categoria')  # cambia si tu listado tiene otro nombre
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['titulo'] = "Editar Categoría"
         context['listar_url'] = reverse_lazy('app:index_categoria')
         context['btn_name'] = "Actualizar"
         return context
-
     def form_valid(self, form):
         messages.success(self.request, "Categoría actualizada correctamente")
         return super().form_valid(form)
