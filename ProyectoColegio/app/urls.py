@@ -50,7 +50,6 @@ urlpatterns = [
     path('tipo/crear/', TipoElementoCreateView.as_view(), name='crear_tipo'),
     path('tipo/editar/<int:pk>/', TipoElementoUpdateView.as_view(),name="actualizar_tipo"),
     path('tipo/eliminar/<int:pk>/',TipoElementoDeleteView.as_view(),name="eliminar_tipo"),
-    path('tipo/limpiar/',TipoCleandView.as_view(),name="limpiar_tipo"),
     
 
     # UNIDAD DE MEDIDA
