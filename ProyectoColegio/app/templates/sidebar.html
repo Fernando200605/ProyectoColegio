@@ -4,24 +4,39 @@
   <div class="profile">
     <img src="{% static 'img/User.jpg' %}" alt="Miku Dayo" />
     <a href="#" class="edit-profile"><i class="fa-solid fa-pencil"></i></a>
-    <p class="name"></p>
-    <p class="role"></p>
+    <p class="name">{{request.user.nombre}}</p>
+    <p class="role">{{request.user.get_rol}}</p>
   </div>
   <ul>
     <li>
-      <a href="index.php"><i class="fa-solid fa-house"></i> Inicio</a>
+      <a href="#"><i class="fa-solid fa-house"></i> Inicio</a>
     </li>
     <li>
-      <a href="{% url "app:index_usuario" %}"><i class="fa-solid fa-check"></i> Asistencia</a>
+      <a href="{% url 'app:index_curso' %}"><i class="fa-solid fa-graduation-cap"></i> Cursos</a>
     </li>
     <li>
-      <a href="../Inventario/inventario.php"><i class="fa-solid fa-tv"></i> Inventario</a>
+      <a href="{% url "app:index_usuario" %}"><i class="fa-solid fa-user"></i> Usuarios</a>
     </li>
     <li>
-      <a href="../Reportes/reportes.php"><i class="fa-regular fa-file"></i> Reportes</a>
+      <a href="{% url "app:index_asistencia" %}"><i class="fa-solid fa-check"></i> Asistencia</a>
     </li>
     <li>
-      <a href="../cerrarsesion.php" id=""><i class="fa-solid fa-right-from-bracket"></i> Cerrar Sesión</a>
+      <a href="{% url 'app:index_inventario' %}"><i class="fa-solid fa-tv"></i> Inventario</a>
+    </li>
+    <li>
+      <a href="{% url 'app:index_movimiento' %}"><i class="fa-solid fa-exchange-alt"></i> Movimientos</a>
+    </li>
+    <li>
+      <a href="{% url 'app:index_evento' %}"><i class="fa-regular fa-calendar"></i> Eventos</a>
+    </li>
+    <li>
+      <a href="{% url 'app:index_notificacion' %}"><i class="fa-regular fa-file"></i> Notificaciones</a>
+    </li>
+    <li>
+      <form action="{% url 'app:logout' %}" method="post">
+        {% csrf_token %}
+        <button type="submit">Cerrar Sesion</button>
+      </form>
     </li>
     <li>
       <a href="#"><i class="fa-solid fa-question"></i> Ayuda</a>

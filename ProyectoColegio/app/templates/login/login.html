@@ -1,0 +1,82 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login | Colegio</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="{% static 'css/estilos.css' %}" />
+  </head>
+  <body>
+    <div class="login">
+      <div class="aside">
+        <h1>Iniciar sesión</h1>
+      </div>
+
+      <form action="" method="post">
+        {% csrf_token %}
+        <div class="logo-container">
+          <img src="{% static 'img/Logo.jpeg' %}" alt="Logo" class="logo" />
+        </div>
+
+        {% for field in form %}
+          <div class="input-container">
+            {% if 'password' in field.name %}
+              <i class="fa-solid fa-lock"></i>
+            {% else %}
+              <i class="fa-solid fa-user"></i>
+            {% endif %}
+
+            {{ field }}
+
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+
+            <span class="error-message" id="{{ field.name }}-error"></span>
+
+            {% if 'password' in field.name %}
+              <i class="fa-solid fa-eye" id="eye"></i>
+            {% endif %}
+          </div>
+        {% endfor %}
+
+        <button type="submit" class="btn-login">Ingresar</button>
+
+        <div class="separator">O</div>
+
+        <button type="button" class="btn-recuperar" onclick="window.location.href = 'Reset.php'">¿Olvidaste tu contraseña?</button>
+      </form>
+    </div>
+    <script src="{% static 'lib/sweetalert2/sweetalert2.all.min.js' %}"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        {% if form.errors %}
+            let errorMessages = "";
+            
+            {% for field in form %}
+                {% for error in field.errors %}
+                    errorMessages += "{{ error|escapejs }}\n";
+                {% endfor %}
+            {% endfor %}
+
+            {% for error in form.non_field_errors %}
+                errorMessages += "{{ error|escapejs }}\n";
+            {% endfor %}
+            console.log(errorMessages)
+            if (errorMessages !== "") {
+                Swal.fire({
+                    title: 'Error de acceso',
+                    text: errorMessages,
+                    icon: 'error',
+                    confirmButtonColor: '#1C2E4A',
+                    heightAuto: false, // CLAVE: evita que el body cambie de tamaño
+                    customClass: {
+                        popup: 'border-radius-40'
+                    }
+                });
+            }
+        {% endif %}
+    });
+</script>
+  </body>
+</html>
