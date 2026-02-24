@@ -233,10 +233,19 @@ class Movimiento(models.Model):
     def __str__(self):
         return self.tipo
 class Notificacion(models.Model):
+    choise = [
+        ('A tiempo', 'A tiempo'),
+        ('Tarde', 'Tarde'),
+        ('Inasistencia', 'Inasistencia'),
+    ]
     titulo = models.CharField(max_length=200)
     mensaje = models.TextField()
     fecha_envio = models.DateTimeField(auto_now_add=True)
-    estado = models.BooleanField(default=False)
+    estado = models.CharField(
+        max_length=20,
+        choices=choise
+    )
+    
     tipo = models.CharField(max_length=50)
     receptor = models.ForeignKey(Usuario, on_delete=models.CASCADE)
     evento = models.ForeignKey(Evento, on_delete=models.CASCADE, null=True, blank=True)
