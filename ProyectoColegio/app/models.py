@@ -128,15 +128,22 @@ class Estudiante(models.Model):
         verbose_name_plural = "Estudiantes" 
         db_table = "Estudiante"
 #creacion de modelo asistencia 
-choice = [("Tarde","Tarde"),("Atiempo", "Atiempo"),("Nollego","Nollego")]
 class Asistencia (models.Model):
+    choise = [
+        ('A tiempo', 'A tiempo'),
+        ('Tarde', 'Tarde'),
+        ('Inasistencia', 'Inasistencia'),
+    ]
     id =models.AutoField(primary_key=True)
     estudianteid = models.ForeignKey(Estudiante, on_delete=models.CASCADE)
     fecha = models.DateTimeField(auto_now=True)
     horaentrada = models.TimeField ()
     horasalida = models.TimeField()
-    estado = models.CharField(max_length=50,choices=choice)
-    obsevaciones = models.TextField()
+    estado = models.CharField(
+        max_length=20,
+        choices=choise
+    )
+    observaciones = models.TextField()
     class Meta:
         verbose_name = "asistencia"
         verbose_name_plural = "asistencias"
@@ -228,8 +235,19 @@ class Elemento(models.Model):
 
 
 class Movimiento(models.Model):
-    tipo = models.CharField(max_length=50)
-    fecha = models.DateTimeField()
+    choise = [
+        ("Absoluto", "Absoluto"),
+        ("Parcial", "Parcial"),
+        ("Indefinido", "Indefinido")
+        
+    ]
+    
+    tipo = models.CharField(
+        max_length=50,
+        choices=choise
+        )
+    
+    fecha = models.DateTimeField(auto_now=True)
     cantidad = models.IntegerField()
     elementoId = models.ForeignKey(Elemento, on_delete=models.CASCADE)
     usuarioId = models.ForeignKey(Usuario, on_delete=models.CASCADE)
@@ -259,4 +277,3 @@ class Notificacion(models.Model):
 
     def __str__(self):
         return self.titulo
-
