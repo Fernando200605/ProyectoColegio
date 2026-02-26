@@ -470,8 +470,85 @@ class EventoForm(forms.ModelForm):
             'fecha_inicio': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
             'fecha_fin': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
         }
-    # Validación personalizada para el campo capacidad
 
+    def clean_titulo(self):
+        titulo = self.cleaned_data.get('titulo')
+
+        if Evento.objects.filter(titulo__iexact=titulo).exclude(pk=self.instance.pk).exists():
+            raise forms.ValidationError("Ya existe un evento con este título.")
+
+        return titulo
+
+    def clean_descripcion(self):
+        descripcion = self.cleaned_data.get('descripcion')
+
+        if not descripcion:
+            raise forms.ValidationError("La descripción es obligatoria.")
+
+        if len(descripcion) > 200:
+            raise forms.ValidationError("La descripción no puede superar los 200 caracteres.")
+
+        if len(descripcion) < 10:
+            raise forms.ValidationError("La descripción debe tener mínimo 10 caracteres.")
+
+        return descripcion
+
+    def clean(self):
+        cleaned_data = super().clean()
+        fecha_inicio = cleaned_data.get('fecha_inicio')
+        fecha_fin = cleaned_data.get('fecha_fin')
+
+        if fecha_inicio and fecha_fin:
+            if fecha_inicio >= fecha_fin:
+                self.add_error('fecha_fin', "La fecha de fin debe ser mayor que la fecha de inicio.")
+
+        return cleaned_data
+    def clean_titulo(self):
+        titulo = self.cleaned_data.get('titulo')
+
+        # Validación 1: No permitir que sea solo números
+        if titulo.isdigit():
+            raise forms.ValidationError("El título no puede contener solo números.")
+
+        # Validación 2: No permitir caracteres especiales
+        if not re.match(r'^[a-zA-ZÁÉÍÓÚáéíóúÑñ0-9 ]+$', titulo):
+            raise forms.ValidationError("El título no puede contener caracteres especiales.")
+
+        return titulo
+    # Validación personalizada para el campo capacidad
+    def clean_titulo(self):
+        titulo = self.cleaned_data.get('titulo')
+
+        if Evento.objects.filter(titulo__iexact=titulo).exclude(pk=self.instance.pk).exists():
+            raise forms.ValidationError("Ya existe un evento con este título.")
+
+        return titulo
+
+    def clean_descripcion(self):
+        descripcion = self.cleaned_data.get('descripcion')
+
+        if not descripcion:
+            raise forms.ValidationError("La descripción es obligatoria.")
+
+        if len(descripcion) > 200:
+            raise forms.ValidationError("La descripción no puede superar los 200 caracteres.")
+
+        if len(descripcion) < 10:
+            raise forms.ValidationError("La descripción debe tener mínimo 10 caracteres.")
+
+        return descripcion
+
+    def clean(self):
+        cleaned_data = super().clean()
+        fecha_inicio = cleaned_data.get('fecha_inicio')
+        fecha_fin = cleaned_data.get('fecha_fin')
+
+        if fecha_inicio and fecha_fin:
+            if fecha_inicio >= fecha_fin:
+                self.add_error('fecha_fin', "La fecha de fin debe ser mayor que la fecha de inicio.")
+
+        return cleaned_data
+    
 
 class NotificacionForm(forms.ModelForm):
     class Meta:
