@@ -1,26 +1,30 @@
 {% extends 'home.html' %}
 {% load static %}
 {% block body %}
-  <body>
+  <body class="layout-blur">
     <!-- Botón hamburguesa (fuera de la sidebar para que siempre sea visible) -->
     <button class="hamburger" id="hamburger"><i class="fa-solid fa-bars"></i></button>
 
     <!-- Sidebar -->
     {% include 'sidebar.html' %}
 
-    <!-- Contenido principal -->
+
     <div class="main-content">
       {% include 'header.html' %}
       {% block main %}
         {% include 'main.html' %}
       {% endblock %}
+      <div class="modal fade" id="modalGeneral" tabindex="-1" aria-hidden="true">
+        <div id="contenedorModal"></div>
+      </div>
+      <div id="contenedorMensajes" class="position-fixed top-0 end-0 p-3" style="z-index: 9999;"></div>
     </div>
+    <script src="{% static 'Js/modal.js' %}"></script>
     <script src="{% static 'lib/jquery/jquery-3.6.0.min.js' %}"></script>
     <script src="{% static 'lib/bootstrap-4.4.1-dist/js/bootstrap.min.js' %}"></script>
     <script src="{% static 'lib/adminlte-3.0.4/js/adminlte.min.js' %}"></script>
     <script src="{% static 'lib/sweetalert2/sweetalert2.all.min.js' %}"></script>
-
-
+    
     <script>
       const hamburger = document.getElementById('hamburger')
       const sidebar = document.getElementById('sidebar')
@@ -34,6 +38,17 @@
       <script>
         document.addEventListener('DOMContentLoaded', function () {
           {% for message in messages %}
+          {% if 'login' in message.tags %}
+            Swal.fire({
+              toast: true,
+              position: "top-end",
+              title: "{{ message }}",
+              icon: "success",
+              showConfirmButton: false,
+              timer: 2000,
+              timerProgressBar: true
+            });
+          {% else %}
             Swal.fire({
               title: "{{ message }}",
               icon: "{{ message.tags }}",
@@ -41,6 +56,7 @@
               timer: 2000,
               timerProgressBar: true
             });
+            {% endif %}
           {% endfor %}
         });
       </script>

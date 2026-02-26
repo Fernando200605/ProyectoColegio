@@ -16,35 +16,50 @@
 
       <form action="" method="post">
         {% csrf_token %}
+
+        <!-- Logo -->
         <div class="logo-container">
-          <img src="{% static 'img/Logo.jpeg' %}" alt="Logo" class="logo" />
+          <img src="{% static 'img/Logo.jpeg' %}" alt="Logo institucional" class="logo" />
         </div>
 
+        <!-- Campos -->
         {% for field in form %}
           <div class="input-container">
+            <!-- Ícono -->
             {% if 'password' in field.name %}
               <i class="fa-solid fa-lock"></i>
             {% else %}
               <i class="fa-solid fa-user"></i>
             {% endif %}
 
-            {{ field }}
-
+            <!-- Label -->
             <label for="{{ field.id_for_label }}">{{ field.label }}</label>
 
-            <span class="error-message" id="{{ field.name }}-error"></span>
+            <!-- Input -->
+            {{ field }}
 
+            <!-- Mostrar errores de Django -->
+            {% if field.errors %}
+              <span class="error-message">{{ field.errors|striptags }}</span>
+            {% else %}
+              <span class="error-message" id="{{ field.name }}-error"></span>
+            {% endif %}
+
+            <!-- Ver contraseña -->
             {% if 'password' in field.name %}
-              <i class="fa-solid fa-eye" id="eye"></i>
+              <i class="fa-solid fa-eye eye-toggle" data-target="{{ field.id_for_label }}"></i>
             {% endif %}
           </div>
         {% endfor %}
 
+        <!-- Botón login -->
         <button type="submit" class="btn-login">Ingresar</button>
 
+        <!-- Separador -->
         <div class="separator">O</div>
 
-        <button type="button" class="btn-recuperar" onclick="window.location.href = 'Reset.php'">¿Olvidaste tu contraseña?</button>
+        <!-- Recuperar contraseña -->
+        <button type="button" class="btn-recuperar" onclick="location.href='app'">¿Olvidaste tu contraseña?</button>
       </form>
     </div>
     <script src="{% static 'lib/sweetalert2/sweetalert2.all.min.js' %}"></script>

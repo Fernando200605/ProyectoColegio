@@ -1,4 +1,5 @@
-import re
+
+from django.urls import reverse_lazy
 from django import forms
 from app.models import (
     Curso,
@@ -158,8 +159,13 @@ class UsuarioForm(forms.ModelForm):
             'password': forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Contraseña', 'id': 'id_contraseña'}),
             'estado': forms.Select(attrs={'class': 'form-control'}),
         }
-
-# Formulario para Editar Usuario (Sin Contraseña)
+    
+    def save(self, commit = True):
+        usuario = super().save(commit=False)
+        usuario.set_password(self.cleaned_data['password'])
+        if commit:
+            usuario.save()
+        return usuario
 
     # Nombre: solo letras
 
@@ -336,6 +342,19 @@ class TipoElementoForm(forms.ModelForm):
     class Meta:
         model = tipoelemento
         fields = '__all__'
+        widgets = {
+            'nombre': forms.TextInput(attrs={
+                'class': 'form-control'
+            })
+        }
+
+    def clean_nombre(self):
+        nombre = self.cleaned_data['nombre']
+        exist = tipoelemento.objects.filter(
+            nombre=nombre).exclude(pk=self.instance.pk).exists()
+        if exist:
+            self.add_error('nombre', "El nombre ya existe")
+        return nombre
 
     def clean_nombre(self):
         nombre = self.cleaned_data.get("nombre")
@@ -356,6 +375,11 @@ class UnidadMedidaForm(forms.ModelForm):
     class Meta:
         model = UnidadMedida
         fields = '__all__'
+        widgets = {
+            'nombre': forms.TextInput(attrs={
+                'class': 'form-control'
+            })
+        }
 
     def clean_nombre(self):
         nombre = self.cleaned_data.get("nombre")
@@ -381,10 +405,42 @@ class ElementoForm(forms.ModelForm):
         fields = '__all__'
         widgets = {
             'nombre': forms.TextInput(attrs={'class': 'form-control'}),
-            'marca': forms.Select(attrs={'class': 'form-control'}),
-            'tipo': forms.Select(attrs={'class': 'form-control'}),
-            'unidad_medida': forms.Select(attrs={'class': 'form-control'}),
             'cantidad': forms.NumberInput(attrs={'class': 'form-control'}),
+
+            # Campos con botones de creación rápida (CORRECTO)
+            'marcaId': forms.Select(attrs={
+                'class': 'form-control',
+                'data-crear-url': reverse_lazy('app:index_marca'),
+                'data-label': 'Marca'
+            }),
+            'tipoElementoId': forms.Select(attrs={
+                'class': 'form-control',
+                'data-crear-url': reverse_lazy('app:crear_tipo'),
+                'data-label': 'Tipo de Elemento'
+            }),
+            'unidadMedidaId': forms.Select(attrs={
+                'class': 'form-control',
+                'data-crear-url': reverse_lazy('app:crear_unidad'),
+                'data-label': 'Unidad de Medida'
+            }),
+            'categoriaId': forms.Select(attrs={
+                'class': 'form-control',
+                'data-crear-url': reverse_lazy('app:crear_categoria'),
+                'data-label': 'Categoría'
+            }),
+            'descripcion': forms.Textarea(attrs={
+                'class': 'form-control'
+            }),
+            'stockActual': forms.NumberInput(attrs={
+                'class': 'form-control'
+            }),
+            'stockMinimo': forms.NumberInput(attrs={
+                'class': 'form-control'
+            }),
+            'ubicacion': forms.TextInput(attrs={
+                'class': 'form-control'
+            })
+                
         }
 
     def clean_nombre(self):
@@ -549,6 +605,7 @@ class EventoForm(forms.ModelForm):
 
         return cleaned_data
     
+
 
 class NotificacionForm(forms.ModelForm):
     class Meta:
