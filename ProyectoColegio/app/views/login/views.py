@@ -13,7 +13,8 @@ class CreLoginView(LoginView):
         if not user.estado:
             form.add_error(None, "El usuario no se encuentra activo")
             return self.form_invalid(form)  # vuelve a renderizar el formulario con el error
-
+        
+        messages.success(self.request,f"Bienvenido Usuario {user.nombre}",extra_tags='login')
         return super().form_valid(form)
 
     def get_success_url(self):
