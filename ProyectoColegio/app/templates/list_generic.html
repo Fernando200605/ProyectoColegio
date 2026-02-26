@@ -1,26 +1,53 @@
 {% extends 'body.html' %}
 {% load static %}
-{% block title %}
-  <title>{{title}}</title>
-{% endblock %}
 
 {% block main %}
-<div class="container-fluid">
-    <h2 class="text-info-custom mb-4">{% block titulo %}{% endblock titulo %}</h2>
+<div class="container-fluid edit main-content-glass">
+    
+    <h2 class="text-custom mt-2 edit-text">{% block titulo %}{% endblock titulo %}</h2>
 
-    <div class="card card-custom mb-4 p-3">
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card card-stats card-pastel-blue">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <p class="text-muted mb-0">Total Items</p>
+                            <h3 class="fw-bold">{% block total_count %}0{% endblock %}</h3>
+                        </div>
+                        <i class="fas fa-boxes fa-2x text-primary-light"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card card-stats card-pastel-red">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <p class="text-muted mb-0">Stock Bajo</p>
+                            <h3 class="fw-bold text-danger">{% block low_stock %}0{% endblock %}</h3>
+                        </div>
+                        <i class="fas fa-exclamation-triangle fa-2x text-danger-light"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div>
+
+    <div class="card card-custom mb-4 p-3 shadow-sm">
         <div class="d-flex justify-content-between align-items-center flex-wrap">
             <h5 class="card-title mb-0" style="color: #1C2E4A; font-weight: 600;">
                 <i class="fas fa-graduation-cap me-2"></i>{% block subtitulo %}{% endblock subtitulo %}
             </h5>
-            <div class="mt-2 mt-md-0">
+            <div class="mt-2 mt-md-0 d-flex gap-2">
                 {% block options %}
-                <a href="{{ crear_url }}" class="btn btn-create me-2">
+                <a href="{{ crear_url }}" class="btn btn-create">
                     <i class="fas fa-plus-circle me-1"></i> Nuevo Registro
                 </a>
-                <form action="{{ limpiar_url }}" method="post" style="display:inline;" id="Eliminar_Todo">
+                <form action="{{ limpiar_url }}" method="post" id="Eliminar_Todo">
                     {% csrf_token %}
-                    <button type="submit" class="btn btn-outline-danger border-2" style="border-radius: 10px; font-weight: 600;">
+                    <button type="submit" class="btn btn-outline-danger btn-rounded-custom">
                         <i class="fas fa-trash-alt me-1"></i> Vaciar Lista
                     </button>
                 </form>
@@ -28,63 +55,20 @@
             </div>
         </div>
     </div>
+
     {% block devolver %}{% endblock devolver %}
-    <div class="table-responsive" style="padding: 10px;">
+
+    <div class="table-responsive bg-white rounded-4 shadow-sm p-3">
         <table class="table" id="Tabla">
             <thead>
                 <tr>
-                    {% block columns %}
-                    
-                    {% endblock columns %}
+                    {% block columns %}{% endblock columns %}
                 </tr>
             </thead>
             <tbody>
-                {% block rows %}
-
-                {% endblock rows %}
+                {% block rows %}{% endblock rows %}
             </tbody>
         </table>
     </div>
 </div>
 {% endblock %}
-
-{% block js %}
-<script src="{% static 'lib/jquery/jquery-3.6.0.min.js' %}"></script>
-<script src="{% static 'lib/datatables-1.10.20/js/jquery.dataTables.js' %}"></script>
-<script src="{% static 'lib/datatables-1.10.20/js/dataTables.bootstrap4.min.js' %}"></script>
-<script src="{% static 'lib/datatables-1.10.20/plugins/responsive-2.2.3/js/dataTables.responsive.min.js' %}"></script>
-<script src="{% static 'lib/datatables-1.10.20/plugins/responsive-2.2.3/js/responsive.bootstrap4.min.js' %}"></script>
-
-<script>
-$(document).ready(function () {
-    $('#Tabla').DataTable({
-        pageLength: 10,
-        pagingType: 'numbers', 
-        responsive: true,
-        autoWidth: false
-    });
-});
-
-// SweetAlert para eliminar todos
-document.getElementById('Eliminar_Todo').addEventListener('submit', function (e) {
-    e.preventDefault();
-    Swal.fire({
-        title: '¿Estás seguro de eliminar todos los {{table}} ?',
-        text: 'Esta acción no se puede deshacer',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: 'Sí, eliminar',
-        cancelButtonText: 'Cancelar',
-        confirmButtonColor: '#d33',
-        cancelButtonColor: '#3085d6'
-    }).then((result) => {
-        if (result.value) {
-            this.submit();
-        }
-    });
-});
-</script>
-
-{% endblock %}
-{% block js_aditional %}
-{% endblock js_aditional %}
