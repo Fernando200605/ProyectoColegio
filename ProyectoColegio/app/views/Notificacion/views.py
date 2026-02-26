@@ -42,10 +42,11 @@ class NotificacionListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)  # Herencia por medio de super
-        context['titulo'] = 'Listado de notificaciones'
-        context['subtitulo'] = 'Bienvenido al listado de notificaciones'
+        context['titulo'] = 'Listado de Notificaciones'
+        context['subtitulo'] = 'Bienvenido al listado de Notificaciones'
         context['crear_url'] = reverse_lazy('app:crear_notificacion')
-        context['msg']='Notificaciones'
+        context['limpiar_url'] = reverse_lazy('app:limpiar_notificacion')
+        context['table'] = "notificacion"  
         return context
 
 
