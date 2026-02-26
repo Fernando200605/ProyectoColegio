@@ -216,8 +216,19 @@ class Elemento(models.Model):
 
 
 class Movimiento(models.Model):
-    tipo = models.CharField(max_length=50)
-    fecha = models.DateTimeField()
+    choise = [
+        ("Absoluto", "Absoluto"),
+        ("Parcial", "Parcial"),
+        ("Indefinido", "Indefinido")
+        
+    ]
+    
+    tipo = models.CharField(
+        max_length=50,
+        choices=choise
+        )
+    
+    fecha = models.DateTimeField(auto_now=True)
     cantidad = models.IntegerField()
     elementoId = models.ForeignKey(Elemento, on_delete=models.CASCADE)
     usuarioId = models.ForeignKey(Usuario, on_delete=models.CASCADE)

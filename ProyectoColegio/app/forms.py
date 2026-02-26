@@ -215,10 +215,7 @@ class MovimientoForm(forms.ModelForm):
         model = Movimiento
         fields = '__all__'
         widgets = {
-            'nom': forms.TextInput(attrs={
-                'class':'form-control'
-            }),
-            'jornada':forms.TextInput(attrs={
+            'tipo': forms.Select(attrs={
                 'class':'form-control'
             }),
             'codigo':forms.TextInput(attrs={
@@ -229,6 +226,10 @@ class MovimientoForm(forms.ModelForm):
             }),
             'docenteid':forms.Select(attrs={
                 'class':'form-control'
+            }),
+            'fecha': forms.DateInput(attrs={
+                'class': 'form-control',
+                'type': 'date'
             })
         }
     
