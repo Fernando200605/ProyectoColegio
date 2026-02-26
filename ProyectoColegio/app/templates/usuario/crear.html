@@ -15,7 +15,19 @@
         {{ field.label }}
       </label>
 
-      {{ field|add_class:'form-control form-control-custom' }}
+      {# ── Campo contraseña con ojito ── #}
+      {% if field.name == 'contraseña' %}
+        <div class="input-group">
+          {{ field|add_class:'form-control form-control-custom'|attr:'id:id_contraseña' }}
+          <button class="btn btn-outline-secondary" type="button"
+                  onclick="togglePassword('id_contraseña', 'eye_contraseña')"
+                  tabindex="-1">
+            <i id="eye_contraseña" class="fas fa-eye"></i>
+          </button>
+        </div>
+      {% else %}
+        {{ field|add_class:'form-control form-control-custom' }}
+      {% endif %}
 
       {% if field.errors %}
         {% for error in field.errors %}
@@ -26,14 +38,22 @@
       {% endif %}
     </div>
 
-    {# Campo confirmar contraseña  #}
+    {# ── Campo confirmar contraseña con ojito ── #}
     {% if field.name == 'contraseña' %}
       <div class="mb-4">
         <label class="form-label fw-bold" style="color: #1C2E4A;">Confirmar Contraseña</label>
-        <input type="password"
-               name="confirmar_contraseña"
-               class="form-control form-control-custom"
-               placeholder="Repite la contraseña">
+        <div class="input-group">
+          <input type="password"
+                 id="id_confirmar_contraseña"
+                 name="confirmar_contraseña"
+                 class="form-control form-control-custom"
+                 placeholder="Repite la contraseña">
+          <button class="btn btn-outline-secondary" type="button"
+                  onclick="togglePassword('id_confirmar_contraseña', 'eye_confirmar')"
+                  tabindex="-1">
+            <i id="eye_confirmar" class="fas fa-eye"></i>
+          </button>
+        </div>
       </div>
     {% endif %}
   {% endfor %}
@@ -50,7 +70,7 @@
     </select>
   </div>
 
-  {# ===== FORMULARIOS POR ROL  ===== #}
+  {# ===== FORMULARIOS POR ROL ===== #}
   <div id="administrador-form" class="rol-form" style="display:none;">
     <div class="mb-4">
       <label class="form-label fw-bold" style="color: #1C2E4A;">Cargo</label>
@@ -76,34 +96,91 @@
       <label class="form-label fw-bold">Teléfono</label>
       {{ acudiente_form.telefono|add_class:'form-control'|attr:"name:telefono" }}
     </div>
+    <div class="mb-4">
+      <label class="form-label fw-bold">Dirección</label>
+      {{ acudiente_form.direccion|add_class:'form-control'|attr:"name:direccion" }}
+    </div>
   </div>
 
-  
+
   <script>
+    //  Ojito: alternar visibilidad de contraseña 
+    function togglePassword(inputId, iconId) {
+      const input = document.getElementById(inputId);
+      const icon  = document.getElementById(iconId);
+      if (input.type === 'password') {
+        input.type = 'text';
+        icon.classList.replace('fa-eye', 'fa-eye-slash');
+      } else {
+        input.type = 'password';
+        icon.classList.replace('fa-eye-slash', 'fa-eye');
+      }
+    }
+
+    // ── Bloqueo de teclas en tiempo real 
     document.addEventListener('DOMContentLoaded', function () {
+
+      // Solo letras, tildes, ñ y espacios — sin números ni caracteres especiales
+      const SOLO_LETRAS  = /^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]$/;
+
+      // Solo dígitos (para teléfono)
+      const SOLO_DIGITOS = /^\d$/;
+
+      function bloquearTeclas(selector, regex) {
+        document.querySelectorAll(selector).forEach(function (el) {
+          el.addEventListener('keypress', function (e) {
+            if (e.key.length > 1) return; 
+            if (!regex.test(e.key)) e.preventDefault();
+          });
+          el.addEventListener('paste', function (e) {
+            const texto = (e.clipboardData || window.clipboardData).getData('text');
+            if (!texto.split('').every(c => regex.test(c))) e.preventDefault();
+          });
+        });
+      }
+
+      // ── Todos los campos de texto: solo letras, sin números ni especiales 
+      // Nombre, cargo, especialidad: solo letras
+      bloquearTeclas(
+        'input[name="nombre"], ' +
+        'input[name="cargo"], ' +
+        'input[name="especialidad"], ' +
+        'textarea[name="especialidad"]',
+        SOLO_LETRAS
+      );
+
+      // Código y teléfono: solo dígi
+      bloquearTeclas(
+        'input[name="codigo"], ' +
+        'input[name="telefono"]',
+        SOLO_DIGITOS
+      );
+      
+
+      // Toggle de formularios por rol 
       const rolSelect = document.getElementById('rol-select');
       const rolForms  = document.querySelectorAll('.rol-form');
 
       function toggleRolForm() {
         rolForms.forEach(div => {
           div.style.display = 'none';
-          div.querySelectorAll('input, select, textarea').forEach(input => {
-            input.disabled = true;
+          div.querySelectorAll('input, select, textarea').forEach(inp => {
+            inp.disabled = true;
           });
         });
         if (rolSelect.value) {
           const formActivo = document.getElementById(rolSelect.value + '-form');
           if (formActivo) {
             formActivo.style.display = 'block';
-            formActivo.querySelectorAll('input, select, textarea').forEach(input => {
-              input.disabled = false;
+            formActivo.querySelectorAll('input, select, textarea').forEach(inp => {
+              inp.disabled = false;
             });
           }
         }
       }
 
       rolSelect.addEventListener('change', toggleRolForm);
-      toggleRolForm(); 
+      toggleRolForm();
     });
   </script>
 
