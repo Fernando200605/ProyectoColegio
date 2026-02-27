@@ -3,27 +3,27 @@
 {% load static %}
 
 {% block main %}
-  <div class="container py-4 edit">
-    <a href="{{ listar_url }}"
-      class="btn btn-back mb-4 shadow-sm">
-      <i class="fas fa-chevron-left me-2"></i> Volver al listado
-    </a>
+<div class="container py-4 edit">
+  <a href="{{ listar_url }}" class="btn btn-back mb-4 shadow-sm">
+    <i class="fas fa-chevron-left me-2"></i> Volver al listado
+  </a>
 
-    <div class="row justify-content-center">
-      <div class="col-md-8">
-        <form method="post" action="">
-          <div class="card card-form shadow-lg">
-            <div class="card-header card-header-custom">
-              <h3 class="card-title mb-0 d-flex align-items-center">
-                <i class="fas fa-edit me-3"></i> {% block titulo %}{% endblock titulo %}
-              </h3>
-            </div>
+  <div class="row justify-content-center">
+    <div class="col-md-12">
+      <form method="post" action="">
+        <div class="card card-form shadow-lg">
+          <div class="card-header card-header-custom">
+            <h3 class="card-title mb-0 d-flex align-items-center">
+              <i class="fas fa-edit me-3"></i> {% block titulo %}{% endblock titulo %}
+            </h3>
+          </div>
 
-            <div class="card-body p-4">
-              {% block form %}
-              {% csrf_token %}
+          <div class="card-body p-4">
+            {% block form %}
+            {% csrf_token %}
+              <div class="row">
                 {% for field in form.visible_fields %}
-                  <div class="mb-4">
+                  <div class="col-md-4 mb-4">
                     <label class="form-label fw-bold" style="color: #1C2E4A;">
                       {{ field.label }}
                     </label>
@@ -34,29 +34,30 @@
                       <div class="form-text">{{ field.help_text }}</div>
                     {% endif %}
 
-                  {% if field.errors %}
-                    {% for error in field.errors %}
-                      <div class="text-danger mt-1 small animated fadeIn">
-                        <i class="fas fa-exclamation-circle me-1"></i> {{ error }}
-                      </div>
-                    {% endfor %}
-                  {% endif %}
-                </div>
-              {% endfor %}
-              {% endblock form %}
-            </div>
-
-            <div class="card-footer bg-white border-0 p-4 text-end">
-              <button type="submit" class="btn btn-save shadow-sm">
-                <i class="fas fa-check-circle me-2"></i> {{ btn_name }}
-              </button>
-            </div>
-
+                    {% if field.errors %}
+                      {% for error in field.errors %}
+                        <div class="text-danger mt-1 small animated fadeIn">
+                          <i class="fas fa-exclamation-circle me-1"></i> {{ error }}
+                        </div>
+                      {% endfor %}
+                    {% endif %}
+                  </div>
+                {% endfor %}
+              </div>
+            {% endblock form %}
           </div>
-        </form>
-      </div>
+
+          <div class="card-footer bg-white border-0 p-4 text-end">
+            <button type="submit" class="btn btn-save shadow-sm">
+              <i class="fas fa-check-circle me-2"></i> {{ btn_name }}
+            </button>
+          </div>
+
+        </div>
+      </form>
     </div>
   </div>
+</div>
 {% endblock %}
 
 {% block js %}
