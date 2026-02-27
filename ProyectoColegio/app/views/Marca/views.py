@@ -5,10 +5,13 @@ from app.forms import MarcaForm
 from django.urls import reverse_lazy
 from django.contrib import messages
 from django.db import connection
+from django.http import JsonResponse
+
 
 def listar_marca(request):
     marcas = marca.objects.all()
     return render(request, 'Marca/index.html', {'marcas': marcas})
+
 
 class marcaListView(ListView):
     model = marca
@@ -22,16 +25,37 @@ class marcaListView(ListView):
         context['crear_url'] = reverse_lazy('app:crear_marca')
         return context
 
+
 class marcaCreateView(CreateView):
     model = marca
     form_class = MarcaForm
-    template_name = 'Marca/crear.html'
+    template_name = 'modals/modals_base.html'
     success_url = reverse_lazy('app:crear_elemento')
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['listar_url'] = reverse_lazy('app:index_unidad')
+        context['btn_name'] = "Guardar"
+        return context
     def form_valid(self, form):
-        messages.success(self.request, "Marca creada correctamente")
+        self.object = form.save()
+        mensaje_texto = 'Se creo un nueva Unidad de Medida'
+        
+        if self.request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return JsonResponse({
+                'success' : True,
+                'id':self.object.id,
+                'nombre':str(self.object),
+                'message' : mensaje_texto
+            })
         return super().form_valid(form)
-
+    def form_invalid(self, form):
+        if self.request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return JsonResponse({
+                'succes' : False,
+                'errors': form.error
+            },status=400)
+        return super().form_invalid(form)
 class marcaUpdateView(UpdateView):
     model = marca
     form_class = MarcaForm
