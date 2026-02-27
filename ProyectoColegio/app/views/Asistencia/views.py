@@ -51,6 +51,8 @@ class AsistenciaListView(ListView):
         context['crear_url'] = reverse_lazy('app:crear_asistencia')
         context['limpiar_url'] = reverse_lazy('app:limpiar_asistencia')
         context['table'] = "Asistencias"  
+        context['icon_primary'] = "fa-arrow-up"
+        context['icon_secodary'] = "fa-arrow-down"
         return context
 
 

@@ -47,6 +47,8 @@ class NotificacionListView(ListView):
         context['crear_url'] = reverse_lazy('app:crear_notificacion')
         context['limpiar_url'] = reverse_lazy('app:limpiar_notificacion')
         context['table'] = "notificacion"  
+        context['icon_primary'] = "fa-arrow-up"
+        context['icon_secodary'] = "fa-arrow-down"
         return context
 
 

@@ -47,6 +47,8 @@ class MovimientoListView(ListView):
         context['crear_url'] = reverse_lazy('app:crear_movimiento')
         context['limpiar_url'] = reverse_lazy('app:limpiar_movimiento')
         context['table'] = "movimiento"  
+        context['icon_primary'] = "fa-arrow-up"
+        context['icon_secodary'] = "fa-arrow-down"
         return context
 
 

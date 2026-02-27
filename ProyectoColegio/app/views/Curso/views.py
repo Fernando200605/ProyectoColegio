@@ -49,6 +49,8 @@ class CursoListView(ListView):
         context['titulo'] = 'Listado de Cursos'
         context['subtitulo'] = 'Bienvenido al listado de cursos'
         context['crear_url'] = reverse_lazy('app:crear_curso')
+        context['icon_primary'] = "fa-arrow-up"
+        context['icon_secodary'] = "fa-arrow-down"
         return context
 
 
