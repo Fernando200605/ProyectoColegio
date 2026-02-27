@@ -19,8 +19,9 @@ def listar_usuario(request):
 
 
 def listar_evento(request):
-    evento = evento.objects.all()
+    evento = Evento.objects.all()
     return render(request, 'evento/index.html', {'eventos': evento})
+
 
 
 class EventoListView(ListView):
@@ -43,11 +44,10 @@ class EventoListView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)  # Herencia por medio de super
         context['titulo'] = 'Listado de Eventos'
-        context['subtitulo'] = 'Bienvenido al listado de eventos'
+        context['subtitulo'] = 'Bienvenido al listado de Eventos'
         context['crear_url'] = reverse_lazy('app:crear_evento')
-        context['url']= reverse_lazy('app:limpiar_evento')
-        context['msg']='Eventos'
-        
+        context['limpiar_url'] = reverse_lazy('app:limpiar_evento')
+        context['table'] = "evento"  
         return context
     
 
@@ -112,5 +112,5 @@ class EventoCleandView(View):
             print(nombre_tabla)
             cursor.execute(f"DELETE FROM sqlite_sequence WHERE name='{nombre_tabla}';")
         
-        messages.success(self.request, "Todos los eventos han sido eliminados y el ID reiniciado.")
+        messages.success(self.request, "Todos los Eventos han sido eliminados y el ID reiniciado.")
         return redirect(reverse_lazy('app:index_evento'))

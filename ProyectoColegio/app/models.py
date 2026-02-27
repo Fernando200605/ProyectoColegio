@@ -1,36 +1,44 @@
+from django.contrib.auth.models import AbstractUser, UserManager
 from django.db import models
 
-
-
-# Create your models here.
-estado_usuario = [
+estado_usuario = (
     (True, 'Activo'),
     (False, 'Inactivo'),
-]
+)
 
-class Usuario(models.Model):
-    nombre = models.CharField(max_length=100)
+class Usuario(AbstractUser):
+    nombre = models.CharField(max_length=100, unique=True) 
     email = models.EmailField(unique=True)
-    contraseña = models.CharField(max_length=100)
-    estado = models.BooleanField(default=True,choices=estado_usuario)
+    estado = models.BooleanField(default=True, choices=estado_usuario)
+
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     fecha_actualizacion = models.DateTimeField(auto_now=True)
-    
+
+    username = None  
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['nombre']
+
+    # Solo esto para que Django sepa que no hay username sin crear un Manager desde cero
+    objects = UserManager() 
+
     class Meta:
         verbose_name = "Usuario"
         verbose_name_plural = "Usuarios"
         db_table = "usuario"
-    
+
+    # Eliminamos el save() que asignaba username para evitar errores de base de datos
+
     def get_rol(self):
-        if hasattr(self,'administrador'):
+        if hasattr(self, 'administrador'):
             return 'Administrador'
-        elif hasattr(self,'docente'):
+        elif hasattr(self, 'docente'):
             return 'Docente'
-        elif hasattr(self,'estudiante'):
+        elif hasattr(self, 'estudiante'):
             return 'Estudiante'
-        elif hasattr(self,'acudiente'):
+        elif hasattr(self, 'acudiente'):
             return 'Acudiente'
         return 'Desconocido'
+
     def __str__(self):
         return self.nombre
 
@@ -85,6 +93,17 @@ class Curso (models.Model):
         db_table = "Curso"
     def __str__ (self):
         return self.nom 
+    
+GRADOS_CURSO = [
+    ('4', '4°'),
+    ('5', '5°'),
+    ('6', '6°'),
+    ('7', '7°'),
+    ('8', '8°'),
+    ('9', '9°'),
+    ('10', '10°'),
+    ('11', '11°'),
+]
 
 Estado_Matricula = [
     ('Matriculado', 'Matriculado'),
@@ -99,7 +118,7 @@ class Estudiante(models.Model):
     fechaNacimiento = models.DateField(verbose_name="Fecha de nacimiento")
     estadoMatricula = models.TextField(max_length=20, null=True, blank=True, verbose_name="Estado de Matricula" , choices=Estado_Matricula)
     fechaIngreso = models.DateField(verbose_name="Fecha de Ingreso")
-    cursoId = models.ForeignKey(Curso,on_delete=models.CASCADE)
+    cursoId = models.ForeignKey(Curso,on_delete=models.CASCADE, choices=GRADOS_CURSO, verbose_name="Curso")
     
     def __str__(self):
         return self.usuario.nombre
@@ -124,7 +143,7 @@ class Asistencia (models.Model):
         max_length=20,
         choices=choise
     )
-    obsevaciones = models.TextField()
+    observaciones = models.TextField()
     class Meta:
         verbose_name = "asistencia"
         verbose_name_plural = "asistencias"
@@ -216,8 +235,19 @@ class Elemento(models.Model):
 
 
 class Movimiento(models.Model):
-    tipo = models.CharField(max_length=50)
-    fecha = models.DateTimeField()
+    choise = [
+        ("Absoluto", "Absoluto"),
+        ("Parcial", "Parcial"),
+        ("Indefinido", "Indefinido")
+        
+    ]
+    
+    tipo = models.CharField(
+        max_length=50,
+        choices=choise
+        )
+    
+    fecha = models.DateTimeField(auto_now=True)
     cantidad = models.IntegerField()
     elementoId = models.ForeignKey(Elemento, on_delete=models.CASCADE)
     usuarioId = models.ForeignKey(Usuario, on_delete=models.CASCADE)
@@ -232,10 +262,19 @@ class Movimiento(models.Model):
     def __str__(self):
         return self.tipo
 class Notificacion(models.Model):
+    choise = [
+        ('A tiempo', 'A tiempo'),
+        ('Tarde', 'Tarde'),
+        ('Inasistencia', 'Inasistencia'),
+    ]
     titulo = models.CharField(max_length=200)
     mensaje = models.TextField()
     fecha_envio = models.DateTimeField(auto_now_add=True)
-    estado = models.BooleanField(default=False)
+    estado = models.CharField(
+        max_length=20,
+        choices=choise
+    )
+    
     tipo = models.CharField(max_length=50)
     receptor = models.ForeignKey(Usuario, on_delete=models.CASCADE)
     evento = models.ForeignKey(Evento, on_delete=models.CASCADE, null=True, blank=True)
@@ -247,5 +286,3 @@ class Notificacion(models.Model):
 
     def __str__(self):
         return self.titulo
-
-#Hola amigos

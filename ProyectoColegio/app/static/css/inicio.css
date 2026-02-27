@@ -11,12 +11,7 @@ body {
     /* Fondo general */
 }
 
-html,
-body {
-  height: 100%;
-  background-color: #f9f9f9;
-  /* Fondo general */
-}
+
 
 body {
   display: flex;
@@ -34,6 +29,22 @@ body {
 }
 
 
+body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    /* Reemplaza con la ruta real de la foto de tu colegio */
+    background-image: url('../img/slogan.jpeg'); 
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    /* Aquí controlas qué tan opaca se ve la foto (0.1 es 10% visible) */
+    opacity: 0.15; 
+    z-index: 0; /* Se mantiene detrás de todo */
+}
 .hamburger {
   position: fixed;
   top: 15px;
@@ -906,8 +917,6 @@ body.is-large-text .guia-item p {
 
 .card-header-custom h3 {
   color: #ffffff;
-
-  color: #FFD1DC;
   font-size: 1.8rem;
   font-weight: 800;
   letter-spacing: 1px;
@@ -1127,4 +1136,47 @@ body.is-large-text .guia-item p {
   padding: 1.5rem !important;
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15) !important;
   background: #f9fafb !important;
+}
+/* Overlay blur */
+.main-content-glass {
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    background: rgba(249, 249, 249, 0.4);
+    border-radius: 20px;
+    padding: 20px;
+    margin-top: 10px;
+}
+
+/* 3. Estilos para las tarjetas de métricas (Pastel) */
+.card-stats {
+    border: none;
+    border-radius: 15px;
+    transition: transform 0.3s;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.card-stats:hover {
+    transform: translateY(-5px);
+}
+
+.card-pastel-blue { background-color: #e3f2fd; border-left: 5px solid #2196f3; }
+.card-pastel-red { background-color: #ffebee; border-left: 5px solid #f44336; }
+
+/* 4. Botón Vaciar Lista más estilizado */
+.btn-rounded-custom {
+    border-radius: 10px !important;
+    font-weight: 600;
+    border-width: 2px !important;
+}
+.edit-text {
+    background-color: #1C2E4A; /* El azul oscuro que ya usas */
+    color: #ffffff !important; /* Rosa pastel para el texto (contraste elegante) */
+    padding: 20px 30px;
+    border-radius: 15px 15px 0 0; /* Redondeado solo arriba */
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    display: block; /* Asegura que tome todo el ancho */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    text-align: left;
 }

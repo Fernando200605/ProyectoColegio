@@ -12,9 +12,10 @@
      <tr>
                     <th><i class="fas fa-hashtag me-2"></i>ID</th>
                     <th><i class="fas fa-box me-2"></i>Nombre</th>
-                    <th><i class="fas fa-warehouse me-2"></i>Ubicación</th>
+                    <th><i class="fas fa-box me-2"></i>Marca</th>
+                    <th><i class="fas fa-warehouse me-2"></i>Categoría</th>
                     <th><i class="fas fa-chart-line me-2"></i>Stock</th>
-                    <th><i class="fas fa-chart-line me-2"></i>Descripción</th>
+                    <th><i class="fas fa-chart-line me-2"></i>Ubicación</th>
                     <th class="text-center"><i class="fas fa-tools me-2"></i>Acciones</th>
                 </tr>
 {% endblock columns %}
@@ -24,8 +25,10 @@
     <tr>
         <td>{{ elemento.id }}</td>
         <td>{{ elemento.nombre }}</td>
+        <td>{{ elemento.marcaId }}</td>
+        <td>{{ elemento.categoriaId }}</td>
+        <td>{{ elemento.stockActual }}</td>
         <td>{{ elemento.ubicacion }}</td>
-        <td>{{ elemento.stock_actual }}</td>
         <td class="text-center">
             <a href="{% url 'app:editar_elemento' elemento.id %}" class="btn btn-sm me-1" style="background-color: #3054f7; color: #ffffff; border-radius: 8px;">
                             <i class="fa-solid fa-pen-to-square"></i>
