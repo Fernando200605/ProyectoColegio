@@ -1,7 +1,7 @@
 :root {
   --primary-color: #f6f6f6;
   --text: 22px;
-  --text-font: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  --text-font: 'Courier New', Courier, monospace;
   --secondary-color: #fab5b5;
   --secondary-hover: #ff4d6d; /* entre rosa y coral */
 }

@@ -190,7 +190,7 @@ class UsuarioForm(forms.ModelForm):
             )
 
         dominios_permitidos = ['gmail.com',
-                               'hotmail.com', 'outlook.com', 'yahoo.com']
+                                'hotmail.com', 'outlook.com', 'yahoo.com']
         partes = email.split('@')
         if len(partes) > 1 and partes[1] not in dominios_permitidos:
             self.fields['email'].widget.attrs['class'] = 'form-control is-invalid'
@@ -287,7 +287,7 @@ class EstudianteForm(forms.ModelForm):
     class Meta:
         model = Estudiante
         fields = ['codigo', 'fechaNacimiento',
-                  'estadoMatricula', 'fechaIngreso', 'cursoId']
+                    'estadoMatricula', 'fechaIngreso', 'cursoId']
         widgets = {
             'codigo':          forms.TextInput(attrs={'class': 'form-control'}),
             'fechaNacimiento': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
@@ -406,7 +406,7 @@ class ElementoForm(forms.ModelForm):
         widgets = {
             'nombre': forms.TextInput(attrs={'class': 'form-control'}),
             'cantidad': forms.NumberInput(attrs={'class': 'form-control'}),
-
+            
             # Campos con botones de creación rápida (CORRECTO)
             'marcaId': forms.Select(attrs={
                 'class': 'form-control',
