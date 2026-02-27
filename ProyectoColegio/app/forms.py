@@ -506,10 +506,22 @@ class MovimientoForm(forms.ModelForm):
             'fecha': forms.DateInput(attrs={
                 'class': 'form-control',
                 'type': 'date'
-            })
+            }),
+            'motivo': forms.Textarea(attrs={
+                'class': 'form-control',
+
+}),
         }
+    def clean_motivo(self):
+        motivo = self.cleaned_data.get('motivo')
 
+        motivo = motivo.strip()
 
+        if len(motivo) < 10 or len(motivo) > 200:
+            raise forms.ValidationError("El motivo debe tener entre 10 y 200 caracteres."
+        )
+
+        return motivo
 class EventoForm(forms.ModelForm):
     class Meta:
         model = Evento
