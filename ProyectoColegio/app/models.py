@@ -94,16 +94,6 @@ class Curso (models.Model):
     def __str__ (self):
         return self.nom 
     
-GRADOS_CURSO = [
-    ('4', '4°'),
-    ('5', '5°'),
-    ('6', '6°'),
-    ('7', '7°'),
-    ('8', '8°'),
-    ('9', '9°'),
-    ('10', '10°'),
-    ('11', '11°'),
-]
 
 Estado_Matricula = [
     ('Matriculado', 'Matriculado'),
@@ -118,7 +108,7 @@ class Estudiante(models.Model):
     fechaNacimiento = models.DateField(verbose_name="Fecha de nacimiento")
     estadoMatricula = models.TextField(max_length=20, null=True, blank=True, verbose_name="Estado de Matricula" , choices=Estado_Matricula)
     fechaIngreso = models.DateField(verbose_name="Fecha de Ingreso")
-    cursoId = models.ForeignKey(Curso,on_delete=models.CASCADE, choices=GRADOS_CURSO, verbose_name="Curso")
+    cursoId = models.ForeignKey(Curso,on_delete=models.CASCADE, verbose_name="Curso")
     
     def __str__(self):
         return self.usuario.nombre

@@ -221,7 +221,7 @@ header::before {
     font-weight: 800;
     font-size: 22px;
     text-transform: uppercase;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
+    text-shadow: 2px 2px 4px rgb(255, 0, 0);
 }
 
 #imag {
