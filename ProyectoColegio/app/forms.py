@@ -73,7 +73,7 @@ class CursoForm(forms.ModelForm):
 
 
 class AsistenciaForm(forms.ModelForm):
-    
+
     class Meta:
         model = Asistencia
         fields = '__all__'
@@ -81,7 +81,7 @@ class AsistenciaForm(forms.ModelForm):
             'estudiante-id': forms.Select(attrs={
                 'class': 'form-control'
             }),
-            
+
             'horaentrada': forms.TimeInput(attrs={
                 'class': 'form-control',
                 'type': 'time'
@@ -96,7 +96,7 @@ class AsistenciaForm(forms.ModelForm):
                 'class': 'form-control'
             }),
 
-            'observaciones': forms.TextInput(attrs={ 
+            'observaciones': forms.TextInput(attrs={
                 'class': 'form-control'
             }),
 
@@ -110,13 +110,14 @@ class AsistenciaForm(forms.ModelForm):
         observaciones = self.cleaned_data.get('observaciones')
 
         if len(observaciones) > 200:
-            raise forms.ValidationError("La descripción no puede superar los 200 caracteres.")
+            raise forms.ValidationError(
+                "La descripción no puede superar los 200 caracteres.")
 
         if len(observaciones) < 10:
-            raise forms.ValidationError("La descripción debe tener mínimo 10 caracteres.")
+            raise forms.ValidationError(
+                "La descripción debe tener mínimo 10 caracteres.")
 
         return observaciones
-    
 
     def clean(self):
         cleaned_data = super().clean()
@@ -149,6 +150,7 @@ class AsistenciaForm(forms.ModelForm):
 
 # ── Formulario para Crear Usuario ────────────────────────────────────────────
 
+
 class UsuarioForm(forms.ModelForm):
     class Meta:
         model = Usuario
@@ -159,8 +161,8 @@ class UsuarioForm(forms.ModelForm):
             'password': forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Contraseña', 'id': 'id_contraseña'}),
             'estado': forms.Select(attrs={'class': 'form-control'}),
         }
-    
-    def save(self, commit = True):
+
+    def save(self, commit=True):
         usuario = super().save(commit=False)
         usuario.set_password(self.cleaned_data['password'])
         if commit:
@@ -312,6 +314,7 @@ class AcudienteForm(forms.ModelForm):
             'telefono': forms.TextInput(attrs={'class': 'form-control', 'maxlength': '10'}),
             'direccion': forms.Textarea(attrs={'class': 'form-control', 'rows': 2})
         }
+
         def clean(self):
             cleaned_data = super().clean()
             inicio = cleaned_data.get('fecha_inicio')
@@ -347,15 +350,6 @@ class TipoElementoForm(forms.ModelForm):
                 'class': 'form-control'
             })
         }
-
-    def clean_nombre(self):
-        nombre = self.cleaned_data['nombre']
-        exist = tipoelemento.objects.filter(
-            nombre=nombre).exclude(pk=self.instance.pk).exists()
-        if exist:
-            self.add_error('nombre', "El nombre ya existe")
-        return nombre
-
     def clean_nombre(self):
         nombre = self.cleaned_data.get("nombre")
         patron = r"^[A-Za-zÁÉÍÓÚáéíóúÑñ ]+$"
@@ -440,7 +434,7 @@ class ElementoForm(forms.ModelForm):
             'ubicacion': forms.TextInput(attrs={
                 'class': 'form-control'
             })
-                
+
         }
 
     def clean_nombre(self):
@@ -498,7 +492,7 @@ class MovimientoForm(forms.ModelForm):
         fields = '__all__'
         widgets = {
             'tipo': forms.Select(attrs={
-                'class':'form-control'
+                'class': 'form-control'
             }),
             'codigo': forms.TextInput(attrs={
                 'class': 'form-control'
@@ -506,8 +500,8 @@ class MovimientoForm(forms.ModelForm):
             'capacidad': forms.NumberInput(attrs={
                 'class': 'form-control'
             }),
-            'docenteid':forms.Select(attrs={
-                'class':'form-control'
+            'docenteid': forms.Select(attrs={
+                'class': 'form-control'
             }),
             'fecha': forms.DateInput(attrs={
                 'class': 'form-control',
@@ -542,10 +536,12 @@ class EventoForm(forms.ModelForm):
             raise forms.ValidationError("La descripción es obligatoria.")
 
         if len(descripcion) > 200:
-            raise forms.ValidationError("La descripción no puede superar los 200 caracteres.")
+            raise forms.ValidationError(
+                "La descripción no puede superar los 200 caracteres.")
 
         if len(descripcion) < 10:
-            raise forms.ValidationError("La descripción debe tener mínimo 10 caracteres.")
+            raise forms.ValidationError(
+                "La descripción debe tener mínimo 10 caracteres.")
 
         return descripcion
 
@@ -556,22 +552,27 @@ class EventoForm(forms.ModelForm):
 
         if fecha_inicio and fecha_fin:
             if fecha_inicio >= fecha_fin:
-                self.add_error('fecha_fin', "La fecha de fin debe ser mayor que la fecha de inicio.")
+                self.add_error(
+                    'fecha_fin', "La fecha de fin debe ser mayor que la fecha de inicio.")
 
         return cleaned_data
+
     def clean_titulo(self):
         titulo = self.cleaned_data.get('titulo')
 
         # Validación 1: No permitir que sea solo números
         if titulo.isdigit():
-            raise forms.ValidationError("El título no puede contener solo números.")
+            raise forms.ValidationError(
+                "El título no puede contener solo números.")
 
         # Validación 2: No permitir caracteres especiales
         if not re.match(r'^[a-zA-ZÁÉÍÓÚáéíóúÑñ0-9 ]+$', titulo):
-            raise forms.ValidationError("El título no puede contener caracteres especiales.")
+            raise forms.ValidationError(
+                "El título no puede contener caracteres especiales.")
 
         return titulo
     # Validación personalizada para el campo capacidad
+
     def clean_titulo(self):
         titulo = self.cleaned_data.get('titulo')
 
@@ -587,10 +588,12 @@ class EventoForm(forms.ModelForm):
             raise forms.ValidationError("La descripción es obligatoria.")
 
         if len(descripcion) > 200:
-            raise forms.ValidationError("La descripción no puede superar los 200 caracteres.")
+            raise forms.ValidationError(
+                "La descripción no puede superar los 200 caracteres.")
 
         if len(descripcion) < 10:
-            raise forms.ValidationError("La descripción debe tener mínimo 10 caracteres.")
+            raise forms.ValidationError(
+                "La descripción debe tener mínimo 10 caracteres.")
 
         return descripcion
 
@@ -601,10 +604,10 @@ class EventoForm(forms.ModelForm):
 
         if fecha_inicio and fecha_fin:
             if fecha_inicio >= fecha_fin:
-                self.add_error('fecha_fin', "La fecha de fin debe ser mayor que la fecha de inicio.")
+                self.add_error(
+                    'fecha_fin', "La fecha de fin debe ser mayor que la fecha de inicio.")
 
         return cleaned_data
-    
 
 
 class NotificacionForm(forms.ModelForm):
@@ -612,32 +615,60 @@ class NotificacionForm(forms.ModelForm):
         model = Notificacion
         fields = '__all__'
         widgets = {
-            'nom': forms.TextInput(attrs={
+            'titulo': forms.TextInput(attrs={
                 'class': 'form-control'
             }),
-            'jornada': forms.TextInput(attrs={
+            'mensaje': forms.TextInput(attrs={
                 'class': 'form-control'
             }),
-            'codigo': forms.TextInput(attrs={
+            'fecha_envio': forms.TextInput(attrs={
                 'class': 'form-control'
             }),
-            'capacidad': forms.NumberInput(attrs={
+            'estado': forms.Select(attrs={
                 'class': 'form-control'
             }),
-            'docenteid': forms.Select(attrs={
+            'tipo': forms.Select(attrs={
+                'class': 'form-control'
+            }),
+            'receptor': forms.Select(attrs={
+                'class': 'form-control'
+            }),
+            'evento': forms.Select(attrs={
                 'class': 'form-control'
             })
         }
 
-    def clean_capacidad(self):
-        capacidad = self.cleaned_data.get('capacidad')
+    def clean_mensaje(self):
+        mensaje = self.cleaned_data.get('mensaje')
 
-        if capacidad is None or capacidad <= 0:
+        if not mensaje:
+            raise forms.ValidationError("El mensaje es obligatorio.")
+
+        if len(mensaje) > 200:
             raise forms.ValidationError(
-                "La capacidad debe ser un número positivo."
-            )
+                "El mensaje no puede superar los 200 caracteres.")
 
-        return capacidad
+        if len(mensaje) < 10:
+            raise forms.ValidationError(
+                "El mensaje debe tener mínimo 10 caracteres.")
+
+        return mensaje
+
+    def clean_titulo(self):
+        titulo = self.cleaned_data.get('titulo')
+
+        # Validación 1: No permitir que sea solo números
+        if titulo.isdigit():
+            raise forms.ValidationError(
+                "El título no puede contener solo números.")
+
+        # Validación 2: No permitir caracteres especiales
+        if not re.match(r'^[a-zA-ZÁÉÍÓÚáéíóúÑñ0-9 ]+$', titulo):
+            raise forms.ValidationError(
+                "El título no puede contener caracteres especiales.")
+
+        return titulo
+
 
 # MARCA
 
@@ -713,12 +744,57 @@ class EventoForm(forms.ModelForm):
         widgets = {
             'titulo': forms.TextInput(attrs={'class': 'form-control'}),
             'descripcion': forms.Textarea(attrs={'class': 'form-control'}),
-            'fecha_inicio': forms.DateTimeInput(attrs={
-                'type': 'datetime-local',
-                'class': 'form-control'
-            }),
-            'fecha_fin': forms.DateTimeInput(attrs={
-                'type': 'datetime-local',
-                'class': 'form-control'
-            }),
+            'fecha_inicio': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
+            'fecha_fin': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
         }
+
+    def clean_titulo(self):
+        titulo = self.cleaned_data.get('titulo')
+
+        if Evento.objects.filter(titulo__iexact=titulo).exclude(pk=self.instance.pk).exists():
+            raise forms.ValidationError("Ya existe un evento con este título.")
+
+        return titulo
+
+    def clean_descripcion(self):
+        descripcion = self.cleaned_data.get('descripcion')
+
+        if not descripcion:
+            raise forms.ValidationError("La descripción es obligatoria.")
+
+        if len(descripcion) > 200:
+            raise forms.ValidationError(
+                "La descripción no puede superar los 200 caracteres.")
+
+        if len(descripcion) < 10:
+            raise forms.ValidationError(
+                "La descripción debe tener mínimo 10 caracteres.")
+
+        return descripcion
+
+    def clean(self):
+        cleaned_data = super().clean()
+        fecha_inicio = cleaned_data.get('fecha_inicio')
+        fecha_fin = cleaned_data.get('fecha_fin')
+
+        if fecha_inicio and fecha_fin:
+            if fecha_inicio >= fecha_fin:
+                self.add_error(
+                    'fecha_fin', "La fecha de fin debe ser mayor que la fecha de inicio.")
+
+        return cleaned_data
+
+    def clean_titulo(self):
+        titulo = self.cleaned_data.get('titulo')
+
+        # Validación 1: No permitir que sea solo números
+        if titulo.isdigit():
+            raise forms.ValidationError(
+                "El título no puede contener solo números.")
+
+        # Validación 2: No permitir caracteres especiales
+        if not re.match(r'^[a-zA-ZÁÉÍÓÚáéíóúÑñ0-9 ]+$', titulo):
+            raise forms.ValidationError(
+                "El título no puede contener caracteres especiales.")
+
+        return titulo
