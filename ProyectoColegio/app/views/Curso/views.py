@@ -49,6 +49,8 @@ class CursoListView(ListView):
         context['titulo'] = 'Listado de Cursos'
         context['subtitulo'] = 'Bienvenido al listado de cursos'
         context['crear_url'] = reverse_lazy('app:crear_curso')
+        context['text'] = "Cursos con estado inactivo"
+        context['total_text'] = "Total de Cursos"
         return context
 
 

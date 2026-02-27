@@ -48,6 +48,8 @@ class EventoListView(ListView):
         context['crear_url'] = reverse_lazy('app:crear_evento')
         context['limpiar_url'] = reverse_lazy('app:limpiar_evento')
         context['table'] = "evento"  
+        context['text'] = "Eventos de Hoy"
+        context['total_text'] = "Total de Eventos"
         return context
     
 

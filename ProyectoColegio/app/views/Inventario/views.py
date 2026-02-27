@@ -63,6 +63,8 @@ class InventarioListView(ListView):
         context['stock_bajo'] = Elemento.objects.filter(
             stockActual__lte=F("stockMinimo")
         ).count()
+        context['text'] = "Elementos con stock bajo"
+        context['total_text'] = "Total de Elementos"
 
         return context
 

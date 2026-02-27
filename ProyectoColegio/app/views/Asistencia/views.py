@@ -50,7 +50,9 @@ class AsistenciaListView(ListView):
         context['subtitulo'] = 'Bienvenido al listado de asistencias'
         context['crear_url'] = reverse_lazy('app:crear_asistencia')
         context['limpiar_url'] = reverse_lazy('app:limpiar_asistencia')
-        context['table'] = "Asistencias"  
+        context['table'] = "Asistencias"
+        context['text'] = "Asistencias Hoy"
+        context['total_text'] = "Total de Asistencias"  
         return context
 
 
