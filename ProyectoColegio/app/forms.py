@@ -397,7 +397,7 @@ class ElementoForm(forms.ModelForm):
             # Campos con botones de creación rápida (CORRECTO)
             'marcaId': forms.Select(attrs={
                 'class': 'form-control',
-                'data-crear-url': reverse_lazy('app:index_marca'),
+                'data-crear-url': reverse_lazy('app:crear_marca'),
                 'data-label': 'Marca'
             }),
             'tipoElementoId': forms.Select(attrs={

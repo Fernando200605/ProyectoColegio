@@ -35,34 +35,6 @@
 
       <!-- 🔹 BOTONES EXCLUSIVOS DE INVENTARIO (SIN MODAL) -->
 
-      {% if field.name == "tipoElementoId" %}
-        <a href="{% url 'app:crear_tipo' %}"
-           class="btn btn-sm btn-outline-primary mt-2">
-          ➕ Crear Tipo de Elemento
-        </a>
-      {% endif %}
-
-      {% if field.name == "marcaId" %}
-        <a href="{% url 'app:crear_marca' %}"
-           class="btn btn-sm btn-outline-success mt-2">
-          ➕ Crear Marca
-        </a>
-      {% endif %}
-
-      {% if field.name == "categoriaId" %}
-        <a href="{% url 'app:crear_categoria' %}"
-           class="btn btn-sm btn-outline-secondary mt-2">
-          ➕ Crear Categoría
-        </a>
-      {% endif %}
-
-      {% if field.name == "unidadMedidaId" %}
-        <a href="{% url 'app:crear_unidad' %}"
-           class="btn btn-sm btn-outline-warning mt-2">
-          ➕ Crear Unidad de Medida
-        </a>
-      {% endif %}
-
     </div>
   {% endfor %}
 {% endblock %}
