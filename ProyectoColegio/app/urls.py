@@ -11,9 +11,14 @@ from app.views.Curso.views import *
 from app.views.Movimiento.views import *
 from app.views.Evento.views import *
 from app.views.Notificacion.views import *
-
+from app.views.login.views import *
+from app.views.Index.views import DashboardView
+from django.contrib.auth.views import LogoutView
 app_name = 'app'
 urlpatterns = [
+    path('login/',CreLoginView.as_view(),name="login"),
+    path('dashboard/',DashboardView.as_view(),name="dashboard"),
+    path('logout',LogoutView.as_view(next_page='app:login'),name = "logout"),
     #path('Curso/',listar_curso,name="listar_curso" ),
     path('curso/',CursoListView.as_view(),name="index_curso"),
     path('curso/crear/',CursoCreateView.as_view(),name="crear_curso"),
@@ -45,6 +50,7 @@ urlpatterns = [
     path('tipo/crear/', TipoElementoCreateView.as_view(), name='crear_tipo'),
     path('tipo/editar/<int:pk>/', TipoElementoUpdateView.as_view(),name="actualizar_tipo"),
     path('tipo/eliminar/<int:pk>/',TipoElementoDeleteView.as_view(),name="eliminar_tipo"),
+    
 
     # UNIDAD DE MEDIDA
     path('unidad/', UnidadMedidaListView.as_view(), name='index_unidad'),
@@ -54,7 +60,6 @@ urlpatterns = [
     # MARCA
     path('marca/', marcaListView.as_view(), name='index_marca'),
     path('marca/crear/', marcaCreateView.as_view(), name='crear_marca'),
-    path('categoria/crear/', CategoriaCreateView.as_view(), name='crear_categoria'),
     path('marca/editar/<int:pk>/', marcaUpdateView.as_view(), name='editar_marca'),
     path('marca/eliminar/<int:pk>/', marcaDeleteView.as_view(), name='eliminar_marca'),
     # CATEGORIA
@@ -76,8 +81,8 @@ urlpatterns = [
     path('movimiento/limpiar/',MovimientoCleandView.as_view(),name="limpiar_movimiento"),
     path('evento/',EventoListView.as_view(),name="index_evento"),
     path('evento/crear/',EventoCreateView.as_view(),name="crear_evento"),
-    path('evento/editar/<int:pk>/',EventoupdateView.as_view(),name="editar_evento"),
-    path('evento/eliminar/<int:pk>/',EventoDeleteView.as_view(),name="eliminar_evento"),
+    path('evento/editar/<int:pk>/',EventoupdateView.as_view(), name="editar_evento"),
+    path('evento/eliminar/<int:pk>/',EventoDeleteView.as_view(), name="eliminar_evento"),
     path('evento/limpiar/',EventoCleandView.as_view(),name="limpiar_evento"),
     path('notificacion/',NotificacionListView.as_view(),name="index_notificacion"),
     path('notificacion/crear/',NotificacionCreateView.as_view(),name="crear_notificacion"),

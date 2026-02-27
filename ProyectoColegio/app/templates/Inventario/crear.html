@@ -3,7 +3,7 @@
 {% load static %}
 
 {% block titulo %}
-Registrar Elemento
+  Registrar Elemento
 {% endblock %}
 
 {% block form %}
@@ -11,14 +11,18 @@ Registrar Elemento
 
   {% for field in form.visible_fields %}
     <div class="mb-4">
-      <label class="form-label fw-bold" style="color: #1C2E4A;">
-        {{ field.label }}
-      </label>
+      <label class="form-label fw-bold" style="color: #1C2E4A;">{{ field.label }}</label>
 
-      {{ field|add_class:'form-control form-control-custom'|attr:'autocomplete:on' }}
+      {{ field }}
 
-      {% if field.help_text %}
-        <div class="form-text">{{ field.help_text }}</div>
+      {% for error in field.errors %}
+        <div class="text-danger mt-1 small">{{ error }}</div>
+      {% endfor %}
+
+      {% if 'data-crear-url' in field.field.widget.attrs %}
+        <div class="d-grid gap-2">
+          <button type="button" class="btn btn-sm btn-outline-primary mt-2" onclick="abrirModalCreacionDesdeCampo('{{ field.id_for_label }}')">➕ Crear Nuevo {{ field.label }}</button>
+        </div>
       {% endif %}
 
       {% if field.errors %}
@@ -32,21 +36,21 @@ Registrar Elemento
       <!-- 🔹 BOTONES EXCLUSIVOS DE INVENTARIO (SIN MODAL) -->
 
       {% if field.name == "tipoElementoId" %}
-        <a href="{% url 'app:index_tipo' %}"
+        <a href="{% url 'app:crear_tipo' %}"
            class="btn btn-sm btn-outline-primary mt-2">
           ➕ Crear Tipo de Elemento
         </a>
       {% endif %}
 
       {% if field.name == "marcaId" %}
-        <a href="{% url 'app:index_marca' %}"
+        <a href="{% url 'app:crear_marca' %}"
            class="btn btn-sm btn-outline-success mt-2">
           ➕ Crear Marca
         </a>
       {% endif %}
 
       {% if field.name == "categoriaId" %}
-        <a href="{% url 'app:index_categoria' %}"
+        <a href="{% url 'app:crear_categoria' %}"
            class="btn btn-sm btn-outline-secondary mt-2">
           ➕ Crear Categoría
         </a>

@@ -13,13 +13,11 @@ from app.models import Usuario, Administrador, docente, Estudiante, Acudiente
 
 from app.forms import UsuarioForm, UsuarioUpdateForm, AdministradorForm, DocenteForm, EstudianteForm, AcudienteForm
 
-# --- FUNCIONES DE APOYO ---
 
 
 def validar_formulario_rol(rol, data, instance=None):
     """
-    Valida el formulario según el rol. 
-    Pasar 'instance' es la clave para que el botón Actualizar funcione.
+    Valida el formulario según el rol.
     """
     if rol == 'administrador':
         form = AdministradorForm(data, instance=instance)
@@ -136,7 +134,7 @@ class UsuarioCreateView(View):
 
 class UsuarioUpdateView(UpdateView):
     model = Usuario
-    form_class = UsuarioUpdateForm  # Cambiado para no pedir contraseña en edición
+    form_class = UsuarioUpdateForm  
     template_name = 'usuario/crear.html'
     success_url = reverse_lazy('app:index_usuario')
 
@@ -210,11 +208,11 @@ class UsuarioUpdateView(UpdateView):
 
         # Lógica de guardado
         if perfil_previo and instancia_a_validar is None:
-            # Si el rol cambió (ej: de docente a admin), borramos el anterior y creamos nuevo
+ 
             perfil_previo.delete()
             guardar_perfil_rol(usuario, nuevo_rol, self.request.POST)
         else:
-            # Si es el mismo rol, actualizamos los datos existentes
+
             obj = rol_form.save(commit=False)
             obj.usuario = usuario
             obj.save()
