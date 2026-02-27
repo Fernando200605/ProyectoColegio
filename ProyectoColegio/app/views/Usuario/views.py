@@ -14,7 +14,6 @@ from app.models import Usuario, Administrador, docente, Estudiante, Acudiente
 from app.forms import UsuarioForm, UsuarioUpdateForm, AdministradorForm, DocenteForm, EstudianteForm, AcudienteForm
 
 
-
 def validar_formulario_rol(rol, data, instance=None):
     """
     Valida el formulario según el rol.
@@ -67,7 +66,7 @@ class UsuarioListView(ListView):
         context['subtitulo'] = 'Bienvenido al listado de usuarios'
         context['crear_url'] = reverse_lazy('app:crear_usuario')
         context['limpiar_url'] = reverse_lazy('app:limpiar_usuario')
-        context['table'] = "Usuarios" 
+        context['table'] = "Usuarios"
         context['text'] = "Usuarios con estado inactivo"
         context['total_text'] = "Total de Usuarios"
         return context
@@ -76,28 +75,6 @@ class UsuarioListView(ListView):
 class UsuarioCreateView(View):
     template_name = 'usuario/crear.html'
     success_url = reverse_lazy('app:index_usuario')
-
-    def form_valid(self, form):
-        usuario = form.save(commit=False)
-        usuario.contraseña = form.cleaned_data['contraseña']
-
-        usuario.save()
-
-        rol = self.request.POST.get('rol')
-
-        if rol == 'administrador':
-            Administrador.objects.create(
-                usuario=usuario, cargo='Administrador'
-            )
-
-        elif rol == 'docente':
-            docente.objects.create(usuario=usuario
-                                   )
-        elif rol == 'acudiente':
-            Acudiente.objects.create(usuario=usuario)
-
-        messages.success(self.request, 'Usuario creado exitosamente.')
-        return redirect(self.success_url)
 
     def get_context(self, **kwargs):
         context = {
@@ -112,8 +89,6 @@ class UsuarioCreateView(View):
             'btn_name': 'Guardar'
         }
         context.update(kwargs)
-        if 'usuario_form' in context:
-            context['form'] = context['usuario_form']
         return context
 
     def get(self, request):
@@ -121,22 +96,53 @@ class UsuarioCreateView(View):
 
     @transaction.atomic
     def post(self, request):
+
         usuario_form = UsuarioForm(request.POST)
         rol = request.POST.get('rol')
-        rol_valido, rol_form = validar_formulario_rol(rol, request.POST)
 
-        if usuario_form.is_valid() and rol_valido:
-            usuario = usuario_form.save()
-            guardar_perfil_rol(usuario, rol, request.POST)
-            messages.success(request, f'Usuario creado correctamente')
-            return redirect('app:index_usuario')
+        print("ROL:", rol)
 
-        return render(request, self.template_name, self.get_context(usuario_form=usuario_form, rol_actual=rol))
+        if rol == 'estudiante':
+            rol_form = EstudianteForm(request.POST)
+        elif rol == 'docente':
+            rol_form = DocenteForm(request.POST)
+        elif rol == 'administrador':
+            rol_form = AdministradorForm(request.POST)
+        elif rol == 'acudiente':
+            rol_form = AcudienteForm(request.POST)
+        else:
+            rol_form = None
+
+        print("FORM USUARIO VALIDO:", usuario_form.is_valid())
+        print("FORM ROL VALIDO:", rol_form.is_valid() if rol_form else None)
+        print("ERRORES ROL:", rol_form.errors if rol_form else None)
+
+        if usuario_form.is_valid() and rol_form and rol_form.is_valid():
+
+            usuario = usuario_form.save(commit=False)
+            usuario.password = usuario_form.cleaned_data['password']
+            usuario.save()
+
+            perfil = rol_form.save(commit=False)
+            perfil.usuario = usuario
+            perfil.save()
+
+            messages.success(request, 'Usuario creado correctamente')
+            return redirect(self.success_url)
+
+        return render(
+            request,
+            self.template_name,
+            self.get_context(
+                usuario_form=usuario_form,
+                rol_actual=rol
+            )
+        )
 
 
 class UsuarioUpdateView(UpdateView):
     model = Usuario
-    form_class = UsuarioUpdateForm  
+    form_class = UsuarioUpdateForm
     template_name = 'usuario/crear.html'
     success_url = reverse_lazy('app:index_usuario')
 
@@ -210,7 +216,7 @@ class UsuarioUpdateView(UpdateView):
 
         # Lógica de guardado
         if perfil_previo and instancia_a_validar is None:
- 
+
             perfil_previo.delete()
             guardar_perfil_rol(usuario, nuevo_rol, self.request.POST)
         else:
@@ -254,6 +260,7 @@ class UsuarioDeleteView(DeleteView):
     model = Usuario
     template_name = 'usuario/eliminar.html'
     success_url = reverse_lazy('app:index_usuario')
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['titulo'] = 'Eliminar Usuario'

@@ -51,25 +51,25 @@ class CursoForm(forms.ModelForm):
             'docenteid': forms.Select(attrs={'class': 'form-control'})
         }
 
-        def clean_capacidad(self):
-            capacidad = self.cleaned_data.get('capacidad')
-            if capacidad <= 0:
-                raise forms.ValidationError(
-                    "La capacidad debe ser un número positivo.")
-            return capacidad
+    def clean_capacidad(self):
+        capacidad = self.cleaned_data.get('capacidad')
+        if capacidad <= 0:
+            raise forms.ValidationError(
+                "La capacidad debe ser un número positivo.")
+        return capacidad
 
-        def clean_nom(self):
-            return solo_letras(self.cleaned_data.get('nom', ''), "El nombre del curso")
+    def clean_nom(self):
+        return solo_letras(self.cleaned_data.get('nom', ''), "El nombre del curso")
 
-        def clean_jornada(self):
-            return solo_letras(self.cleaned_data.get('jornada', ''), "La jornada")
+    def clean_jornada(self):
+        return solo_letras(self.cleaned_data.get('jornada', ''), "La jornada")
 
-        def clean_capacidad(self):
-            capacidad = self.cleaned_data.get('capacidad')
-            if capacidad <= 0:
-                raise forms.ValidationError(
-                    "La capacidad debe ser un número positivo.")
-            return capacidad
+    def clean_capacidad(self):
+        capacidad = self.cleaned_data.get('capacidad')
+        if capacidad <= 0:
+            raise forms.ValidationError(
+                "La capacidad debe ser un número positivo.")
+        return capacidad
 
 
 class AsistenciaForm(forms.ModelForm):
@@ -153,6 +153,7 @@ class AsistenciaForm(forms.ModelForm):
 
 class UsuarioForm(forms.ModelForm):
     class Meta:
+        
         model = Usuario
         fields = ['nombre', 'email', 'password', 'estado']
         widgets = {
@@ -203,8 +204,10 @@ class UsuarioForm(forms.ModelForm):
         return email
 
     #  Contraseña
-    def clean_contraseña(self):
-        password = self.cleaned_data.get('contraseña')
+
+
+    def clean_password(self):
+        password = self.cleaned_data.get('password')
         if not password:
             return password
 
@@ -217,7 +220,6 @@ class UsuarioForm(forms.ModelForm):
             errores.append("un número")
 
         if errores:
-            self.fields['contraseña'].widget.attrs['class'] = 'form-control is-invalid'
             raise forms.ValidationError(f"Falta: {', '.join(errores)}.")
 
         return password
@@ -225,15 +227,12 @@ class UsuarioForm(forms.ModelForm):
     #  Confirmar contraseña
     def clean(self):
         cleaned_data = super().clean()
-        password = cleaned_data.get('contraseña')
-        confirm_password = self.data.get('confirmar_contraseña')
+        password = cleaned_data.get('password')
+        confirm_password = self.data.get('confirmar_password')
 
         if password and confirm_password and password != confirm_password:
-            self.fields['contraseña'].widget.attrs['class'] = 'form-control is-invalid'
-            raise forms.ValidationError("Las contraseñas no coinciden.")
-
+            self.add_error('password', "Las contraseñas no coinciden.")
         return cleaned_data
-
 
 #  Formulario para Editar Usuario
 
@@ -298,13 +297,6 @@ class EstudianteForm(forms.ModelForm):
             'cursoId':         forms.Select(attrs={'class': 'form-control'}),
         }
 
-    def clean_codigo(self):
-        codigo = self.cleaned_data.get('codigo', '')
-        if not re.match(r'^\d+$', codigo):
-            raise forms.ValidationError(
-                "El código solo puede contener números.")
-        return codigo
-
 
 class AcudienteForm(forms.ModelForm):
     class Meta:
@@ -350,6 +342,7 @@ class TipoElementoForm(forms.ModelForm):
                 'class': 'form-control'
             })
         }
+
     def clean_nombre(self):
         nombre = self.cleaned_data.get("nombre")
         patron = r"^[A-Za-zÁÉÍÓÚáéíóúÑñ ]+$"
@@ -510,8 +503,9 @@ class MovimientoForm(forms.ModelForm):
             'motivo': forms.Textarea(attrs={
                 'class': 'form-control',
 
-}),
+            }),
         }
+
     def clean_motivo(self):
         motivo = self.cleaned_data.get('motivo')
 
@@ -519,9 +513,11 @@ class MovimientoForm(forms.ModelForm):
 
         if len(motivo) < 10 or len(motivo) > 200:
             raise forms.ValidationError("El motivo debe tener entre 10 y 200 caracteres."
-        )
+                                        )
 
         return motivo
+
+
 class EventoForm(forms.ModelForm):
     class Meta:
         model = Evento
