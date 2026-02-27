@@ -11,11 +11,14 @@
             <div class="card card-stats card-pastel-blue">
                 <div class="card-body">
                     <div class="d-flex justify-content-between">
-                        <div>
-                            <p class="text-muted mb-0">Total Items</p>
+                        <d>
+                            <p class="text-muted mb-0">
+                                {{ total_text }}
+                            </p>
                             <h3 class="fw-bold">{% block total_count %}0{% endblock %}</h3>
-                        </div>
-                        <i class="fas fa-boxes fa-2x text-primary-light"></i>
+                        </d>
+                <i class="fas fa-boxes fa-2x text-primary-light"></i>
+
                     </div>
                 </div>
             </div>
@@ -25,7 +28,9 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-between">
                         <div>
-                            <p class="text-muted mb-0">Stock Bajo</p>
+                            <p class="text-muted mb-0">
+                                {{text}}
+                            </p>
                             <h3 class="fw-bold text-danger">{% block low_stock %}0{% endblock %}</h3>
                         </div>
                         <i class="fas fa-exclamation-triangle fa-2x text-danger-light"></i>

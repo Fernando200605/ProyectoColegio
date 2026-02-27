@@ -68,6 +68,8 @@ class UsuarioListView(ListView):
         context['crear_url'] = reverse_lazy('app:crear_usuario')
         context['limpiar_url'] = reverse_lazy('app:limpiar_usuario')
         context['table'] = "Usuarios" 
+        context['text'] = "Usuarios con estado inactivo"
+        context['total_text'] = "Total de Usuarios"
         return context
 
 
