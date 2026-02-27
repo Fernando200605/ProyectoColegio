@@ -19,6 +19,7 @@ from app.models import (
 )
 import re
 from django.utils import timezone
+from datetime import time
 
 # CURSO
 
@@ -40,36 +41,28 @@ def solo_letras(value, campo="Este campo"):
 # ── Formulario de Cursos
 
 class CursoForm(forms.ModelForm):
+
     class Meta:
         model = Curso
         fields = '__all__'
         widgets = {
-            'nom': forms.TextInput(attrs={'class': 'form-control'}),
-            'jornada': forms.TextInput(attrs={'class': 'form-control'}),
-            'codigo': forms.TextInput(attrs={'class': 'form-control'}),
+            'grado': forms.Select(attrs={'class': 'form-control'}),
+            'codigo': forms.NumberInput(attrs={'class': 'form-control'}),
             'capacidad': forms.NumberInput(attrs={'class': 'form-control'}),
-            'docenteid': forms.Select(attrs={'class': 'form-control'})
+            'docenteid': forms.Select(attrs={'class': 'form-control'}),
         }
 
-        def clean_capacidad(self):
-            capacidad = self.cleaned_data.get('capacidad')
-            if capacidad <= 0:
-                raise forms.ValidationError(
-                    "La capacidad debe ser un número positivo.")
-            return capacidad
+    def clean_capacidad(self):
+        capacidad = self.cleaned_data.get('capacidad')
 
-        def clean_nom(self):
-            return solo_letras(self.cleaned_data.get('nom', ''), "El nombre del curso")
+        if capacidad is None or capacidad <= 0:
+            raise forms.ValidationError(
+                "La capacidad debe ser un número positivo."
+            )
 
-        def clean_jornada(self):
-            return solo_letras(self.cleaned_data.get('jornada', ''), "La jornada")
+        return capacidad
 
-        def clean_capacidad(self):
-            capacidad = self.cleaned_data.get('capacidad')
-            if capacidad <= 0:
-                raise forms.ValidationError(
-                    "La capacidad debe ser un número positivo.")
-            return capacidad
+
 
 
 class AsistenciaForm(forms.ModelForm):
@@ -91,7 +84,7 @@ class AsistenciaForm(forms.ModelForm):
                 'class': 'form-control',
                 'type': 'time'
             }),
-
+            
             'estado': forms.Select(attrs={
                 'class': 'form-control'
             }),
@@ -103,7 +96,8 @@ class AsistenciaForm(forms.ModelForm):
             'fecha': forms.DateInput(attrs={
                 'class': 'form-control',
                 'type': 'date'
-            })
+            }),
+            'estado': forms.HiddenInput()
         }
 
     def clean_observaciones(self):
@@ -145,6 +139,20 @@ class AsistenciaForm(forms.ModelForm):
                     'horasalida',
                     'La hora de salida no puede ser igual o menor a la hora de entrada'
                 )
+
+        return cleaned_data
+
+    def clean(self):
+        cleaned_data = super().clean()
+        horaentrada = cleaned_data.get('horaentrada')
+
+        if horaentrada:
+            hora_limite = time(7, 0) 
+
+            if horaentrada <= hora_limite:
+                cleaned_data['estado'] = 'A tiempo'
+            else:
+                cleaned_data['estado'] = 'Tarde'
 
         return cleaned_data
 
