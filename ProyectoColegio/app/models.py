@@ -78,23 +78,11 @@ class docente (models.Model):
     def __str__ (self):
         return self.usuario.nombre
   #creacion de modelo curso
-class Curso (models.Model):
-    id = models.AutoField(primary_key=True)
-    nom = models.CharField(max_length=100 )
-    jornada =models.CharField(max_length=200)
-    codigo = models.CharField(max_length=50 , unique=True)
-    capacidad = models.IntegerField()
-    fechainicio = models.DateTimeField(auto_now_add=True , editable=False)
-    fechafin = models.DateTimeField(auto_now_add=True, editable=False)
-    docenteid = models.ForeignKey(docente, on_delete=models.CASCADE)
-    class Meta:
-        verbose_name = "curso"
-        verbose_name_plural = "Cursos"
-        db_table = "Curso"
-    def __str__ (self):
-        return self.nom 
-    
 GRADOS_CURSO = [
+    ('Preescolar', 'Preescolar'),
+    ('1', '1°'),
+    ('2', '2°'),
+    ('3', '3°'),
     ('4', '4°'),
     ('5', '5°'),
     ('6', '6°'),
@@ -104,7 +92,6 @@ GRADOS_CURSO = [
     ('10', '10°'),
     ('11', '11°'),
 ]
-
 Estado_Matricula = [
     ('Matriculado', 'Matriculado'),
     ('No Matriculado', 'No Matriculado'),
@@ -112,6 +99,28 @@ Estado_Matricula = [
     ('Graduado', 'Graduado'),
     ('Sancionado', 'Sancionado'),
 ]
+
+class Curso(models.Model):
+    id = models.AutoField(primary_key=True)
+
+    grado = models.CharField(
+        max_length=20,
+        choices=GRADOS_CURSO
+    )
+
+    codigo = models.CharField(max_length=50, unique=True)
+    capacidad = models.IntegerField()
+    fechainicio = models.DateTimeField(auto_now_add=True, editable=False)
+    fechafin = models.DateTimeField(auto_now_add=True, editable=False)
+    docenteid = models.ForeignKey(docente, on_delete=models.CASCADE)
+
+    class Meta:
+        verbose_name = "curso"
+        verbose_name_plural = "Cursos"
+        db_table = "Curso"
+
+    def __str__(self):
+        return self.codigo
 class Estudiante(models.Model):
     usuario = models.OneToOneField(Usuario,on_delete=models.CASCADE,primary_key=True)
     codigo = models.TextField(max_length=50, null=True, blank=True, verbose_name="Codigo")
