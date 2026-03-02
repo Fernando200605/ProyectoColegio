@@ -47,7 +47,7 @@ class CategoriaCreateView(CreateView):
         if self.request.headers.get('x-requested-with') == 'XMLHttpRequest':
             return JsonResponse({
                 'succes' : False,
-                'errors': form.error
+                'errors': form.errors
             },status=400)
         return super().form_invalid(form)
 

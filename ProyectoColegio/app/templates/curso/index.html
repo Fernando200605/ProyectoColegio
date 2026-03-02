@@ -11,7 +11,7 @@
 {% block columns %}
     <th><i class="fas fa-hashtag me-2"></i>ID</th>
     <th><i class="fas fa-book me-2"></i>Nombre del Curso</th>
-    <th><i class="fas fa-clock me-2"></i>Jornada</th>
+    <th><i class="fas fa-clock me-2"></i>Nombre Docente</th>
     <th class="text-center"><i class="fas fa-tools me-2"></i>Acciones</th>
 {% endblock columns %}
 
@@ -19,8 +19,8 @@
     {% for curso in object_list %}
     <tr>
         <td>{{ curso.id }}</td>
-        <td>{{ curso.nom }}</td>
-        <td>{{ curso.jornada }}</td>
+        <td>{{ curso.grado }}</td>
+        <td>{{ curso.docenteid }}</td>
         <td class="text-center">
             <a href="{% url 'app:editar_curso' curso.id %}" class="btn btn-sm me-1" style="background-color: #3054f7; color: #ffffff; border-radius: 8px;">
                             <i class="fa-solid fa-pen-to-square"></i>
