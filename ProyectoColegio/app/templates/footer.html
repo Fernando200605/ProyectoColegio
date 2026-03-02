@@ -1,16 +1,25 @@
 {% load static %}
-<div class="info-footer">
-  <footer>
-    <h4>C.A.T.S Proyect</h4>
-    <h4>Contáctanos</h4>
-    <div class="iconos">
-      <button class="tiktok"><img src="{% static 'img/tiktok.jpeg' %}" alt="TikTok" /></button>
-      <button class="instagram"><img src="{% static 'img/instagram.jpeg' %}" alt="Instagram" /></button>
-      <button class="youtube"><img src="{% static 'img/youtube.jpeg' %}" alt="Youtube" /></button>
-    </div>
 
-    <div class="copyrigth">
-      <h6>----------Todos los derechos reservados---------</h6>
+<footer class="border-top bg-light py-2 mt-4">
+  <div class="container-fluid">
+    <div class="row small text-muted align-items-center">
+
+      <!-- Izquierda -->
+      <div class="col-md-4 text-center text-md-start">
+        <strong>C.A.T.S</strong> – Checking and Attendance Tracking System
+      </div>
+
+      <!-- Centro -->
+      <div class="col-md-4 text-center">
+        Versión 1.0.0 · Entorno 
+        <span class="text-success fw-semibold">Desarrollo</span>
+      </div>
+
+      <!-- Derecha -->
+      <div class="col-md-4 text-center text-md-end">
+        © {% now "Y" %} Liceo San Nicolás de Tolentino · Soporte TI
+      </div>
+
     </div>
-  </footer>
-</div>
+  </div>
+</footer>
