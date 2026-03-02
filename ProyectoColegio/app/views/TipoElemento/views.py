@@ -18,6 +18,8 @@ class TipoElementoListView(ListView):
         context['subtitulo'] = 'Clasificación de inventario'
         context['crear_url'] = reverse_lazy('app:crear_elemento')
         context['limpiar_url'] = reverse_lazy('app:limpiar_tipo')
+        context['icon_primary'] = "fa-arrow-up"
+        context['icon_secodary'] = "fa-arrow-down"
         return context
 
 

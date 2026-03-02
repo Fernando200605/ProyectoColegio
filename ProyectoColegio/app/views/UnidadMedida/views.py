@@ -14,6 +14,8 @@ class UnidadMedidaListView(ListView):
         context['titulo'] = 'Unidades de Medida'
         context['subtitulo'] = 'Gestión de unidades para inventario'
         context['crear_url'] = reverse_lazy('app:crear_unidad')
+        context['icon_primary'] = "fa-arrow-up"
+        context['icon_secodary'] = "fa-arrow-down"
         return context
 
 class UnidadMedidaCreateView(CreateView):

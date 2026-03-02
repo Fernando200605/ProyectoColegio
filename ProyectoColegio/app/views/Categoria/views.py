@@ -16,6 +16,8 @@ class CategoriaListView(ListView):
         context['titulo'] = 'Listado de Categorías'
         context['subtitulo'] = 'Gestión de categorías para inventario'
         context['crear_url'] = reverse_lazy('app:crear_categoria')
+        context['icon_primary'] = "fa-arrow-up"
+        context['icon_secodary'] = "fa-arrow-down"
         return context
 
 

@@ -57,7 +57,8 @@ class InventarioListView(ListView):
         context['titulo'] = 'Inventario General'
         context['subtitulo'] = 'Gestión de elementos del colegio'
         context['crear_url'] = reverse_lazy('app:crear_elemento')
-
+        context['icon_primary'] = "fa-arrow-up"
+        context['icon_secodary'] = "fa-arrow-down"
         # Contadores útiles
         context['total_elementos'] = Elemento.objects.count()
         context['stock_bajo'] = Elemento.objects.filter(

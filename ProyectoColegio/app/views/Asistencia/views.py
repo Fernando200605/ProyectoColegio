@@ -53,6 +53,9 @@ class AsistenciaListView(ListView):
         context['table'] = "Asistencias"
         context['text'] = "Asistencias Hoy"
         context['total_text'] = "Total de Asistencias"  
+        context['table'] = "Asistencias"  
+        context['icon_primary'] = "fa-arrow-up"
+        context['icon_secodary'] = "fa-arrow-down"
         return context
 
 
