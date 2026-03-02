@@ -20,6 +20,7 @@ from app.models import (
 )
 import re
 from django.utils import timezone
+from datetime import time
 
 # CURSO
 
@@ -41,23 +42,16 @@ def solo_letras(value, campo="Este campo"):
 # ── Formulario de Cursos
 
 class CursoForm(forms.ModelForm):
+
     class Meta:
         model = Curso
         fields = '__all__'
         widgets = {
-            'nom': forms.TextInput(attrs={'class': 'form-control'}),
-            'jornada': forms.TextInput(attrs={'class': 'form-control'}),
-            'codigo': forms.TextInput(attrs={'class': 'form-control'}),
+            'grado': forms.Select(attrs={'class': 'form-control'}),
+            'codigo': forms.NumberInput(attrs={'class': 'form-control'}),
             'capacidad': forms.NumberInput(attrs={'class': 'form-control'}),
-            'docenteid': forms.Select(attrs={'class': 'form-control'})
+            'docenteid': forms.Select(attrs={'class': 'form-control'}),
         }
-
-    def clean_capacidad(self):
-        capacidad = self.cleaned_data.get('capacidad')
-        if capacidad <= 0:
-            raise forms.ValidationError(
-                "La capacidad debe ser un número positivo.")
-        return capacidad
 
     def clean_nom(self):
         return solo_letras(self.cleaned_data.get('nom', ''), "El nombre del curso")
@@ -74,61 +68,45 @@ class CursoForm(forms.ModelForm):
 
 
 class AsistenciaForm(forms.ModelForm):
-
     class Meta:
         model = Asistencia
         fields = '__all__'
         widgets = {
-            'estudiante-id': forms.Select(attrs={
-                'class': 'form-control'
-            }),
-
-            'horaentrada': forms.TimeInput(attrs={
+            # Corregido: Quité el guion si tu modelo usa 'estudianteid'
+            'estudianteid': forms.Select(attrs={'class': 'form-control'}),
+            'horaentrada': forms.TimeInput(attrs={'class': 'form-control', 'type': 'time'}),
+            'horasalida': forms.TimeInput(attrs={'class': 'form-control', 'type': 'time'}),
+            'observaciones': forms.TextInput(attrs={'class': 'form-control'}),
+            'fecha': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'estado': forms.HiddenInput(attrs={
                 'class': 'form-control',
-                'type': 'time'
+                'value': 'Pendiente'  # Valor temporal que luego sobreescribes en clean()
             }),
-
-            'horasalida': forms.TimeInput(attrs={
-                'class': 'form-control',
-                'type': 'time'
-            }),
-
-            'estado': forms.Select(attrs={
-                'class': 'form-control'
-            }),
-
-            'observaciones': forms.TextInput(attrs={
-                'class': 'form-control'
-            }),
-
-            'fecha': forms.DateInput(attrs={
-                'class': 'form-control',
-                'type': 'date'
-            })
         }
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Esto le dice a Django: "No esperes este dato del usuario"
+        self.fields['estado'].required = False
+
     def clean_observaciones(self):
-        observaciones = self.cleaned_data.get('observaciones')
-
-        if len(observaciones) > 200:
-            raise forms.ValidationError(
-                "La descripción no puede superar los 200 caracteres.")
-
-        if len(observaciones) < 10:
-            raise forms.ValidationError(
-                "La descripción debe tener mínimo 10 caracteres.")
-
-        return observaciones
+        obs = self.cleaned_data.get('observaciones')
+        if obs:
+            if len(obs) > 200:
+                raise forms.ValidationError("Máximo 200 caracteres.")
+            if len(obs) < 10:
+                raise forms.ValidationError("Mínimo 10 caracteres.")
+        return obs
 
     def clean(self):
         cleaned_data = super().clean()
-
         estudiante = cleaned_data.get('estudianteid')
         horaentrada = cleaned_data.get('horaentrada')
         horasalida = cleaned_data.get('horasalida')
+
+        # 1. Validación de duplicados por día
         if estudiante:
             fecha_hoy = timezone.now().date()
-
             existe = Asistencia.objects.filter(
                 estudianteid=estudiante,
                 fecha__date=fecha_hoy
@@ -136,25 +114,26 @@ class AsistenciaForm(forms.ModelForm):
 
             if existe:
                 self.add_error(
-                    'estudianteid',
-                    'Este estudiante ya tiene asistencia registrada hoy.'
-                )
+                    'estudianteid', 'Este estudiante ya tiene asistencia hoy.')
 
+        # 2. Lógica de Estado (A tiempo / Tarde)
+        if horaentrada:
+            limite = time(7, 0)
+            cleaned_data['estado'] = 'A tiempo' if horaentrada <= limite else 'Tarde'
+
+        # 3. Validación de horas
         if horaentrada and horasalida:
             if horaentrada >= horasalida:
                 self.add_error(
-                    'horasalida',
-                    'La hora de salida no puede ser igual o menor a la hora de entrada'
-                )
+                    'horasalida', 'La hora de salida debe ser posterior a la de entrada.')
 
         return cleaned_data
-
 # ── Formulario para Crear Usuario ────────────────────────────────────────────
 
 
 class UsuarioForm(forms.ModelForm):
     class Meta:
-        
+
         model = Usuario
         fields = ['nombre', 'email', 'password', 'estado']
         widgets = {
@@ -194,7 +173,7 @@ class UsuarioForm(forms.ModelForm):
             )
 
         dominios_permitidos = ['gmail.com',
-                                'hotmail.com', 'outlook.com', 'yahoo.com']
+                               'hotmail.com', 'outlook.com', 'yahoo.com']
         partes = email.split('@')
         if len(partes) > 1 and partes[1] not in dominios_permitidos:
             self.fields['email'].widget.attrs['class'] = 'form-control is-invalid'
@@ -205,7 +184,6 @@ class UsuarioForm(forms.ModelForm):
         return email
 
     #  Contraseña
-
 
     def clean_password(self):
         password = self.cleaned_data.get('password')
@@ -236,6 +214,7 @@ class UsuarioForm(forms.ModelForm):
         return cleaned_data
 
 #  Formulario para Editar Usuario
+
 
 class UsuarioUpdateForm(forms.ModelForm):
     class Meta:
@@ -289,7 +268,7 @@ class EstudianteForm(forms.ModelForm):
     class Meta:
         model = Estudiante
         fields = ['codigo', 'fechaNacimiento',
-                    'estadoMatricula', 'fechaIngreso', 'cursoId']
+                  'estadoMatricula', 'fechaIngreso', 'cursoId']
         widgets = {
             'codigo':          forms.TextInput(attrs={'class': 'form-control'}),
             'fechaNacimiento': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
@@ -394,7 +373,7 @@ class ElementoForm(forms.ModelForm):
         widgets = {
             'nombre': forms.TextInput(attrs={'class': 'form-control'}),
             'cantidad': forms.NumberInput(attrs={'class': 'form-control'}),
-            
+
             # Campos con botones de creación rápida (CORRECTO)
             'marcaId': forms.Select(attrs={
                 'class': 'form-control',
@@ -513,7 +492,8 @@ class MovimientoForm(forms.ModelForm):
         motivo = motivo.strip()
 
         if len(motivo) < 10 or len(motivo) > 200:
-            raise forms.ValidationError("El motivo debe tener entre 10 y 200 caracteres.")
+            raise forms.ValidationError(
+                "El motivo debe tener entre 10 y 200 caracteres.")
 
         return motivo
 
@@ -683,6 +663,11 @@ class MarcaForm(forms.ModelForm):
     class Meta:
         model = marca
         fields = '__all__'
+        widgets = {
+            'nombre': forms.TextInput(attrs={
+                'class': 'form-control'
+            })
+        }
 
     def clean_nombre(self):
         nombre = self.cleaned_data.get('nombre', '').strip()
@@ -715,6 +700,11 @@ class CategoriaForm(forms.ModelForm):
     class Meta:
         model = categoria
         fields = ['nombre']
+        widgets = {
+            'nombre': forms.TextInput(attrs={
+                'class': 'form-control'
+            })
+        }
 
     def clean_nombre(self):
         nombre = self.cleaned_data.get('nombre', '').strip()
@@ -804,23 +794,23 @@ class EventoForm(forms.ModelForm):
                 "El título no puede contener caracteres especiales.")
 
         return titulo
+
     def clean_fecha_inicio(self):
         fecha_inicio = self.cleaned_data.get('fecha_inicio')
 
         if fecha_inicio and fecha_inicio < timezone.now():
             raise forms.ValidationError(
-            "La fecha de inicio no puede ser una fecha pasada."
-        )
+                "La fecha de inicio no puede ser una fecha pasada."
+            )
 
         return fecha_inicio
+
     def clean_fecha_fin(self):
         fecha_fin = self.cleaned_data.get('fecha_fin')
 
         if fecha_fin and fecha_fin < timezone.now():
             raise forms.ValidationError(
-            "La fecha de fin no puede ser una fecha pasada."
-        )
+                "La fecha de fin no puede ser una fecha pasada."
+            )
 
         return fecha_fin
-
-

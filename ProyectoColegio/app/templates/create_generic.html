@@ -4,77 +4,74 @@
 
 {% block main %}
 <div class="container py-4 edit">
-  <a href="{{ listar_url }}" class="btn btn-back mb-4 shadow-sm">
-    <i class="fas fa-chevron-left me-2"></i> Volver al listado
-  </a>
+    <a href="{{ listar_url }}" class="btn btn-back mb-4 shadow-sm" style="position: relative; z-index: 1050;">
+        <i class="fas fa-chevron-left me-2"></i> Volver al listado
+    </a>
 
-  <div class="row justify-content-center">
-    <div class="col-md-12">
-      <form method="post" action="">
-        <div class="card card-form shadow-lg">
-          <div class="card-header card-header-custom">
-            <h3 class="card-title mb-0 d-flex align-items-center">
-              <i class="fas fa-edit me-3"></i> {% block titulo %}{% endblock titulo %}
-            </h3>
-          </div>
+    <div class="row justify-content-center">
+        <div class="col-md-12">
+            <form method="post" action="" enctype="multipart/form-data">
+                <div class="card card-form shadow-lg">
+                    <div class="card-header card-header-custom">
+                        <h3 class="card-title mb-0 d-flex align-items-center">
+                            <i class="fas fa-edit me-3"></i> {% block titulo %}{% endblock %}
+                        </h3>
+                    </div>
 
-          <div class="card-body p-4">
-            {% block form %}
-            {% csrf_token %}
-              <div class="row">
-                {% for field in form.visible_fields %}
-                  <div class="col-md-4 mb-4">
-                    <label class="form-label fw-bold" style="color: #1C2E4A;">
-                      {{ field.label }}
-                    </label>
+                    <div class="card-body p-4">
+                        {% block form %}
+                            {% csrf_token %}
+                            <div class="row">
+                                {% for field in form.visible_fields %}
+                                    {# Lógica para expandir el Textarea al ancho completo #}
+                                    <div class="{% if field.field.widget.input_type == None %}col-md-12{% else %}col-md-4{% endif %} mb-4">
+                                        <label class="form-label fw-bold" style="color: #1C2E4A;">
+                                            {{ field.label }}
+                                        </label>
 
-                    {{ field|add_class:'form-control form-control-custom'|attr:'autocomplete:on' }}
+                                        {{ field|add_class:'form-control form-control-custom'|attr:'autocomplete:off'|attr:'style:resize:none' }}
 
-                    {% if field.help_text %}
-                      <div class="form-text">{{ field.help_text }}</div>
-                    {% endif %}
+                                        {% if field.help_text %}
+                                            <div class="form-text text-muted">{{ field.help_text }}</div>
+                                        {% endif %}
 
-                    {% if field.errors %}
-                      {% for error in field.errors %}
-                        <div class="text-danger mt-1 small animated fadeIn">
-                          <i class="fas fa-exclamation-circle me-1"></i> {{ error }}
-                        </div>
-                      {% endfor %}
-                    {% endif %}
-                  </div>
-                {% endfor %}
-              </div>
-            {% endblock form %}
-          </div>
+                                        {% if field.errors %}
+                                            {% for error in field.errors %}
+                                                <div class="text-danger mt-1 small animated fadeIn">
+                                                    <i class="fas fa-exclamation-circle me-1"></i> {{ error }}
+                                                </div>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% endblock %}
+                    </div>
 
-          <div class="card-footer bg-white border-0 p-4 text-end">
-            <button type="submit" class="btn btn-save shadow-sm">
-              <i class="fas fa-check-circle me-2"></i> {{ btn_name }}
-            </button>
-          </div>
-
+                    <div class="card-footer bg-white border-0 p-4 text-end">
+                        <button type="submit" class="btn btn-save shadow-sm">
+                            <i class="fas fa-check-circle me-2"></i> {{ btn_name }}
+                        </button>
+                    </div>
+                </div>
+            </form>
         </div>
-      </form>
     </div>
-  </div>
 </div>
 {% endblock %}
 
 {% block js %}
-  {% if form.is_bound and form.errors %}
-    <script src="{% static 'lib/sweetalert2/sweetalert2.all.min.js' %}"></script>
+    {% if form.errors %}
     <script>
-      document.addEventListener('DOMContentLoaded', function () {
-        Swal.fire({
-          title: '¡Atención!',
-          text: 'Por favor, corrige los errores en el formulario.',
-          icon: 'warning',
-          confirmButtonColor: '#1C2E4A',
-          customClass: {
-            popup: 'border-radius-20'
-          }
-        })
-      })
+        document.addEventListener('DOMContentLoaded', function () {
+            Swal.fire({
+                title: '¡Atención!',
+                text: 'Por favor, corrige los errores en el formulario.',
+                icon: 'warning',
+                confirmButtonColor: '#1C2E4A',
+                customClass: { popup: 'border-radius-20' }
+            });
+        });
     </script>
-  {% endif %}
+    {% endif %}
 {% endblock %}

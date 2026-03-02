@@ -46,7 +46,7 @@
             </h5>
             <div class="mt-2 mt-md-0 d-flex gap-2">
                 {% block options %}
-                <a href="{{ crear_url }}" class="btn btn-create">
+                <a href="{{ crear_url }}" class="btn btn-create" >
                     <i class="fas fa-plus-circle me-1"></i> Nuevo Registro
                 </a>
                 <form action="{{ limpiar_url }}" method="post" id="Eliminar_Todo">
@@ -62,14 +62,14 @@
 
     {% block devolver %}{% endblock devolver %}
 
-    <div class="table-responsive bg-white rounded-4 shadow-sm p-3">
+    <div class="table-responsive bg-white rounded-4 shadow-sm p-3" >
         <table class="table" id="Tabla">
             <thead>
                 <tr>
                     {% block columns %}{% endblock columns %}
                 </tr>
             </thead>
-            <tbody>
+            <tbody style="position: relative; z-index: 1000;">
                 {% block rows %}{% endblock rows %}
             </tbody>
         </table>
