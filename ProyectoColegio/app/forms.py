@@ -80,13 +80,12 @@ class AsistenciaForm(forms.ModelForm):
             'fecha': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'estado': forms.HiddenInput(attrs={
                 'class': 'form-control',
-                'value': 'Pendiente'  # Valor temporal que luego sobreescribes en clean()
+                'value': 'Pendiente'  
             }),
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Esto le dice a Django: "No esperes este dato del usuario"
         self.fields['estado'].required = False
 
     def clean_observaciones(self):
