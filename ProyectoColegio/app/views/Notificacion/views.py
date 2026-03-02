@@ -49,6 +49,8 @@ class NotificacionListView(ListView):
         context['table'] = "notificacion"  
         context['text'] = "Notificaciones de Hoy"
         context['total_text'] = "Total de Notificaciones"
+        context['icon_primary'] = "fa-arrow-up"
+        context['icon_secodary'] = "fa-arrow-down"
         return context
 
 

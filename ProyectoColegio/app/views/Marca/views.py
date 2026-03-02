@@ -23,6 +23,8 @@ class marcaListView(ListView):
         context['titulo'] = 'Listado de Marcas'
         context['subtitulo'] = 'Gestión de marcas para inventario'
         context['crear_url'] = reverse_lazy('app:crear_marca')
+        context['icon_primary'] = "fa-arrow-up"
+        context['icon_secodary'] = "fa-arrow-down"
         return context
 
 

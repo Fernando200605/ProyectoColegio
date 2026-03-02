@@ -69,6 +69,9 @@ class UsuarioListView(ListView):
         context['table'] = "Usuarios"
         context['text'] = "Usuarios con estado inactivo"
         context['total_text'] = "Total de Usuarios"
+        context['table'] = "Usuarios" 
+        context['icon_primary'] = "fa-arrow-up"
+        context['icon_secodary'] = "fa-arrow-down"
         return context
 
 

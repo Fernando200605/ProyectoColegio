@@ -49,6 +49,8 @@ class MovimientoListView(ListView):
         context['table'] = "movimiento"  
         context['text'] = "Movimientos de Hoy"
         context['total_text'] = "Total de Movimientos"
+        context['icon_primary'] = "fa-arrow-up"
+        context['icon_secodary'] = "fa-arrow-down"
         return context
 
 

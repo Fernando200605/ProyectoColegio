@@ -50,6 +50,8 @@ class EventoListView(ListView):
         context['table'] = "evento"  
         context['text'] = "Eventos de Hoy"
         context['total_text'] = "Total de Eventos"
+        context['icon_primary'] = "fa-arrow-up"
+        context['icon_secodary'] = "fa-arrow-down"
         return context
     
 
