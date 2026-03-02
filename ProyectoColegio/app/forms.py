@@ -1,6 +1,7 @@
 
 from django.urls import reverse_lazy
 from django import forms
+from django.utils import timezone
 from app.models import (
     Curso,
     categoria,
@@ -512,8 +513,7 @@ class MovimientoForm(forms.ModelForm):
         motivo = motivo.strip()
 
         if len(motivo) < 10 or len(motivo) > 200:
-            raise forms.ValidationError("El motivo debe tener entre 10 y 200 caracteres."
-                                        )
+            raise forms.ValidationError("El motivo debe tener entre 10 y 200 caracteres.")
 
         return motivo
 
@@ -676,8 +676,6 @@ class NotificacionForm(forms.ModelForm):
                 "El título no puede contener caracteres especiales.")
 
         return titulo
-
-
 # MARCA
 
 
@@ -806,3 +804,23 @@ class EventoForm(forms.ModelForm):
                 "El título no puede contener caracteres especiales.")
 
         return titulo
+    def clean_fecha_inicio(self):
+        fecha_inicio = self.cleaned_data.get('fecha_inicio')
+
+        if fecha_inicio and fecha_inicio < timezone.now():
+            raise forms.ValidationError(
+            "La fecha de inicio no puede ser una fecha pasada."
+        )
+
+        return fecha_inicio
+    def clean_fecha_fin(self):
+        fecha_fin = self.cleaned_data.get('fecha_fin')
+
+        if fecha_fin and fecha_fin < timezone.now():
+            raise forms.ValidationError(
+            "La fecha de fin no puede ser una fecha pasada."
+        )
+
+        return fecha_fin
+
+
