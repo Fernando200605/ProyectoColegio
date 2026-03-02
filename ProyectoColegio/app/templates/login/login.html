@@ -27,9 +27,9 @@
           <div class="input-container">
             <!-- Ícono -->
             {% if 'password' in field.name %}
-              <i class="fa-solid fa-lock"></i>
+              <i class="fa-solid fa-lock" id = "lock"></i>
             {% else %}
-              <i class="fa-solid fa-user"></i>
+              <i class="fa-solid fa-user" id = "user"></i>
             {% endif %}
 
             <!-- Label -->
@@ -47,13 +47,14 @@
 
             <!-- Ver contraseña -->
             {% if 'password' in field.name %}
-              <i class="fa-solid fa-eye eye-toggle" data-target="{{ field.id_for_label }}"></i>
+                
+               <i class="fa fa-eye toggle-password" id="eye"></i>
             {% endif %}
           </div>
         {% endfor %}
 
         <!-- Botón login -->
-        <button type="submit" class="btn-login">Ingresar</button>
+        <button type="submit" class="btn-login" id = "">Ingresar</button>
 
         <!-- Separador -->
         <div class="separator">O</div>
@@ -93,5 +94,6 @@
         {% endif %}
     });
 </script>
+<script src="{% static "Js/password.js" %}"></script>
   </body>
 </html>

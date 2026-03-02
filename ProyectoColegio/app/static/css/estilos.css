@@ -3,7 +3,8 @@
   --text: 22px;
   --text-font: 'Courier New', Courier, monospace;
   --secondary-color: #fab5b5;
-  --secondary-hover: #ff4d6d; /* entre rosa y coral */
+  --secondary-hover: #ff4d6d;
+  /* entre rosa y coral */
 }
 
 * {
@@ -20,6 +21,8 @@ body {
   justify-content: center;
   align-items: center;
 }
+
+
 
 .login {
   display: flex;
@@ -51,7 +54,7 @@ body {
   width: 70%;
   top: 38%;
   height: auto;
-  margin-bottom: 20px;
+  margin-bottom: 20px
 }
 
 .input-container input {
@@ -61,12 +64,19 @@ body {
   transition: border-color 0.3s;
   border: none;
   margin-left: 2%;
+  
+}
+
+label {
+  position: relative;
+  left: 10px;
+  top: -7px;
 }
 
 .input-container i {
   position: absolute;
   left: 5%;
-  top: 70%;
+  top: 35%;
   transform: translateY(-50%);
   transition: color 0.3s;
   color: #aaaaaa;
@@ -77,27 +87,32 @@ body {
   outline: none;
   color: blue;
   border-color: blue;
-  box-shadow: 0 0 8px rgba(0,123,255,0.3);
+  box-shadow: 0 0 8px rgba(0, 123, 255, 0.3);
 }
 
 .input-container:focus-within i {
   color: blue;
 }
+
 .error-message {
   position: absolute;
-  bottom: -25px; /* ajusta según altura del input */
+  bottom: -25px;
+  /* ajusta según altura del input */
   left: 5%;
   font-size: 12px;
-  color: #eb4545; /* texto blanco para contraste */
+  color: #eb4545;
+  /* texto blanco para contraste */
   padding: 5px 10px;
-  border-radius: 10px; /* bordes redondeados */
+  border-radius: 10px;
+  /* bordes redondeados */
   margin-top: 10px;
 }
 
 .input-error {
   border: 1px solid #d8000c !important;
   box-shadow: 0 0 4px rgba(216, 0, 12, 0.3);
-} 
+}
+
 .btn-login {
   position: absolute;
   width: 10%;
@@ -110,7 +125,7 @@ body {
   cursor: pointer;
   transition: background-color 0.3s;
   left: 85%;
-  top: 45%;
+  top: 50%;
 }
 
 .btn-login:hover {
@@ -125,9 +140,18 @@ body {
 
 }
 
+#user {
+  position: absolute;
+  top: 70%;
+  transform: translateY(-50%);
+  right: 95%;
+  cursor: pointer;
+  color: #aaa;
+}
+
 #eye {
   position: absolute;
-  top: 50%;
+  top: 70%;
   transform: translateY(-50%);
   left: 95%;
   cursor: pointer;
@@ -136,6 +160,15 @@ body {
 
 #eye:hover {
   color: black;
+}
+
+#lock {
+  position: absolute;
+  top: 70%;
+  transform: translateY(-50%);
+  right: 95%;
+  cursor: pointer;
+  color: #aaa;
 }
 
 .aside {
@@ -167,7 +200,7 @@ body {
   border-bottom-right-radius: -30px;
   padding: 10px 50px;
   border-right: none;
-  color:  #007bff;
+  color: #007bff;
 }
 
 form {
@@ -227,6 +260,7 @@ input::placeholder {
 input:focus::placeholder {
   color: black;
 }
+
 @media screen and (max-width: 768px) {
   body {
     height: auto;
@@ -298,60 +332,68 @@ input:focus::placeholder {
   }
 
   #eye {
-    left: auto;
+    left: 30px;
     right: 10px;
   }
 }
-.error-name{
+
+.error-name {
   position: absolute;
-    background-color: #ffe0e0;
-    color: #252525;
-    border: 1px solid #e74c3c;
-    border-radius: 5px;
-    width: 50%;
-    text-align: center;
-    font-weight: bold;
-    top: 30%;
+  background-color: #ffe0e0;
+  color: #252525;
+  border: 1px solid #e74c3c;
+  border-radius: 5px;
+  width: 50%;
+  text-align: center;
+  font-weight: bold;
+  top: 30%;
 }
 
-.pass{
+.pass {
   position: absolute;
   top: 28%;
-  background-color: #34d399; /* verde éxito */
+  background-color: #34d399;
+  /* verde éxito */
   color: #fff;
   padding: 12px 20px;
   border-radius: 8px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   font-size: 0.95rem;
   z-index: 1000;
   animation: successSlide 4s forwards;
 }
+
 .pass-error {
   position: absolute;
   top: 28%;
-  background-color: #ff0000; /* verde éxito */
+  background-color: #ff0000;
+  /* verde éxito */
   color: #fff;
   padding: 12px 15px;
   border-radius: 8px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   font-size: 0.95rem;
   z-index: 1000;
   animation: successSlide 4s forwards;
 }
+
 /* Animación: entra desde la derecha, se mantiene, luego sube y se desvanece */
 @keyframes successSlide {
   0% {
     opacity: 0;
     transform: translateY(-90px);
   }
+
   20% {
     opacity: 1;
     transform: translateX(0);
   }
+
   80% {
     opacity: 1;
     transform: translateX(0);
   }
+
   100% {
     opacity: 0;
     transform: translateY(-50px);
