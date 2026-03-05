@@ -14,6 +14,7 @@ from app.views.Notificacion.views import *
 from app.views.login.views import *
 from app.views.Index.views import DashboardView
 from django.contrib.auth.views import LogoutView
+from app.views.reportes import * 
 app_name = 'app'
 urlpatterns = [
     path('login/', CreLoginView.as_view(), name="login"),
@@ -119,4 +120,6 @@ urlpatterns = [
          NotificacionDeleteView.as_view(), name="eliminar_notificacion"),
     path('notificacion/limpiar/', NotificacionCleandView.as_view(),
          name="limpiar_notificacion"),
+    path('reporte/usuario/pdf',ExportarCategoriasPDF.as_view(),name="reporte_usuario_pdf"),
+    path('reporte/usuario/excel',ExportarCategoriasExcel.as_view(),name="reporte_usuario_excel")
 ]
