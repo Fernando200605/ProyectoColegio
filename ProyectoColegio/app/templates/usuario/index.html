@@ -30,7 +30,11 @@
     <i class="fas fa-tools me-2"></i>Acciones
   </th>
 {% endblock %}
-
+      {% block exportar %}
+      <a href="{% url 'app:reporte_usuario_pdf' %}" class="btn-pdf" style="z-index: 10000000;">
+          Descargar PDF
+      </a>
+      {% endblock %}
 {% block rows %}
   {% for usuario in object_list %}
     <tr>
