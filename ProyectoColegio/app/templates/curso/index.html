@@ -1,34 +1,52 @@
 {% extends 'list_generic.html' %}
 
 {% block titulo %}
-{{titulo}}
-{% endblock titulo %}
+  {{ titulo }}
+{% endblock %}
 
 {% block subtitulo %}
-{{subtitulo}}
-{% endblock subtitulo%}
+  <div class="d-flex justify-content-between align-items-center">
+    <span>{{ subtitulo }}</span>
+
+    <div class="dropdown">
+      <button class="btn btn-success dropdown-toggle" type="button" id="dropdownReportes" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="border-radius: 8px;"><i class="fas fa-file-excel me-2"></i>Exportar Reporte</button>
+
+      <div class="dropdown-menu" aria-labelledby="dropdownReportes">
+        <a class="dropdown-item" href="{% url 'app:exportar_cursos' %}">Descargar Todo</a>
+        <div class="dropdown-divider"></div>
+        <h6 class="dropdown-header">Por Módulo (ID)</h6>
+
+        {% for curso in object_list %}
+          <a class="dropdown-item" href="{% url 'app:exportar_cursos' %}?curso_id={{ curso.id }}">Reporte: {{ curso.grado }} - {{ curso.codigo }}</a>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+{% endblock %}
 
 {% block columns %}
-    <th><i class="fas fa-hashtag me-2"></i>ID</th>
-    <th><i class="fas fa-book me-2"></i>Nombre del Curso</th>
-    <th><i class="fas fa-clock me-2"></i>Nombre Docente</th>
-    <th class="text-center"><i class="fas fa-tools me-2"></i>Acciones</th>
-{% endblock columns %}
+  <th>
+    <i class="fas fa-hashtag me-2"></i>ID
+  </th>
+  <th>
+    <i class="fas fa-book me-2"></i>Nombre del Curso
+  </th>
+  <th>
+    <i class="fas fa-chalkboard-teacher me-2"></i>Nombre Docente
+  </th> <th class="text-center">
+    <i class="fas fa-tools me-2"></i>Acciones
+  </th>
+{% endblock %}
 
 {% block rows %}
-    {% for curso in object_list %}
+  {% for curso in object_list %}
     <tr>
-        <td>{{ curso.id }}</td>
-        <td>{{ curso.grado }}</td>
-        <td>{{ curso.docenteid }}</td>
-        <td class="text-center">
-            <a href="{% url 'app:editar_curso' curso.id %}" class="btn btn-sm me-1" style="background-color: #3054f7; color: #ffffff; border-radius: 8px;">
-                            <i class="fa-solid fa-pen-to-square"></i>
-            </a>
-            <a href="{% url 'app:eliminar_curso' curso.id %}" class="btn btn-sm" style="background-color: #ff4d4d; color: white; border-radius: 8px;">
-                            <i class="fa-solid fa-trash"></i>
-            </a>
-        </td>
+      <td>{{ curso.id }}</td>
+      <td>{{ curso.get_grado_display }}</td> <td>{{ curso.docenteid }}</td>
+      <td class="text-center">
+        <a href="{% url 'app:editar_curso' curso.id %}" class="btn btn-sm me-1" style="background-color: #3054f7; color: #ffffff; border-radius: 8px;"><i class="fa-solid fa-pen-to-square"></i></a>
+        <a href="{% url 'app:eliminar_curso' curso.id %}" class="btn btn-sm" style="background-color: #ff4d4d; color: white; border-radius: 8px;"><i class="fa-solid fa-trash"></i></a>
+      </td>
     </tr>
-    {% endfor %}
-{% endblock rows %}
+  {% endfor %}
+{% endblock %}

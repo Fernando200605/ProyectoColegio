@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
-
+import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'widget_tweaks',
     'app', 
     'login',
+    'import_export',
 ]
 
 MIDDLEWARE = [
@@ -128,3 +129,5 @@ LOGIN_REDIRECT_URL = 'app:index_curso'
 LOGOUT_REDIRECT_URL = 'login:login' 
 LOGIN_URL = 'login:login'   
 LOGOUT_URL = 'login:logout'
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

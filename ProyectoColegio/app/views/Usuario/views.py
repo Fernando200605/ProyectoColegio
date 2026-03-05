@@ -69,7 +69,7 @@ class UsuarioListView(ListView):
         context['table'] = "Usuarios"
         context['text'] = "Usuarios con estado inactivo"
         context['total_text'] = "Total de Usuarios"
-        context['table'] = "Usuarios" 
+        context['table'] = "Usuarios"
         context['icon_primary'] = "fa-arrow-up"
         context['icon_secodary'] = "fa-arrow-down"
         return context
@@ -99,20 +99,18 @@ class UsuarioCreateView(View):
 
     @transaction.atomic
     def post(self, request):
-
-        usuario_form = UsuarioForm(request.POST)
+          # Esto muestra todos los archivos enviados
+        usuario_form = UsuarioForm(request.POST, request.FILES)
+        print(request.FILES)
         rol = request.POST.get('rol')
-
-        print("ROL:", rol)
-
         if rol == 'estudiante':
-            rol_form = EstudianteForm(request.POST)
+            rol_form = EstudianteForm(request.POST, request.FILES)
         elif rol == 'docente':
-            rol_form = DocenteForm(request.POST)
+            rol_form = DocenteForm(request.POST, request.FILES)
         elif rol == 'administrador':
-            rol_form = AdministradorForm(request.POST)
+            rol_form = AdministradorForm(request.POST, request.FILES)
         elif rol == 'acudiente':
-            rol_form = AcudienteForm(request.POST)
+            rol_form = AcudienteForm(request.POST, request.FILES)
         else:
             rol_form = None
 
@@ -123,7 +121,7 @@ class UsuarioCreateView(View):
         if usuario_form.is_valid() and rol_form and rol_form.is_valid():
 
             usuario = usuario_form.save(commit=False)
-            usuario.password = usuario_form.cleaned_data['password']
+            usuario.set_password(usuario_form.cleaned_data['password'])
             usuario.save()
 
             perfil = rol_form.save(commit=False)
