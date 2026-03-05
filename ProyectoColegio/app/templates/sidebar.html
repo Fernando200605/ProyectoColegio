@@ -2,10 +2,12 @@
 <!-- Sidebar -->
 <div id="sidebar" class="sidebar">
   <div class="profile">
-    <img src="{% static 'img/User.jpg' %}" alt="Miku Dayo" />
+    {% if request.user.img_usuario %}
+    <img src="{{request.user.img_usuario.url}}" alt="{{request.user.nombre}}" />
+    {% endif %}
     <a href="#" class="edit-profile"><i class="fa-solid fa-pencil"></i></a>
     <p class="name">{{request.user.nombre}}</p>
-    <p class="role">{{request.user.get_rol}}</p>
+    <p class="badge rounded-pill badge-primary rol">{{request.user.get_rol}}</p>
   </div>
   <ul>
     <li>

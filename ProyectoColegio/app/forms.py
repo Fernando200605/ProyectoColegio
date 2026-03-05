@@ -134,12 +134,13 @@ class UsuarioForm(forms.ModelForm):
     class Meta:
 
         model = Usuario
-        fields = ['nombre', 'email', 'password', 'estado']
+        fields = ['nombre', 'email', 'password', 'estado','img_usuario']
         widgets = {
             'nombre': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Nombre completo'}),
             'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'correo@ejemplo.com'}),
             'password': forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Contraseña', 'id': 'id_contraseña'}),
             'estado': forms.Select(attrs={'class': 'form-control'}),
+            'img_usuario': forms.FileInput(attrs={'class': 'form-control'}),
         }
 
     def save(self, commit=True):

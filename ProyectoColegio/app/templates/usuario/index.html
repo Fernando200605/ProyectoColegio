@@ -1,5 +1,6 @@
-{% extends 'list_generic.html' %}
 
+{% extends 'list_generic.html' %}
+{% load static %}
 {% block titulo %}
   {{ titulo }}
 {% endblock %}
@@ -23,6 +24,9 @@
     <i class="fas fa-user-shield me-2"></i>Role
   </th>
   <th class="text-center">
+    <i class="fa-regular fa-file-image"></i>Img
+  </th>
+  <th class="text-center">
     <i class="fas fa-tools me-2"></i>Acciones
   </th>
 {% endblock %}
@@ -34,6 +38,11 @@
       <td>{{ usuario.nombre }}</td>
       <td>{{ usuario.email }}</td>
       <td class="text-center">{{ usuario.get_rol }}</td>
+      {% if usuario.img_usuario %}
+      <td class="text-center"><img src="{{ usuario.img_usuario.url }}" alt="" width="100px" style="border-radius: 15px;"></td>
+      {% else %}
+      <td class="text-center"><img src="{% static 'img/User.jpg' %}" alt="" width="100px" style="border-radius: 15px;"></td>
+      {% endif %}
       <td class="text-center">
         <button class="btn btn-sm btn-info btn-ver-usuario" data-url="{% url 'app:detalle_usuario' usuario.id %}">Ver</button>
         <a href="{% url 'app:editar_usuario' usuario.id %}" class="btn btn-sm me-1" style="background-color: #3054f7; color: #ffffff; border-radius: 8px;"><i class="fa-solid fa-pen-to-square"></i></a>

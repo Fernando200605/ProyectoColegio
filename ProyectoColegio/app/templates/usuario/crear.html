@@ -25,6 +25,11 @@
             <i id="eye_password" class="fas fa-eye"></i>
           </button>
         </div>
+      {% elif fiel.name == 'img_usuario' %}
+        <div class="mb-4">
+        <label class="form-label fw-bold">Foto de Perfil</label>
+        {{ usuario_form.img_usuario|add_class:'form-control' }}
+      </div>
       {% else %}
         {{ field|add_class:'form-control form-control-custom' }}
       {% endif %}

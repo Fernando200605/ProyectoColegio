@@ -7,6 +7,7 @@ estado_usuario = (
 )
 
 class Usuario(AbstractUser):
+    img_usuario = models.ImageField(upload_to='usuarios/',blank=True,null=True)
     nombre = models.CharField(max_length=100, unique=True) 
     email = models.EmailField(unique=True)
     estado = models.BooleanField(default=True, choices=estado_usuario)
