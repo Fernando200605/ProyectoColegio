@@ -121,5 +121,8 @@ urlpatterns = [
     path('notificacion/limpiar/', NotificacionCleandView.as_view(),
          name="limpiar_notificacion"),
     path('reporte/usuario/pdf',ExportarCategoriasPDF.as_view(),name="reporte_usuario_pdf"),
-    path('reporte/usuario/excel',ExportarCategoriasExcel.as_view(),name="reporte_usuario_excel")
+    path('reporte/usuario/excel',ExportarCategoriasExcel.as_view(),name="reporte_usuario_excel"),
+    
+    path('reporte/inventario/pdf',ExportarInventarioPDF.as_view(),name="reporte_inventario_pdf"),
+    path('reporte/inventario/excel',ExportarInventarioExcel.as_view(),name="reporte_inventario_excel"),
 ]

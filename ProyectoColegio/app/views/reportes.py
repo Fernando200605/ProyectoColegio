@@ -71,3 +71,58 @@ class ExportarCategoriasExcel(DjangoView):
             nombre_archivo=nombre_archivo
         )
     
+class ExportarInventarioPDF(DjangoView):
+    def get(self, request):
+        inventario = Elemento.objects.all()
+        
+        columnas = ['ID', 'Nombre', 'Marca', 'Categoría', 'Stock', 'Ubicación']
+        
+        datos = [
+            (
+                inv.id,
+                inv.nombre,
+                inv.marcaId.nombre,        # FK → marca.nombre
+                inv.categoriaId.nombre,    # FK → categoria.nombre
+                inv.stockActual,
+                inv.ubicacion
+            )
+            for inv in inventario
+        ]
+        
+        nombre_archivo = f'Reporte_Inventario_{datetime.now().strftime("%d_%m_%Y")}'
+        
+        return exportar_pdf(
+            request,
+            titulo='REPORTE DE INVENTARIO',
+            columnas=columnas,
+            datos=datos,
+            nombre_archivo=nombre_archivo,
+        )
+
+
+class ExportarInventarioExcel(DjangoView):
+    def get(self, request):
+        inventario = Elemento.objects.select_related('marcaId', 'categoriaId').all()
+        
+        columnas = ['ID', 'Nombre', 'Marca', 'Categoría', 'Stock', 'Ubicación']
+        
+        datos = [
+            (
+                inv.id,
+                inv.nombre,
+                inv.marcaId.nombre,        # FK → marca.nombre
+                inv.categoriaId.nombre,    # FK → categoria.nombre
+                inv.stockActual,
+                inv.ubicacion
+            )
+            for inv in inventario
+        ]
+        
+        nombre_archivo = f'Reporte_Inventario_{datetime.now().strftime("%d_%m_%Y")}'
+        
+        return exportar_excel(
+            titulo='REPORTE DE INVENTARIO',
+            columnas=columnas,
+            datos=datos,
+            nombre_archivo=nombre_archivo
+        )

@@ -9,6 +9,7 @@ from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 from django.http import HttpResponse
 from django.template.loader import render_to_string
 from django.templatetags.static import static
+from django.utils import timezone
 import io
 
 # ====== EXPORTACION A PDF ======
@@ -35,6 +36,7 @@ def exportar_pdf(request, titulo, columnas, datos, nombre_archivo):
         'columnas': columnas,
         'datos': datos,
         'logo_url' : logo_url,
+        'now': timezone.now(),
     }
 
     # Generar HTML desde el template
