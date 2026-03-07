@@ -94,6 +94,10 @@ urlpatterns = [
          AsistenciaDeleteView.as_view(), name="eliminar_asistencia"),
     path('asistencia/limpiar/', AsistenciaCleandView.as_view(),
          name="limpiar_asistencia"),
+    path('reporte/asistencia/pdf',ExportarAsistenciaPDF.as_view(),name="reporte_asistencia_pdf"),
+    path('reporte/asistencia/excel',ExportarAsistenciaExcel.as_view(),name="reporte_asistencia_excel"),
+    
+    
     path('movimiento/', MovimientoListView.as_view(), name="index_movimiento"),
     path('movimiento/crear/', MovimientoCreateView.as_view(),
          name="crear_movimiento"),

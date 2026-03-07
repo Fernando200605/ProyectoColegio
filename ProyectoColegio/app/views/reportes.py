@@ -134,3 +134,67 @@ class ExportarUsuarioExcel(DjangoView):
             datos=datos,
             nombre_archivo=nombre_archivo
         )
+    
+class ExportarAsistenciaPDF(DjangoView):
+    """
+    VISTA PARA EXPORTAR CATEGORIAS A PDF
+    Obtiene todas las categorías y las exporta en formato PDF
+    """
+    
+    def get(self, request):
+        # Obtener todas las categorias 
+        asistencia = Asistencia.objects.all()
+        
+        # Definir las columnas que se muestran en el reporte
+        columnas = ['ID', 'NOMBRE DEL ESTUDIANTE', 'FECHA', 'OBSERVACIONES']
+        
+        # Preparar los datos en formato de tuplas
+        datos = [
+            (asi.id, asi.estudianteid, asi.fecha, asi.observaciones)
+            for asi in asistencia
+        ]
+        
+        # Generar nombre del archivo con timestamp
+        nombre_archivo = f'Reporte_Asistencias_{datetime.now().strftime("%d_%m_%Y")}'
+        
+        # Llamar funcion de exportacion a PDF
+        return exportar_pdf(
+            request,
+            titulo='REPORTE DE ASISTENCIAS',
+            columnas=columnas,
+            datos=datos,
+            nombre_archivo=nombre_archivo,
+            
+        )
+
+
+class ExportarAsistenciaExcel(DjangoView):
+    """
+    VISTA PARA EXPORTAR CATEGORIAS A EXCEL
+    Obtiene todas las categorias y las exporta en formato Excel
+    """
+    
+    def get(self, request):
+        # Obtener todas las categorias 
+        asistencia = Asistencia.objects.all()
+        
+        # Definir las columnas que se mostraran en el reporte
+        columnas = ['ID', 'NOMBRE DEL ESTUDIANTE', 'FECHA', 'OBSERVACIONES']
+        
+        # Preparar los datos en  tuplas
+        datos = [
+            (asi.id, asi.estudianteid, asi.fecha, asi.observaciones)
+            for asi in asistencia
+        ]
+        
+        # Generar nombre del archivo con timestamp
+        nombre_archivo = f'Reporte_Asistencias_{datetime.now().strftime("%d_%m_%Y")}'
+        
+        # Llamar funcion de exportacion a Excel
+        return exportar_excel(
+            titulo='REPORTE DE ASISTENCIA',
+            columnas=columnas,
+            datos=datos,
+            nombre_archivo=nombre_archivo
+        )
+    
