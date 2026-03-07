@@ -242,6 +242,9 @@ class Elemento(models.Model):
         verbose_name = "Elemento"
         verbose_name_plural = "Elementos"
         db_table = "elemento"
+    
+    def __str__(self):
+        return self.nombre
 
 
 class Movimiento(models.Model):
