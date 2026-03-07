@@ -71,3 +71,69 @@ class ExportarCategoriasExcel(DjangoView):
             nombre_archivo=nombre_archivo
         )
     
+    
+# ====== VISTAS PARA EXPORTAR REPORTES MOVIMIENTOS ======
+
+class ExportarMovimientosPDF(DjangoView):
+    """
+    VISTA PARA EXPORTAR Movimientos A PDF
+    Obtiene todas los movimientos y los exporta en formato PDF
+    """
+    
+    def get(self, request):
+        # Obtener todas las categorias 
+        movimiento = Movimiento.objects.all()
+        
+        # Definir las columnas que se muestran en el reporte
+        columnas = ["id", "fecha", 'cantidad',"elementoid","usuarioid","cursoid"]
+        
+        # Preparar los datos en formato de tuplas
+        datos = [
+            (mo.id,mo.fecha, mo.cantidad,mo.elementoid,mo.usuarioid,mo.cursoid)
+            for mo in movimiento 
+        ]
+        
+        # Generar nombre del archivo con timestamp
+        nombre_archivo = f'Reporte_movimientos_{datetime.now().strftime("%d_%m_%Y")}'
+        
+        # Llamar funcion de exportacion a PDF
+        return exportar_pdf(
+            request,
+            titulo='REPORTE DE MOVIMIENTOS',
+            columnas=columnas,
+            datos=datos,
+            nombre_archivo=nombre_archivo,
+            
+        )
+
+
+class ExportarMovimientosExcel(DjangoView):
+    """
+    VISTA PARA EXPORTAR MOVIMIENTOS A EXCEL
+    Obtiene todos los movimientos y los exporta en formato Excel
+    """
+    
+    def get(self, request):
+        # Obtener todas las categorias 
+        movimiento = Movimiento.objects.all()
+        
+        # Definir las columnas que se mostraran en el reporte
+        columnas = ["id",'fecha', 'cantidad',"elementoid","usuarioid","cursoid"]
+        
+        # Preparar los datos en  tuplas
+        datos = [
+            (mo.id,mo.fecha, mo.cantidad,mo.elementoid,mo.usuarioid,mo.cursoid)
+            for mo in movimiento 
+        ]
+        
+        # Generar nombre del archivo con timestamp
+        nombre_archivo = f'Reporte_movimientos_{datetime.now().strftime("%d_%m_%Y")}'
+        
+        # Llamar funcion de exportacion a Excel
+        return exportar_excel(
+            titulo='REPORTE DE MOVIMIENTOS',
+            columnas=columnas,
+            datos=datos,
+            nombre_archivo=nombre_archivo
+        )
+    
