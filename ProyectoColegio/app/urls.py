@@ -131,5 +131,7 @@ urlpatterns = [
     path('reporte/usuario/pdf/',ExportarUsuarioPDF.as_view(),name="reporte_usuario_pdf"),
     path('reporte/usuario/excel/',ExportarUsuarioExcel.as_view(),name="reporte_usuario_excel"),
     path('reporte/movimiento/pdf',ExportarMovimientosPDF.as_view(),name="reporte_movimiento_pdf"),
-    path('reporte/movimiento/excel',ExportarMovimientosExcel.as_view(),name="reporte_movimiento_excel"),
+    path('reporte/movimiento/excel',ExportarMovimientosExcel.as_view(),name="reporte_movimiento_excel"),    
+    path('reporte/inventario/pdf',ExportarInventarioPDF.as_view(),name="reporte_inventario_pdf"),
+    path('reporte/inventario/excel',ExportarInventarioExcel.as_view(),name="reporte_inventario_excel"),
 ]
