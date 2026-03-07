@@ -9,6 +9,18 @@
 {{subtitulo}}
 {% endblock subtitulo%}
 
+{%block exportar%}
+<a href="{% url 'app:reporte_inventario_pdf' %}" class="btn-pdf">
+    <i class="fas fa-file-pdf me-1"></i> Exportar a PDF
+</a>
+<a href="{% url 'app:reporte_inventario_excel' %}" class="btn-excel">
+    <i class="fas fa-file-excel me-1"></i> Exportar a Excel
+</a>
+{% endblock exportar %}
+
+
+
+
 {% block columns %}
      <tr>
                     <th><i class="fas fa-hashtag me-2"></i>ID</th>
