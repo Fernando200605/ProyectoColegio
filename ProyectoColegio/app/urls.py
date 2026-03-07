@@ -27,6 +27,9 @@ urlpatterns = [
     path('curso/eliminar/<int:pk>/',
          CursoDeleteView.as_view(), name="eliminar_curso"),
     path('curso/limpiar/', CursoCleandView.as_view(), name="limpiar_curso"),
+    # REPORTES DE CURSOS (Agrega esto al final de urlpatterns)
+    path('reporte/curso/pdf/', ExportarCursoPDF.as_view(), name="exportar_cursos"),
+    path('reporte/curso/excel/', ExportarCursoExcel.as_view(), name="exportar_cursos_excel"),
 
     # Usuario
     path('usuario/', UsuarioListView.as_view(), name="index_usuario"),
