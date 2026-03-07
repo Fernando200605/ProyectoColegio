@@ -9,6 +9,7 @@ from django.urls import reverse_lazy
 from django.contrib import messages
 from django.db import connection
 from django.db.models import Q, F
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 # ===============================
 # LISTAR INVENTARIO (Función simple)
@@ -22,7 +23,7 @@ def listar_inventario(request):
 # LIST VIEW - INVENTARIO (igual estilo a CursoListView)
 # ===============================
 
-class InventarioListView(ListView):
+class InventarioListView(LoginRequiredMixin,ListView):
     model = Elemento
     template_name = 'inventario/index.html'
     context_object_name = 'elementos'
@@ -73,7 +74,7 @@ class InventarioListView(ListView):
 # CREATE VIEW - CREAR ELEMENTO
 # ===============================
 
-class ElementoCreateView(CreateView):
+class ElementoCreateView(LoginRequiredMixin,CreateView):
     model = Elemento
     form_class = ElementoForm
     template_name = 'inventario/crear.html'
@@ -94,7 +95,7 @@ class ElementoCreateView(CreateView):
 # UPDATE VIEW - ACTUALIZAR ELEMENTO
 # ===============================
 
-class ElementoUpdateView(UpdateView):
+class ElementoUpdateView(LoginRequiredMixin,UpdateView):
     model = Elemento
     form_class = ElementoForm
     template_name = 'inventario/crear.html'
@@ -115,7 +116,7 @@ class ElementoUpdateView(UpdateView):
 # DELETE VIEW - ELIMINAR ELEMENTO
 # ===============================
 
-class ElementoDeleteView(DeleteView):
+class ElementoDeleteView(LoginRequiredMixin,DeleteView):
     model = Elemento
     template_name = 'inventario/eliminar.html'
     success_url = reverse_lazy('app:index_inventario')
