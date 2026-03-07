@@ -107,6 +107,7 @@ urlpatterns = [
          MovimientoDeleteView.as_view(), name="eliminar_movimiento"),
     path('movimiento/limpiar/', MovimientoCleandView.as_view(),
          name="limpiar_movimiento"),
+    # EVENTO
     path('evento/', EventoListView.as_view(), name="index_evento"),
     path('evento/crear/', EventoCreateView.as_view(), name="crear_evento"),
     path('evento/editar/<int:pk>/',
@@ -114,6 +115,9 @@ urlpatterns = [
     path('evento/eliminar/<int:pk>/',
          EventoDeleteView.as_view(), name="eliminar_evento"),
     path('evento/limpiar/', EventoCleandView.as_view(), name="limpiar_evento"),
+    path('reporte/evento/pdf',ExportarEventosPDF.as_view(),name="reporte_evento_pdf"),
+    path('reporte/evento/excel',ExportarEventosExcel.as_view(),name="reporte_evento_excel"),
+    
     path('notificacion/', NotificacionListView.as_view(),
          name="index_notificacion"),
     path('notificacion/crear/', NotificacionCreateView.as_view(),
