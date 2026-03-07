@@ -120,6 +120,6 @@ urlpatterns = [
          NotificacionDeleteView.as_view(), name="eliminar_notificacion"),
     path('notificacion/limpiar/', NotificacionCleandView.as_view(),
          name="limpiar_notificacion"),
-    path('reporte/usuario/pdf',ExportarCategoriasPDF.as_view(),name="reporte_usuario_pdf"),
-    path('reporte/usuario/excel',ExportarCategoriasExcel.as_view(),name="reporte_usuario_excel")
+    path('reporte/usuario/pdf/',ExportarUsuarioPDF.as_view(),name="reporte_usuario_pdf"),
+    path('reporte/usuario/excel/',ExportarUsuarioExcel.as_view(),name="reporte_usuario_excel")
 ]

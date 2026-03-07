@@ -31,9 +31,34 @@
   </th>
 {% endblock %}
       {% block exportar %}
-      <a href="{% url 'app:reporte_usuario_pdf' %}" class="btn-pdf" style="z-index: 10000000;">
+      <a href="#" class="btn-pdf" id="ExportarPdf">
+        <i class="fas fa-file-pdf me-1"></i>
           Descargar PDF
       </a>
+      <a href="#" class="btn-excel" id = "ExportarExcel">
+        <i class="fas fa-file-excel me-1"></i>
+          Descargar Excel
+      </a>
+        <div class="filtros" style="z-index: 1000;">
+        <input type="text" id="buscar" name="buscar" placeholder="Buscar usuario">
+
+        <select id="rol" name="rol">
+            <option value="">Todos los roles</option>
+            <option value="administrador">Administrador</option>
+            <option value="docente">Docente</option>
+            <option value="estudiante">Estudiante</option>
+        </select>
+
+        <select id="estado" name="estado">
+            <option value="">Todos</option>
+            <option value="1">Activo</option>
+            <option value="0">Inactivo</option>
+        </select>
+
+        <button type="submit" id="filtrar">
+            Filtrar
+        </button>
+    </div>
       {% endblock %}
 {% block rows %}
   {% for usuario in object_list %}
@@ -54,7 +79,8 @@
       </td>
     </tr>
   {% endfor %}
-
+{% endblock %}
+{% block js %}
 <script>
   document.querySelectorAll('.btn-ver-usuario').forEach(btn => {
 
@@ -114,6 +140,46 @@
   });
 
   });
+</script>
+<script>
+  console.log("Hola mundo")
+  $(document).ready(function () {
+
+      const tabla = $('#Tabla').DataTable();
+
+      document.getElementById('filtrar').addEventListener('click', function () {
+
+          let buscar = document.getElementById('buscar').value
+          let rol = document.getElementById('rol').value
+          let estado = document.getElementById('estado').value
+          console.log(rol)
+          tabla.search(buscar).draw()
+          tabla.column(3).search(rol);
+      });
+
+  });
+</script>
+<script>
+
+    const urlPdf = "{% url 'app:reporte_usuario_pdf' %}"
+    const urlExcel = "{% url 'app:reporte_usuario_excel' %}"
+
+    document.getElementById("ExportarPdf").addEventListener("click", function(e){
+        e.preventDefault()
+        let buscar = document.getElementById("buscar").value
+        let rol = document.getElementById("rol").value
+        let estado = document.getElementById("estado").value
+        window.location.href = `${urlPdf}?buscar=${buscar}&rol=${rol}&estado=${estado}`
+    })
+
+    document.getElementById("ExportarExcel").addEventListener("click", function(e){
+        e.preventDefault()
+        let buscar = document.getElementById("buscar").value
+        let rol = document.getElementById("rol").value
+        let estado = document.getElementById("estado").value
+        window.location.href = `${urlExcel}?buscar=${buscar}&rol=${rol}&estado=${estado}`
+    })
+
 </script>
 
 {% endblock %}
