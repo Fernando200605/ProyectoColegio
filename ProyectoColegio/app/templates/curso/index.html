@@ -12,13 +12,9 @@
       <button class="btn btn-success dropdown-toggle" type="button" id="dropdownReportes" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="border-radius: 8px;"><i class="fas fa-file-excel me-2"></i>Exportar Reporte</button>
 
       <div class="dropdown-menu" aria-labelledby="dropdownReportes">
-        <a class="dropdown-item" href="{% url 'app:exportar_cursos' %}">Descargar Todo</a>
+        <a class="dropdown-item" href="#">Descargar Todo</a>
         <div class="dropdown-divider"></div>
         <h6 class="dropdown-header">Por Módulo (ID)</h6>
-
-        {% for curso in object_list %}
-          <a class="dropdown-item" href="{% url 'app:exportar_cursos' %}?curso_id={{ curso.id }}">Reporte: {{ curso.grado }} - {{ curso.codigo }}</a>
-        {% endfor %}
       </div>
     </div>
   </div>

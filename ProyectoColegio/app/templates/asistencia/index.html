@@ -15,7 +15,16 @@
     <th><i class="fas fa-clock me-2"></i>Observaciones</th>
     <th class="text-center"><i class="fas fa-tools me-2"></i>Acciones</th>
 {% endblock columns %}
-
+    {% block exportar %}
+      <a href="{% url 'app:reporte_asistencia_pdf' %}" class="btn-pdf">
+        <i class="fas fa-file-pdf me-1"></i>
+          Descargar PDF
+      </a>
+      <a href="{% url 'app:reporte_asistencia_excel' %}" class="btn-excel">
+        <i class="fas fa-file-excel me-1"></i>
+          Descargar Excel
+      </a>
+    {% endblock %}
 {% block rows %}
     {% for asistencia in object_list %}
     <tr>
