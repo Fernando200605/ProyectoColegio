@@ -134,29 +134,30 @@ class ExportarUsuarioExcel(DjangoView):
             datos=datos,
             nombre_archivo=nombre_archivo
         )
-    
+
+
 class ExportarAsistenciaPDF(DjangoView):
     """
     VISTA PARA EXPORTAR CATEGORIAS A PDF
     Obtiene todas las categorías y las exporta en formato PDF
     """
-    
+
     def get(self, request):
-        # Obtener todas las categorias 
+        # Obtener todas las categorias
         asistencia = Asistencia.objects.all()
-        
+
         # Definir las columnas que se muestran en el reporte
         columnas = ['ID', 'NOMBRE DEL ESTUDIANTE', 'FECHA', 'OBSERVACIONES']
-        
+
         # Preparar los datos en formato de tuplas
         datos = [
             (asi.id, asi.estudianteid, asi.fecha, asi.observaciones)
             for asi in asistencia
         ]
-        
+
         # Generar nombre del archivo con timestamp
         nombre_archivo = f'Reporte_Asistencias_{datetime.now().strftime("%d_%m_%Y")}'
-        
+
         # Llamar funcion de exportacion a PDF
         return exportar_pdf(
             request,
@@ -164,7 +165,7 @@ class ExportarAsistenciaPDF(DjangoView):
             columnas=columnas,
             datos=datos,
             nombre_archivo=nombre_archivo,
-            
+
         )
 
 
@@ -173,23 +174,23 @@ class ExportarAsistenciaExcel(DjangoView):
     VISTA PARA EXPORTAR CATEGORIAS A EXCEL
     Obtiene todas las categorias y las exporta en formato Excel
     """
-    
+
     def get(self, request):
-        # Obtener todas las categorias 
+        # Obtener todas las categorias
         asistencia = Asistencia.objects.all()
-        
+
         # Definir las columnas que se mostraran en el reporte
         columnas = ['ID', 'NOMBRE DEL ESTUDIANTE', 'FECHA', 'OBSERVACIONES']
-        
+
         # Preparar los datos en  tuplas
         datos = [
             (asi.id, asi.estudianteid, asi.fecha, asi.observaciones)
             for asi in asistencia
         ]
-        
+
         # Generar nombre del archivo con timestamp
         nombre_archivo = f'Reporte_Asistencias_{datetime.now().strftime("%d_%m_%Y")}'
-        
+
         # Llamar funcion de exportacion a Excel
         return exportar_excel(
             titulo='REPORTE DE ASISTENCIA',
@@ -198,28 +199,29 @@ class ExportarAsistenciaExcel(DjangoView):
             nombre_archivo=nombre_archivo
         )
 
+
 class ExportarEventosPDF(DjangoView):
     """
     VISTA PARA EXPORTAR CATEGORIAS A PDF
     Obtiene todas las categorías y las exporta en formato PDF
     """
-    
+
     def get(self, request):
-        # Obtener todas las categorias 
+        # Obtener todas las categorias
         evento = Evento.objects.all()
-        
+
         # Definir las columnas que se muestran en el reporte
         columnas = ['ID', 'TITULO', 'DESCRIPCION']
-        
+
         # Preparar los datos en formato de tuplas
         datos = [
             (us.id, us.titulo, us.descripcion)
             for us in evento
         ]
-        
+
         # Generar nombre del archivo con timestamp
         nombre_archivo = f'Reporte_Eventos_{datetime.now().strftime("%d_%m_%Y")}'
-        
+
         # Llamar funcion de exportacion a PDF
         return exportar_pdf(
             request,
@@ -227,32 +229,99 @@ class ExportarEventosPDF(DjangoView):
             columnas=columnas,
             datos=datos,
             nombre_archivo=nombre_archivo,
-            
+
         )
 
+
 class ExportarEventosExcel(DjangoView):
-    
+
     def get(self, request):
-        # Obtener todas las categorias 
+        # Obtener todas las categorias
         evento = Evento.objects.all()
-        
+
         # Definir las columnas que se muestran en el reporte
         columnas = ['ID', 'TITULO', 'DESCRIPCION']
-        
+
         # Preparar los datos en formato de tuplas
         datos = [
             (us.id, us.titulo, us.descripcion)
             for us in evento
         ]
-        
+
         # Generar nombre del archivo con timestamp
         nombre_archivo = f'Reporte_Eventos_{datetime.now().strftime("%d_%m_%Y")}'
-        
+
         # Llamar funcion de exportacion a PDF
         return exportar_excel(
             titulo='REPORTE DE EVENTOS',
             columnas=columnas,
             datos=datos,
             nombre_archivo=nombre_archivo,
-            
+
+        )
+
+
+class ExportarMovimientosPDF(DjangoView):
+    """
+    VISTA PARA EXPORTAR Movimientos A PDF
+    Obtiene todas los movimientos y los exporta en formato PDF
+    """
+
+    def get(self, request):
+        # Obtener todas las categorias
+        movimiento = Movimiento.objects.all()
+
+        # Definir las columnas que se muestran en el reporte
+        columnas = ["id", "fecha", 'cantidad',
+                    "elementoid", "usuarioid", "cursoid"]
+
+        # Preparar los datos en formato de tuplas
+        datos = [
+            (mo.id, mo.fecha, mo.cantidad, mo.elementoid, mo.usuarioid, mo.cursoid)
+            for mo in movimiento
+        ]
+
+        # Generar nombre del archivo con timestamp
+        nombre_archivo = f'Reporte_movimientos_{datetime.now().strftime("%d_%m_%Y")}'
+
+        # Llamar funcion de exportacion a PDF
+        return exportar_pdf(
+            request,
+            titulo='REPORTE DE MOVIMIENTOS',
+            columnas=columnas,
+            datos=datos,
+            nombre_archivo=nombre_archivo,
+
+        )
+
+
+class ExportarMovimientosExcel(DjangoView):
+    """
+    VISTA PARA EXPORTAR MOVIMIENTOS A EXCEL
+    Obtiene todos los movimientos y los exporta en formato Excel
+    """
+
+    def get(self, request):
+        # Obtener todas las categorias
+        movimiento = Movimiento.objects.all()
+
+        # Definir las columnas que se mostraran en el reporte
+        columnas = ["id", 'fecha', 'cantidad',
+                    "elementoid", "usuarioid", "cursoid"]
+
+        # Preparar los datos en  tuplas
+        datos = [
+            (mo.id, mo.fecha, mo.cantidad, mo.elementoid, mo.usuarioid, mo.cursoid)
+            for mo in movimiento
+        ]
+
+        # Generar nombre del archivo con timestamp
+        nombre_archivo = f'Reporte_movimientos_{datetime.now().strftime("%d_%m_%Y")}'
+
+        # Llamar funcion de exportacion a Excel
+        return exportar_excel(
+            titulo='REPORTE DE MOVIMIENTOS',
+            columnas=columnas,
+            datos=datos,
+            nombre_archivo=nombre_archivo
         )
