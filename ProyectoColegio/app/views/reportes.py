@@ -197,4 +197,62 @@ class ExportarAsistenciaExcel(DjangoView):
             datos=datos,
             nombre_archivo=nombre_archivo
         )
+
+class ExportarEventosPDF(DjangoView):
+    """
+    VISTA PARA EXPORTAR CATEGORIAS A PDF
+    Obtiene todas las categorías y las exporta en formato PDF
+    """
     
+    def get(self, request):
+        # Obtener todas las categorias 
+        evento = Evento.objects.all()
+        
+        # Definir las columnas que se muestran en el reporte
+        columnas = ['ID', 'TITULO', 'DESCRIPCION']
+        
+        # Preparar los datos en formato de tuplas
+        datos = [
+            (us.id, us.titulo, us.descripcion)
+            for us in evento
+        ]
+        
+        # Generar nombre del archivo con timestamp
+        nombre_archivo = f'Reporte_Eventos_{datetime.now().strftime("%d_%m_%Y")}'
+        
+        # Llamar funcion de exportacion a PDF
+        return exportar_pdf(
+            request,
+            titulo='REPORTE DE EVENTOS',
+            columnas=columnas,
+            datos=datos,
+            nombre_archivo=nombre_archivo,
+            
+        )
+
+class ExportarEventosExcel(DjangoView):
+    
+    def get(self, request):
+        # Obtener todas las categorias 
+        evento = Evento.objects.all()
+        
+        # Definir las columnas que se muestran en el reporte
+        columnas = ['ID', 'TITULO', 'DESCRIPCION']
+        
+        # Preparar los datos en formato de tuplas
+        datos = [
+            (us.id, us.titulo, us.descripcion)
+            for us in evento
+        ]
+        
+        # Generar nombre del archivo con timestamp
+        nombre_archivo = f'Reporte_Eventos_{datetime.now().strftime("%d_%m_%Y")}'
+        
+        # Llamar funcion de exportacion a PDF
+        return exportar_excel(
+            titulo='REPORTE DE EVENTOS',
+            columnas=columnas,
+            datos=datos,
+            nombre_archivo=nombre_archivo,
+            
+        )
