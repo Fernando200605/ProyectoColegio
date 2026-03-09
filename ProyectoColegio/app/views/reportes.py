@@ -325,13 +325,14 @@ class ExportarMovimientosExcel(DjangoView):
             datos=datos,
             nombre_archivo=nombre_archivo
         )
-    
+
+
 class ExportarInventarioPDF(DjangoView):
     def get(self, request):
         inventario = Elemento.objects.all()
-        
+
         columnas = ['ID', 'Nombre', 'Marca', 'Categoría', 'Stock', 'Ubicación']
-        
+
         datos = [
             (
                 inv.id,
@@ -343,9 +344,9 @@ class ExportarInventarioPDF(DjangoView):
             )
             for inv in inventario
         ]
-        
+
         nombre_archivo = f'Reporte_Inventario_{datetime.now().strftime("%d_%m_%Y")}'
-        
+
         return exportar_pdf(
             request,
             titulo='REPORTE DE INVENTARIO',
@@ -357,10 +358,11 @@ class ExportarInventarioPDF(DjangoView):
 
 class ExportarInventarioExcel(DjangoView):
     def get(self, request):
-        inventario = Elemento.objects.select_related('marcaId', 'categoriaId').all()
-        
+        inventario = Elemento.objects.select_related(
+            'marcaId', 'categoriaId').all()
+
         columnas = ['ID', 'Nombre', 'Marca', 'Categoría', 'Stock', 'Ubicación']
-        
+
         datos = [
             (
                 inv.id,
@@ -372,11 +374,78 @@ class ExportarInventarioExcel(DjangoView):
             )
             for inv in inventario
         ]
-        
+
         nombre_archivo = f'Reporte_Inventario_{datetime.now().strftime("%d_%m_%Y")}'
-        
+
         return exportar_excel(
             titulo='REPORTE DE INVENTARIO',
+            columnas=columnas,
+            datos=datos,
+            nombre_archivo=nombre_archivo
+        )
+
+
+class ExportarCursoPDF(DjangoView):
+    def get(self, request):
+        # 1. Capturamos el ID que viene del selector del HTML
+        curso_id = request.GET.get('curso_id')
+
+        # 2. Si hay un ID, filtramos. Si no, traemos todos.
+        if curso_id:
+            cursos = Curso.objects.filter(id=curso_id)
+            # Intentamos obtener el nombre del grado para un título más bonito
+            curso_obj = cursos.first()
+            grado_nombre = curso_obj.get_grado_display() if curso_obj else curso_id
+            titulo_reporte = f'REPORTE DEL CURSO: {grado_nombre}'
+        else:
+            cursos = Curso.objects.all()
+            titulo_reporte = 'REPORTE GENERAL DE CURSOS'
+
+        columnas = ['ID', 'Grado', 'Código', 'Capacidad']
+
+        # 3. Preparamos los datos usando la variable 'cursos' (ya filtrada)
+        datos = [
+            (c.id, c.grado, c.codigo, c.capacidad)
+            for c in cursos
+        ]
+
+        nombre_archivo = f'Reporte_Cursos_{datetime.now().strftime("%d_%m_%Y")}'
+
+        # 4. Retornamos la función que genera el PDF
+        return exportar_pdf(
+            request,
+            titulo=titulo_reporte,
+            columnas=columnas,
+            datos=datos,
+            nombre_archivo=nombre_archivo
+        )
+
+
+class ExportarCursoExcel(DjangoView):
+    def get(self, request):
+        # 1. Capturamos el ID que viene del selector del HTML
+        curso_id = request.GET.get('curso_id')
+
+        # 2. Si hay un ID, filtramos. Si no, traemos todos.
+        if curso_id:
+            cursos = Curso.objects.filter(id=curso_id)
+            titulo_reporte = f'REPORTE DEL CURSO #{curso_id}'
+        else:
+            cursos = Curso.objects.all()
+            titulo_reporte = 'REPORTE GENERAL DE CURSOS'
+
+        columnas = ['ID', 'Grado', 'Código', 'Capacidad']
+
+        # Usamos la variable 'cursos' que ya está filtrada arriba
+        datos = [
+            (c.id, c.grado, c.codigo, c.capacidad)
+            for c in cursos
+        ]
+
+        nombre_archivo = f'Reporte_Cursos_{datetime.now().strftime("%d_%m_%Y")}'
+
+        return exportar_excel(
+            titulo=titulo_reporte,
             columnas=columnas,
             datos=datos,
             nombre_archivo=nombre_archivo
