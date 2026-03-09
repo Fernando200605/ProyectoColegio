@@ -16,7 +16,10 @@ class ExportarUsuarioPDF(DjangoView):
         print("Aqui")
 
         usuarios = Usuario.objects.all()
-
+        if not usuarios.exists():
+            messages.warning(
+                request, "No existen usuarios registrados en el sistema.")
+            return redirect('app:index_usuario')
         buscar = request.GET.get('buscar', '').strip()
         rol = request.GET.get('rol', '').strip()
         estado = request.GET.get('estado', '').strip()
@@ -81,7 +84,10 @@ class ExportarUsuarioExcel(DjangoView):
         print("Aqui")
 
         usuarios = Usuario.objects.all()
-
+        if not usuarios.exists():
+            messages.warning(
+                request, "No existen usuarios registrados en el sistema.")
+            return redirect('app:index_usuario')
         buscar = request.GET.get('buscar', '').strip()
         rol = request.GET.get('rol', '').strip()
         estado = request.GET.get('estado', '').strip()
@@ -145,7 +151,10 @@ class ExportarAsistenciaPDF(DjangoView):
     def get(self, request):
         # Obtener todas las categorias
         asistencia = Asistencia.objects.all()
-
+        if not asistencia.exists():
+            messages.warning(
+                request, "No existen asistencias registrados en el sistema.")
+            return redirect('app:index_asistencia')
         # Definir las columnas que se muestran en el reporte
         columnas = ['ID', 'NOMBRE DEL ESTUDIANTE', 'FECHA', 'OBSERVACIONES']
 
@@ -178,7 +187,10 @@ class ExportarAsistenciaExcel(DjangoView):
     def get(self, request):
         # Obtener todas las categorias
         asistencia = Asistencia.objects.all()
-
+        if not asistencia.exists():
+            messages.warning(
+                request, "No existen asistencias registrados en el sistema.")
+            return redirect('app:index_asistencia')
         # Definir las columnas que se mostraran en el reporte
         columnas = ['ID', 'NOMBRE DEL ESTUDIANTE', 'FECHA', 'OBSERVACIONES']
 
@@ -209,7 +221,10 @@ class ExportarEventosPDF(DjangoView):
     def get(self, request):
         # Obtener todas las categorias
         evento = Evento.objects.all()
-
+        if not evento.exists():
+            messages.warning(
+                request, "No existen eventos registrados en el sistema.")
+            return redirect('app:index_evento')
         # Definir las columnas que se muestran en el reporte
         columnas = ['ID', 'TITULO', 'DESCRIPCION']
 
@@ -238,7 +253,10 @@ class ExportarEventosExcel(DjangoView):
     def get(self, request):
         # Obtener todas las categorias
         evento = Evento.objects.all()
-
+        if not evento.exists():
+            messages.warning(
+                request, "No existen eventos registrados en el sistema.")
+            return redirect('app:index_evento')
         # Definir las columnas que se muestran en el reporte
         columnas = ['ID', 'TITULO', 'DESCRIPCION']
 
@@ -270,7 +288,10 @@ class ExportarMovimientosPDF(DjangoView):
     def get(self, request):
         # Obtener todas las categorias
         movimiento = Movimiento.objects.all()
-
+        if not movimiento.exists():
+            messages.warning(
+                request, "No existen movimientos registrados en el sistema.")
+            return redirect('app:index_movimiento')
         # Definir las columnas que se muestran en el reporte
         columnas = ["id", "fecha", 'cantidad',
                     "elementoid", "usuarioid", "cursoid"]
@@ -304,7 +325,10 @@ class ExportarMovimientosExcel(DjangoView):
     def get(self, request):
         # Obtener todas las categorias
         movimiento = Movimiento.objects.all()
-
+        if not movimiento.exists():
+            messages.warning(
+                request, "No existen movimientos registrados en el sistema.")
+            return redirect('app:index_movimiento')
         # Definir las columnas que se mostraran en el reporte
         columnas = ["id", 'fecha', 'cantidad',
                     "elementoid", "usuarioid", "cursoid"]
@@ -330,7 +354,10 @@ class ExportarMovimientosExcel(DjangoView):
 class ExportarInventarioPDF(DjangoView):
     def get(self, request):
         inventario = Elemento.objects.all()
-
+        if not inventario.exists():
+            messages.warning(
+                request, "No existen inventario registrados en el sistema.")
+            return redirect('app:index_inventario')
         columnas = ['ID', 'Nombre', 'Marca', 'Categoría', 'Stock', 'Ubicación']
 
         datos = [
@@ -360,7 +387,9 @@ class ExportarInventarioExcel(DjangoView):
     def get(self, request):
         inventario = Elemento.objects.select_related(
             'marcaId', 'categoriaId').all()
-
+        if not inventario.exists():
+            messages.warning(request, "No existen inventario registrados en el sistema.")
+            return redirect('app:index_inventario')
         columnas = ['ID', 'Nombre', 'Marca', 'Categoría', 'Stock', 'Ubicación']
 
         datos = [
@@ -393,12 +422,14 @@ class ExportarCursoPDF(DjangoView):
         # 2. Si hay un ID, filtramos. Si no, traemos todos.
         if curso_id:
             cursos = Curso.objects.filter(id=curso_id)
-            # Intentamos obtener el nombre del grado para un título más bonito
             curso_obj = cursos.first()
             grado_nombre = curso_obj.get_grado_display() if curso_obj else curso_id
             titulo_reporte = f'REPORTE DEL CURSO: {grado_nombre}'
         else:
             cursos = Curso.objects.all()
+            if not cursos.exists():
+                messages.warning(request, "No existen cursos registrados en el sistema.")
+                return redirect('app:index_curso')
             titulo_reporte = 'REPORTE GENERAL DE CURSOS'
 
         columnas = ['ID', 'Grado', 'Código', 'Capacidad']
@@ -432,6 +463,9 @@ class ExportarCursoExcel(DjangoView):
             titulo_reporte = f'REPORTE DEL CURSO #{curso_id}'
         else:
             cursos = Curso.objects.all()
+            if not cursos.exists():
+                messages.warning(request, "No existen cursos registrados en el sistema.")
+                return redirect('app:index_curso')
             titulo_reporte = 'REPORTE GENERAL DE CURSOS'
 
         columnas = ['ID', 'Grado', 'Código', 'Capacidad']
