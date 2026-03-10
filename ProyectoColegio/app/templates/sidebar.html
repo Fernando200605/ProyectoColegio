@@ -3,24 +3,32 @@
 <div id="sidebar" class="sidebar">
   <div class="profile">
     {% if request.user.img_usuario %}
-    <img src="{{request.user.img_usuario.url}}" alt="{{request.user.nombre}}" />
+      <img src="{{ request.user.img_usuario.url }}" alt="{{ request.user.nombre }}" />
     {% endif %}
     <a href="#" class="edit-profile"><i class="fa-solid fa-pencil"></i></a>
-    <p class="name">{{request.user.nombre}}</p>
-    <p class="badge rounded-pill badge-primary rol">{{request.user.get_rol}}</p>
+    <p class="name">{{ request.user.nombre }}</p>
+    <p class="badge rounded-pill badge-primary rol">{{ request.user.get_rol }}</p>
+    <div class="dropdown">
+      <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Dropdown button</button>
+      <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+        <a class="dropdown-item" href="{% url "app:backup" %}">Action</a>
+        <a class="dropdown-item" href="#">Another action</a>
+        <a class="dropdown-item" href="#">Something else here</a>
+      </div>
+    </div>
   </div>
   <ul>
     <li>
-      <a href="{% url "app:dashboard" %}"><i class="fa-solid fa-house"></i> Inicio</a>
+      <a href="{% url 'app:dashboard' %}"><i class="fa-solid fa-house"></i> Inicio</a>
     </li>
     <li>
       <a href="{% url 'app:index_curso' %}"><i class="fa-solid fa-graduation-cap"></i> Cursos</a>
     </li>
     <li>
-      <a href="{% url "app:index_usuario" %}"><i class="fa-solid fa-user"></i> Usuarios</a>
+      <a href="{% url 'app:index_usuario' %}"><i class="fa-solid fa-user"></i> Usuarios</a>
     </li>
     <li>
-      <a href="{% url "app:index_asistencia" %}"><i class="fa-solid fa-check"></i> Asistencia</a>
+      <a href="{% url 'app:index_asistencia' %}"><i class="fa-solid fa-check"></i> Asistencia</a>
     </li>
     <li>
       <a href="{% url 'app:index_inventario' %}"><i class="fa-solid fa-tv"></i> Inventario</a>

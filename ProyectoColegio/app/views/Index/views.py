@@ -28,3 +28,6 @@ class DashboardView(LoginRequiredMixin, TemplateView):
         ]
 
         return context
+
+class Qr_code(TemplateView):
+    template_name = "escaner/escaner.html"

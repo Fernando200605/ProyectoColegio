@@ -15,6 +15,7 @@ from app.views.login.views import *
 from app.views.Index.views import DashboardView
 from django.contrib.auth.views import LogoutView
 from app.views.reportes import * 
+from app.views.backup import *
 app_name = 'app'
 urlpatterns = [
     path('login/', CreLoginView.as_view(), name="login"),
@@ -137,4 +138,6 @@ urlpatterns = [
     path('reporte/movimiento/excel',ExportarMovimientosExcel.as_view(),name="reporte_movimiento_excel"),    
     path('reporte/inventario/pdf',ExportarInventarioPDF.as_view(),name="reporte_inventario_pdf"),
     path('reporte/inventario/excel',ExportarInventarioExcel.as_view(),name="reporte_inventario_excel"),
+    path('backup/', backup , name="backup"),
+    path('backup/restaurar', restaurar_datos , name="restaurar_datos"),
 ]
