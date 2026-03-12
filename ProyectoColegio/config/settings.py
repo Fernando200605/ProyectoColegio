@@ -82,7 +82,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'colegio_db',
         'USER': 'root',
-        'PASSWORD': '1055962626',
+        'PASSWORD': 'mamitas39',
         'HOST': 'localhost',
         'PORT': '3306',
     }
