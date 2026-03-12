@@ -1555,3 +1555,40 @@ body.is-large-text .guia-item p {
     background: #f8f9fa;        /* fondo suave */
     border-radius: 10px;        /* esquinas redondeadas */
 }
+/* El botón principal */
+.btn-secondary.dropdown-toggle {
+    background-color: #0f13ec !important; /* Un color índigo vibrante */
+    border: none !important;
+    border-radius: 8px !important;
+    padding: 10px 20px !important;
+    transition: all 0.3s ease !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !;
+}
+
+.btn-secondary.dropdown-toggle:hover {
+    background-color: #4f46e5 !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* El menú desplegable */
+.dropdown-menu {
+    border: none !important;
+    border-radius: 12px !important;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1) !important;
+    padding: 8px !important;
+    margin-top: 10px !important;
+}
+
+/* Los items del menú */
+.dropdown-item {
+    border-radius: 6px !important;
+    padding: 8px 16px !important;
+    color: #374151 !important;
+    transition: background 0.2s !important;
+}
+
+.dropdown-item:hover {
+    background-color: #f3f4f6 !important;
+    color: #6366f1 !important;
+}

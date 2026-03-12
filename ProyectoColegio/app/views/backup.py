@@ -1,203 +1,148 @@
-"""
-VISTAS PARA RESPALDO Y RESTAURACION DE BD 
-Permite crear respaldo completo y restaurarlo desde archivo SQL
-"""
 import os
 import subprocess
+import platform
 from datetime import datetime
 from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.http import require_http_methods
 from django.conf import settings
 
-# ========== OBTENER DATOS DE LA BD ==========
+# ========== OBTENER DATOS DE LA BD (MULTIPLATAFORMA) ==========
 def obtener_credenciales_mysql():
-    """Obtiene las credenciales de MySQL desde settings.py"""
+    """Detecta el SO y ajusta las rutas de los binarios de MySQL automáticamente"""
     db_config = settings.DATABASES['default']
-    return {
+    sistema = platform.system()
+    
+    creds = {
         'host': db_config.get('HOST', 'localhost'),
         'user': db_config.get('USER', 'root'),
         'password': db_config.get('PASSWORD', ''),
-        'database': db_config.get('NAME', 'sena_db'),
+        'database': db_config.get('NAME', 'colegio_db'),
         'port': db_config.get('PORT', 3306),
-        'mysql_path': r'C:\Program Files\MySQL\MySQL Server 8.0\bin',
     }
+
+    if sistema == "Windows":
+        # Rutas comunes en Windows (MySQL oficial o XAMPP)
+        rutas_posibles = [
+            r'C:\Program Files\MySQL\MySQL Server 8.0\bin',
+            r'C:\xampp\mysql\bin',
+            r'C:\Program Files\MySQL\MySQL Server 8.4\bin'
+        ]
+        creds['mysql_path'] = next((r for r in rutas_posibles if os.path.exists(r)), rutas_posibles[0])
+        creds['ext'] = '.exe'
+    else:
+        # En Linux (Pop!_OS/Ubuntu) los binarios están en el PATH global
+        creds['mysql_path'] = '/usr/bin'
+        creds['ext'] = ''
+        
+    return creds
 
 def probar_conexion_mysql():
-    """Prueba la conexión a MySQL"""
+    """Prueba la conexión a MySQL ejecutando un comando simple"""
     creds = obtener_credenciales_mysql()
     try:
+        # Usamos f-string para la extensión (.exe o vacío)
+        exe = f"mysql{creds['ext']}"
         cmd = [
-            os.path.join(creds["mysql_path"], 'mysql.exe'),
-            '-h', creds["host"],
-            '-u', creds["user"],
-            '-P', str(creds["port"]),
-            '--password=' + creds["password"],
-            '-e', 'SELECT 1;',
-            creds["database"]
-        ]
-
-        resultado = subprocess.run(
-            cmd,
-            capture_output=True,
-            text=True,
-            timeout=10
-        )
-
-        return resultado.returncode == 0
-    except:
-        return False
-
-# ========== VISTA PARA MOSTRAR OPCIONES DE RESPALDO ==========
-@require_http_methods(["GET", "POST"])
-def backup(request):
-    """Muestra el menu de opciones para respaldo y restauracion"""
-    if request.method == "POST":
-        accion = request.POST.get('accion')
-
-        try:
-            if accion == 'backup_completo':
-                # Verificar conexion antes de hacer respaldo
-                if not probar_conexion_mysql():
-                    return JsonResponse({'error': 'No se puede conectar a MySQL. Verifica que el servidor este en ejecucion y el user y pass  sean validos.'}, status=400)
-                return realizar_respaldo_completo()
-    
-        except Exception as e:
-            return JsonResponse({'error': str(e)}, status=400)
-
-    # Verificar conexion para mostrar estado
-    mysql_ok = probar_conexion_mysql()
-    context = {
-        'titulo': 'Respaldo y Restauracion de Base de Datos',
-        'mysql_conectado': mysql_ok,
-    }
-    return render(request, 'backup/menu.html', context)
-
-# ========== VISTA PARA RESTAURAR DATOS ==========
-@require_http_methods(["POST"])
-def restaurar_datos(request):
-    """Restaura datos desde un archivo SQL"""
-    if 'archivo' not in request.FILES:
-        return JsonResponse({'error': 'No se proporciono archivo'}, status=400)
-
-    archivo = request.FILES['archivo']
-
-    try:
-        # Validar que sea .sql
-        if not archivo.name.endswith('.sql'):
-            return JsonResponse({'error': 'El archivo debe tener extension .sql'}, status=400)
-
-        # Leer contenido del archivo
-        contenido_sql = archivo.read().decode('utf-8')
-
-        # Restaurar la BD desde el SQL
-        restaurar_bd_desde_sql(contenido_sql)
-
-        mensaje = " Base de datos restaurada correctamente"
-        return JsonResponse({'exito': True, 'mensaje': mensaje})
-
-    except Exception as e:
-        return JsonResponse({'error': f'Error al restaurar: {str(e)}'}, status=400)
-
-# ========== FUNCIONES DE RESPALDO ==========
-
-def realizar_respaldo_completo():
-    """Realiza un respaldo completo (estructura + datos)"""
-    creds = obtener_credenciales_mysql()
-
-    try:
-        cmd = [
-            os.path.join(creds["mysql_path"], 'mysqldump.exe'),
+            os.path.join(creds["mysql_path"], exe),
             '-h', creds["host"],
             '-u', creds["user"],
             '-P', str(creds["port"]),
             f'--password={creds["password"]}',
-            '--routines',
-            '--triggers',
-            '--events',
+            '-e', 'SELECT 1;',
             creds["database"]
         ]
 
-        resultado = subprocess.run(
-            cmd,
-            capture_output=True,
-            text=True,
-            encoding="utf-8",
-            errors="ignore",
-            timeout=60
-        )
+        resultado = subprocess.run(cmd, capture_output=True, text=True, timeout=5)
+        return resultado.returncode == 0
+    except:
+        return False
 
-        if resultado.returncode != 0:
-            raise Exception(f"Error mysqldump: {resultado.stderr}")
+# ========== VISTA PRINCIPAL DEL BACKUP ==========
+@require_http_methods(["GET", "POST"])
+def backup(request):
+    """Muestra el menú de opciones para respaldo y restauración"""
+    if request.method == "POST":
+        accion = request.POST.get('accion')
+        try:
+            if accion == 'backup_completo':
+                if not probar_conexion_mysql():
+                    return JsonResponse({'error': 'Error de conexión. Verifica el servidor MySQL.'}, status=400)
+                return realizar_respaldo_completo()
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400)
 
-        sql_content = resultado.stdout
+    context = {
+        'titulo': 'Gestión de Base de Datos - ProyectoColegio',
+        'mysql_conectado': probar_conexion_mysql(),
+    }
+    return render(request, 'backup/menu.html', context)
 
-        if not sql_content or not sql_content.strip():
-            raise Exception("El respaldo está vacío")
-
-        sql_content = (
-            f"-- Respaldo Completo de {creds['database']}\n"
-            f"-- Fecha: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n"
-            f"-- Tipo: Completo (Estructura + Datos)\n\n"
-            + sql_content
-        )
-
-        return generar_archivo_descarga(sql_content, 'backup_completo')
-
-    except subprocess.TimeoutExpired:
-        raise Exception("Timeout al ejecutar mysqldump")
-
-    except Exception as e:
-        print(f"Error en respaldo completo: {str(e)}")
-        raise Exception(f"Error en respaldo completo: {str(e)}")
-
-# ========== FUNCIONES PARA RESTAURAR ==========
-
-def restaurar_bd_desde_sql(contenido_sql):
-    """Restaura la BD ejecutando el SQL"""
+# ========== FUNCIONES DE RESPALDO ==========
+def realizar_respaldo_completo():
+    """Genera el volcado SQL (Estructura + Datos)"""
     creds = obtener_credenciales_mysql()
-
     try:
-        # Construir comando mysql usando la misma ruta donde estan los binarios
+        exe = f"mysqldump{creds['ext']}"
         cmd = [
-            os.path.join(creds["mysql_path"], 'mysql.exe'),
+            os.path.join(creds["mysql_path"], exe),
             '-h', creds["host"],
             '-u', creds["user"],
             '-P', str(creds["port"]),
-            '--password=' + creds["password"],
+            f'--password={creds["password"]}',
+            '--routines', '--triggers', '--events',
             creds["database"]
         ]
 
-        # Ejecutar el CLI de mysql para importar el contenido
-        proceso = subprocess.Popen(
-            cmd,
-            stdin=subprocess.PIPE,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            text=True
-        )
+        resultado = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", errors="ignore", timeout=60)
 
-        stdout, stderr = proceso.communicate(input=contenido_sql, timeout=120)  
+        if resultado.returncode != 0:
+            raise Exception(f"Error en mysqldump: {resultado.stderr}")
 
+        header = f"-- Respaldo ProyectoColegio\n-- Fecha: {datetime.now()}\n\n"
+        return generar_archivo_descarga(header + resultado.stdout, 'respaldo_colegio')
+
+    except Exception as e:
+        raise Exception(f"Fallo al generar backup: {str(e)}")
+
+# ========== FUNCIONES DE RESTAURACIÓN ==========
+@require_http_methods(["POST"])
+def restaurar_datos(request):
+    """Recibe un archivo .sql y lo inyecta en la BD"""
+    if 'archivo' not in request.FILES:
+        return JsonResponse({'error': 'No hay archivo'}, status=400)
+
+    archivo = request.FILES['archivo']
+    if not archivo.name.endswith('.sql'):
+        return JsonResponse({'error': 'Formato no válido'}, status=400)
+
+    try:
+        contenido_sql = archivo.read().decode('utf-8')
+        creds = obtener_credenciales_mysql()
+        exe = f"mysql{creds['ext']}"
+        
+        cmd = [
+            os.path.join(creds["mysql_path"], exe),
+            '-h', creds["host"],
+            '-u', creds["user"],
+            '-P', str(creds["port"]),
+            f'--password={creds["password"]}',
+            creds["database"]
+        ]
+
+        proceso = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        stdout, stderr = proceso.communicate(input=contenido_sql, timeout=120)
 
         if proceso.returncode != 0:
-            raise Exception(f"Error MySQL: {stderr}")
+            raise Exception(stderr)
 
-        return True
-
-    except subprocess.TimeoutExpired:
-        raise Exception("Timeout al restaurar la base de datos")
+        return JsonResponse({'exito': True, 'mensaje': 'Base de datos restaurada con éxito'})
     except Exception as e:
-        print(f"Error al restaurar: {str(e)}")
-        raise Exception(f"Error al restaurar: {str(e)}")
+        return JsonResponse({'error': f'Error: {str(e)}'}, status=400)
 
-# ========== FUNCION PARA GENERAR DESCARGA ==========
-
-def generar_archivo_descarga(contenido_sql, nombre_archivo):
-    """Genera un archivo SQL para descargar"""
-    response = HttpResponse(contenido_sql.encode('utf-8'), content_type='application/sql')
-    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-    response['Content-Disposition'] = f'attachment; filename="{nombre_archivo}_{timestamp}.sql"'
-
+def generar_archivo_descarga(contenido, nombre):
+    """Crea la respuesta HTTP para descargar el SQL"""
+    response = HttpResponse(contenido.encode('utf-8'), content_type='application/sql')
+    fecha = datetime.now().strftime('%Y%m%d_%H%M%S')
+    response['Content-Disposition'] = f'attachment; filename="{nombre}_{fecha}.sql"'
     return response
-

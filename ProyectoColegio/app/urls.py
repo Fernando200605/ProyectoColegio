@@ -11,16 +11,13 @@ from app.views.Curso.views import *
 from app.views.Movimiento.views import *
 from app.views.Evento.views import *
 from app.views.Notificacion.views import *
-from app.views.login.views import *
 from app.views.Index.views import DashboardView
-from django.contrib.auth.views import LogoutView
-from app.views.reportes import * 
+
+from app.views.reportes import *
 from app.views.backup import *
 app_name = 'app'
 urlpatterns = [
-    path('login/', CreLoginView.as_view(), name="login"),
     path('dashboard/', DashboardView.as_view(), name="dashboard"),
-    path('logout', LogoutView.as_view(next_page='app:login'), name="logout"),
     # path('Curso/',listar_curso,name="listar_curso" ),
     path('curso/', CursoListView.as_view(), name="index_curso"),
     path('curso/crear/', CursoCreateView.as_view(), name="crear_curso"),
@@ -30,7 +27,8 @@ urlpatterns = [
     path('curso/limpiar/', CursoCleandView.as_view(), name="limpiar_curso"),
     # REPORTES DE CURSOS (Agrega esto al final de urlpatterns)
     path('reporte/curso/pdf/', ExportarCursoPDF.as_view(), name="exportar_cursos"),
-    path('reporte/curso/excel/', ExportarCursoExcel.as_view(), name="exportar_cursos_excel"),
+    path('reporte/curso/excel/', ExportarCursoExcel.as_view(),
+         name="exportar_cursos_excel"),
 
     # Usuario
     path('usuario/', UsuarioListView.as_view(), name="index_usuario"),
@@ -98,10 +96,12 @@ urlpatterns = [
          AsistenciaDeleteView.as_view(), name="eliminar_asistencia"),
     path('asistencia/limpiar/', AsistenciaCleandView.as_view(),
          name="limpiar_asistencia"),
-    path('reporte/asistencia/pdf',ExportarAsistenciaPDF.as_view(),name="reporte_asistencia_pdf"),
-    path('reporte/asistencia/excel',ExportarAsistenciaExcel.as_view(),name="reporte_asistencia_excel"),
-    
-    
+    path('reporte/asistencia/pdf', ExportarAsistenciaPDF.as_view(),
+         name="reporte_asistencia_pdf"),
+    path('reporte/asistencia/excel', ExportarAsistenciaExcel.as_view(),
+         name="reporte_asistencia_excel"),
+
+
     path('movimiento/', MovimientoListView.as_view(), name="index_movimiento"),
     path('movimiento/crear/', MovimientoCreateView.as_view(),
          name="crear_movimiento"),
@@ -119,9 +119,11 @@ urlpatterns = [
     path('evento/eliminar/<int:pk>/',
          EventoDeleteView.as_view(), name="eliminar_evento"),
     path('evento/limpiar/', EventoCleandView.as_view(), name="limpiar_evento"),
-    path('reporte/evento/pdf',ExportarEventosPDF.as_view(),name="reporte_evento_pdf"),
-    path('reporte/evento/excel',ExportarEventosExcel.as_view(),name="reporte_evento_excel"),
-    
+    path('reporte/evento/pdf', ExportarEventosPDF.as_view(),
+         name="reporte_evento_pdf"),
+    path('reporte/evento/excel', ExportarEventosExcel.as_view(),
+         name="reporte_evento_excel"),
+
     path('notificacion/', NotificacionListView.as_view(),
          name="index_notificacion"),
     path('notificacion/crear/', NotificacionCreateView.as_view(),
@@ -132,12 +134,18 @@ urlpatterns = [
          NotificacionDeleteView.as_view(), name="eliminar_notificacion"),
     path('notificacion/limpiar/', NotificacionCleandView.as_view(),
          name="limpiar_notificacion"),
-    path('reporte/usuario/pdf/',ExportarUsuarioPDF.as_view(),name="reporte_usuario_pdf"),
-    path('reporte/usuario/excel/',ExportarUsuarioExcel.as_view(),name="reporte_usuario_excel"),
-    path('reporte/movimiento/pdf',ExportarMovimientosPDF.as_view(),name="reporte_movimiento_pdf"),
-    path('reporte/movimiento/excel',ExportarMovimientosExcel.as_view(),name="reporte_movimiento_excel"),    
-    path('reporte/inventario/pdf',ExportarInventarioPDF.as_view(),name="reporte_inventario_pdf"),
-    path('reporte/inventario/excel',ExportarInventarioExcel.as_view(),name="reporte_inventario_excel"),
-    path('backup/', backup , name="backup"),
-    path('backup/restaurar', restaurar_datos , name="restaurar_datos"),
+    path('reporte/usuario/pdf/', ExportarUsuarioPDF.as_view(),
+         name="reporte_usuario_pdf"),
+    path('reporte/usuario/excel/', ExportarUsuarioExcel.as_view(),
+         name="reporte_usuario_excel"),
+    path('reporte/movimiento/pdf', ExportarMovimientosPDF.as_view(),
+         name="reporte_movimiento_pdf"),
+    path('reporte/movimiento/excel', ExportarMovimientosExcel.as_view(),
+         name="reporte_movimiento_excel"),
+    path('reporte/inventario/pdf', ExportarInventarioPDF.as_view(),
+         name="reporte_inventario_pdf"),
+    path('reporte/inventario/excel', ExportarInventarioExcel.as_view(),
+         name="reporte_inventario_excel"),
+    path('backup/', backup, name="backup"),
+    path('backup/restaurar', restaurar_datos, name="restaurar_datos"),
 ]
