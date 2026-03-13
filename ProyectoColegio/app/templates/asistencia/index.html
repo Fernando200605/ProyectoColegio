@@ -24,6 +24,19 @@
         <i class="fas fa-file-excel me-1"></i>
           Descargar Excel
       </a>
+        <div class="filtros" style="z-index: 1000;">
+        <input type="text" id="buscar" name="buscar" placeholder="Buscar asistencia">
+
+        <select id="rol" name="rol">
+            <option value="">Todas las asistencias</option>
+            <option value="administrador">Nombre del Estudiante</option>
+            <option value="docente">Fecha</option>
+        </select>
+
+        <button type="submit" id="filtrar">
+            Filtrar
+        </button>
+    </div>
     {% endblock %}
 {% block rows %}
     {% for asistencia in object_list %}
@@ -42,4 +55,44 @@
         </td>
     </tr>
     {% endfor %}
+<script>
+  console.log("Hola mundo")
+  $(document).ready(function () {
+
+      const tabla = $('#Tabla').DataTable();
+
+      document.getElementById('filtrar').addEventListener('click', function () {
+
+          let buscar = document.getElementById('buscar').value
+          let rol = document.getElementById('rol').value
+          let estado = document.getElementById('estado').value
+          console.log(rol)
+          tabla.search(buscar).draw()
+          tabla.column(3).search(rol);
+      });
+
+  });
+</script>
+<script>
+
+    const urlPdf = "{% url 'app:reporte_usuario_pdf' %}"
+    const urlExcel = "{% url 'app:reporte_usuario_excel' %}"
+
+    document.getElementById("ExportarPdf").addEventListener("click", function(e){
+        e.preventDefault()
+        let buscar = document.getElementById("buscar").value
+        let rol = document.getElementById("rol").value
+        let estado = document.getElementById("estado").value
+        window.location.href = `${urlPdf}?buscar=${buscar}&rol=${rol}&estado=${estado}`
+    })
+
+    document.getElementById("ExportarExcel").addEventListener("click", function(e){
+        e.preventDefault()
+        let buscar = document.getElementById("buscar").value
+        let rol = document.getElementById("rol").value
+        let estado = document.getElementById("estado").value
+        window.location.href = `${urlExcel}?buscar=${buscar}&rol=${rol}&estado=${estado}`
+    })
+
+</script>
 {% endblock rows %}

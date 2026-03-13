@@ -3,17 +3,37 @@
 <div id="sidebar" class="sidebar">
   <div class="profile">
     {% if request.user.img_usuario %}
-      <img src="{{ request.user.img_usuario.url }}" alt="{{ request.user.nombre }}" />
+    <img
+      src="{{ request.user.img_usuario.url }}"
+      alt="{{ request.user.nombre }}"
+    />
+    {% else %}
+    <img
+      src="{% static "img/User.jpg" %}"
+      alt="{{ request.user.nombre }}"
+    />
     {% endif %}
     <a href="#" class="edit-profile"><i class="fa-solid fa-pencil"></i></a>
     <p class="name">{{ request.user.nombre }}</p>
-    <p class="badge rounded-pill badge-primary rol">{{ request.user.get_rol }}</p>
+    <p class="badge rounded-pill badge-primary rol">
+      {{ request.user.get_rol }}
+    </p>
     <div class="dropdown">
-      <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Dropdown button</button>
+      <button
+        class="btn btn-secondary dropdown-toggle"
+        type="button"
+        id="dropdownMenuButton"
+        data-toggle="dropdown"
+        aria-haspopup="true"
+        aria-expanded="false"
+      >
+        Dropdown button
+      </button>
       <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
         <a class="dropdown-item" href="{% url 'app:backup' %}">Action</a>
         <form method="POST" action="{% url 'app:backup' %}">
-          {% csrf_token %} <input type="hidden" name="accion" value="backup_completo" />
+          {% csrf_token %}
+          <input type="hidden" name="accion" value="backup_completo" />
           <button type="submit" class="dropdown-item">Realizar Respaldo</button>
         </form>
       </div>
@@ -21,33 +41,51 @@
   </div>
   <ul>
     <li>
-      <a href="{% url 'app:dashboard' %}"><i class="fa-solid fa-house"></i> Inicio</a>
+      <a href="{% url 'app:dashboard' %}"
+        ><i class="fa-solid fa-house"></i> Inicio</a
+      >
     </li>
     <li>
-      <a href="{% url 'app:index_curso' %}"><i class="fa-solid fa-graduation-cap"></i> Cursos</a>
+      <a href="{% url 'app:index_curso' %}"
+        ><i class="fa-solid fa-graduation-cap"></i> Cursos</a
+      >
     </li>
     <li>
-      <a href="{% url 'app:index_usuario' %}"><i class="fa-solid fa-user"></i> Usuarios</a>
+      <a href="{% url 'app:index_usuario' %}"
+        ><i class="fa-solid fa-user"></i> Usuarios</a
+      >
     </li>
     <li>
-      <a href="{% url 'app:index_asistencia' %}"><i class="fa-solid fa-check"></i> Asistencia</a>
+      <a href="{% url 'app:index_asistencia' %}"
+        ><i class="fa-solid fa-check"></i> Asistencia</a
+      >
     </li>
     <li>
-      <a href="{% url 'app:index_inventario' %}"><i class="fa-solid fa-tv"></i> Inventario</a>
+      <a href="{% url 'app:index_inventario' %}"
+        ><i class="fa-solid fa-tv"></i> Inventario</a
+      >
     </li>
     <li>
-      <a href="{% url 'app:index_movimiento' %}"><i class="fa-solid fa-exchange-alt"></i> Movimientos</a>
+      <a href="{% url 'app:index_movimiento' %}"
+        ><i class="fa-solid fa-exchange-alt"></i> Movimientos</a
+      >
     </li>
     <li>
-      <a href="{% url 'app:index_evento' %}"><i class="fa-regular fa-calendar"></i> Eventos</a>
+      <a href="{% url 'app:index_evento' %}"
+        ><i class="fa-regular fa-calendar"></i> Eventos</a
+      >
     </li>
     <li>
-      <a href="{% url 'app:index_notificacion' %}"><i class="fa-regular fa-file"></i> Notificaciones</a>
+      <a href="{% url 'app:index_notificacion' %}"
+        ><i class="fa-regular fa-file"></i> Notificaciones</a
+      >
     </li>
     <li>
       <form action="{% url 'login:logout' %}" method="post">
         {% csrf_token %}
-        <button type="submit" class="a"><i class="fa-solid fa-arrow-right-from-bracket"></i>Cerrar Sesion</button>
+        <button type="submit" class="a">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i>Cerrar Sesion
+        </button>
       </form>
     </li>
     <li>
