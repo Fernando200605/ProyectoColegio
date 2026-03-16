@@ -12,6 +12,9 @@ from django.db import transaction
 from app.models import Usuario, Administrador, docente, Estudiante, Acudiente
 
 from app.forms import UsuarioForm, UsuarioUpdateForm, AdministradorForm, DocenteForm, EstudianteForm, AcudienteForm
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth import update_session_auth_hash
+from django.http import JsonResponse
 
 
 def validar_formulario_rol(rol, data, instance=None):
@@ -99,7 +102,7 @@ class UsuarioCreateView(View):
 
     @transaction.atomic
     def post(self, request):
-          # Esto muestra todos los archivos enviados
+        # Esto muestra todos los archivos enviados
         usuario_form = UsuarioForm(request.POST, request.FILES)
         print(request.FILES)
         rol = request.POST.get('rol')
@@ -272,3 +275,52 @@ class UsuarioDeleteView(DeleteView):
     def form_valid(self, form):
         messages.success(self.request, 'Usuario eliminado exitosamente.')
         return super().form_valid(form)
+
+
+class PerfilView(LoginRequiredMixin, View):
+    template_name = "modals/perfil.html"
+
+    def get(self, request):
+        return render(request, self.template_name, {
+            'user': request.user
+        })
+
+    def post(self, request):
+        usuario = request.user
+        errores = []
+
+        nombre = request.POST.get('nombre', '').strip()
+        print("nombre", nombre)
+        if nombre:
+            usuario.nombre = nombre
+            print("nombre recibido", usuario.nombre)
+        else:
+            errores.append('El nombre no puede estar vacío.')
+        if 'img_usuario' in request.FILES:
+            foto = request.FILES['img_usuario']
+            tipos_permitidos = ['image/jpeg', 'image/png', 'image/webp']
+            if foto.content_type not in tipos_permitidos:
+                errores.append('Solo se permiten imágenes JPG, PNG o WEBP.')
+            elif foto.size > 5 * 1024 * 1024:
+                errores.append('La imagen no puede superar 5MB.')
+            else:
+                usuario.img_usuario = foto
+
+        password = request.POST.get('password', '').strip()
+        if password:
+            if len(password) < 8:
+                errores.append(
+                    'La contraseña debe tener al menos 8 caracteres.')
+            else:
+                usuario.set_password(password)
+
+        if errores:
+            return JsonResponse({'success': False, 'message': ' '.join(errores)})
+
+        try:
+            usuario.save()
+            if password and len(password) >= 8:
+                update_session_auth_hash(request, usuario)
+            return JsonResponse({'success': True, 'message': 'Perfil actualizado correctamente.' , 'nombre':usuario.nombre})
+        except Exception as e:
+            return JsonResponse({'success': False, 'message': 'Error al guardar los cambios.'})
