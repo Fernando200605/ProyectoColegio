@@ -1557,22 +1557,25 @@ body.is-large-text .guia-item p {
 }
 /* El botón principal */
 .btn-secondary.dropdown-toggle {
-    background-color: #0f13ec !important; /* Un color índigo vibrante */
+    background-color: rgba(255, 255, 255, 0.3) !important; 
     border: none !important;
-    border-radius: 8px !important;
+    border-radius: 25px !important;
     padding: 10px 20px !important;
     transition: all 0.3s ease !important;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !;
+    color: #000 !important;
 }
 
 .btn-secondary.dropdown-toggle:hover {
-    background-color: #4f46e5 !important;
+    background-color: #1a2a40 !important;
     transform: translateY(-1px) !important;
+    color: #ffffff !important;
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1) !important;
 }
 
 /* El menú desplegable */
 .dropdown-menu {
+    background-color: rgba(255, 255, 255, 0.644) !important;
     border: none !important;
     border-radius: 12px !important;
     box-shadow: 0 10px 25px rgba(0,0,0,0.1) !important;
@@ -1589,6 +1592,6 @@ body.is-large-text .guia-item p {
 }
 
 .dropdown-item:hover {
-    background-color: #f3f4f6 !important;
-    color: #6366f1 !important;
+    background-color:  #1a2a40 !important;
+    color: #ffffff !important;
 }
