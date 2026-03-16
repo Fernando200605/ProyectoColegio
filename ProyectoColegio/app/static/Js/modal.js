@@ -19,6 +19,7 @@ function abrirModalCreacionDesdeCampo(fieldId) {
 
     abrirModalCreacion(url, fieldName);
 }
+
 function MostrarMensaje(Texto) {
     Swal.fire({
         icon: 'success',
@@ -67,7 +68,7 @@ function abrirModalCreacion(url, fieldName) {
                     .then(data => {
                         if (data.success) {
                             miModalInstancia.hide();
-                            if (data.message){
+                            if (data.message) {
                                 MostrarMensaje(data.message)
                             }
                             actualizarSelectDinamico(data.id, data.nombre);
@@ -93,6 +94,7 @@ function actualizarSelectDinamico(id, nombre) {
         }
     }
 }
+
 function mostrarErrores(form, errores) {
     for (let campo in errores) {
         const input = form.querySelector(`[name="${campo}"]`);
@@ -109,4 +111,57 @@ function mostrarErrores(form, errores) {
 function limpiarErrores(form) {
     form.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
     form.querySelectorAll('.invalid-feedback').forEach(el => el.innerText = '');
+}
+
+function abrirPerfil() {
+    const modalElement = document.getElementById('modalGeneral');
+    const contenedor = document.getElementById('contenedorModal');
+    const nombre = document.getElementById('name')
+    const img = document.getElementById('img')
+
+    fetch("/ejemplo/usuario/perfil/")
+        .then(response => response.text())
+        .then(html => {
+            contenedor.innerHTML = html;
+
+            // ✅ Mismo patrón que abrirModalCreacion
+            if (miModalInstancia) { miModalInstancia.dispose(); }
+            miModalInstancia = new bootstrap.Modal(modalElement);
+            miModalInstancia.show();
+
+            // ✅ Configurar botones de cerrar
+            const btnCerrar = contenedor.querySelectorAll('[data-bs-dismiss="modal"]');
+            btnCerrar.forEach(boton => {
+                boton.onclick = () => miModalInstancia.hide();
+            });
+
+            const form = contenedor.querySelector('#formPerfil');
+            if (form) {
+                form.addEventListener('submit', function (e) {
+                    e.preventDefault();
+                    const formData = new FormData(this);
+                    const mensaje = document.getElementById('mensajePerfil');
+
+                    fetch(this.action, {
+                        method: 'POST',
+                        body: formData,
+                        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                    })
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.success) {
+                                miModalInstancia.hide();
+                                if (data.message) { MostrarMensaje(data.message); }
+                                if(nombre && data.nombre){
+                                    nombre.innerText = data.nombre
+                                }
+                            } else {
+                                mensaje.innerHTML = `<div class="alert alert-danger p-2">${data.message || 'Error al actualizar.'}</div>`;
+                            }
+                        })
+                        .catch(error => console.error('Error:', error));
+                });
+            }
+        })
+        .catch(err => console.error("Error al cargar perfil:", err));
 }
