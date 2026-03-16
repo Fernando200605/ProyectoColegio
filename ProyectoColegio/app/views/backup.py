@@ -108,16 +108,28 @@ def realizar_respaldo_completo():
 # ========== FUNCIONES DE RESTAURACIÓN ==========
 @require_http_methods(["POST"])
 def restaurar_datos(request):
-    """Recibe un archivo .sql y lo inyecta en la BD"""
+    """Recibe un archivo .sql y lo inyecta en la BD con validación de contenido"""
     if 'archivo' not in request.FILES:
-        return JsonResponse({'error': 'No hay archivo'}, status=400)
+        return JsonResponse({'error': 'No hay archivo seleccionado'}, status=400)
 
     archivo = request.FILES['archivo']
+    
+    # 1. Validar extensión
     if not archivo.name.endswith('.sql'):
-        return JsonResponse({'error': 'Formato no válido'}, status=400)
+        return JsonResponse({'error': 'Formato no válido. Debe ser un archivo .sql'}, status=400)
+
+    # 2. Validar que el archivo NO esté vacío (0 bytes)
+    if archivo.size == 0:
+        return JsonResponse({'error': 'El archivo está vacío'}, status=400)
 
     try:
+        # Leer el contenido
         contenido_sql = archivo.read().decode('utf-8')
+
+        # 3. Validar que no sean solo espacios o saltos de línea
+        if not contenido_sql.strip():
+            return JsonResponse({'error': 'El archivo no contiene comandos SQL válidos'}, status=400)
+
         creds = obtener_credenciales_mysql()
         exe = f"mysql{creds['ext']}"
         
@@ -131,15 +143,18 @@ def restaurar_datos(request):
         ]
 
         proceso = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        # Aquí le pasamos el contenido que acabamos de validar
         stdout, stderr = proceso.communicate(input=contenido_sql, timeout=120)
 
         if proceso.returncode != 0:
             raise Exception(stderr)
 
         return JsonResponse({'exito': True, 'mensaje': 'Base de datos restaurada con éxito'})
+    
+    except UnicodeDecodeError:
+        return JsonResponse({'error': 'El archivo tiene un formato de texto incompatible (usa UTF-8)'}, status=400)
     except Exception as e:
         return JsonResponse({'error': f'Error: {str(e)}'}, status=400)
-
 def generar_archivo_descarga(contenido, nombre):
     """Crea la respuesta HTTP para descargar el SQL"""
     response = HttpResponse(contenido.encode('utf-8'), content_type='application/sql')
