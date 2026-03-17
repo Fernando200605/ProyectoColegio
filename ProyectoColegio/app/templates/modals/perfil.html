@@ -16,7 +16,7 @@
         <img src="{{ user.img_usuario.url }}" alt="Foto de perfil" class="perfil-avatar" />
       {% else %}
         <div class="perfil-avatar perfil-avatar-placeholder">
-          <span>{{ user.first_name|first|upper }}{{ user.last_name|first|upper }}</span>
+          <span>{{ user.nombre|first|upper }}</span>
         </div>
       {% endif %}
     </div>
@@ -25,7 +25,7 @@
 
       <!-- NOMBRE CENTRADO -->
       <div class="text-center mb-3 mt-2">
-        <p class="fw-500 mb-0" style="font-size: 15px;">{{ user.first_name }} {{ user.last_name }}</p>
+        <p class="fw-500 mb-0" style="font-size: 15px;">{{ user.nombre }}</p>
         <p class="text-muted mb-0" style="font-size: 12px;">{{ user.email }}</p>
       </div>
 
@@ -33,19 +33,11 @@
       <div class="perfil-grid mb-3">
         <div class="perfil-card">
           <span class="perfil-card-label">Usuario</span>
-          <span class="perfil-card-value">{{ user.username }}</span>
-        </div>
-        <div class="perfil-card">
-          <span class="perfil-card-label">Documento</span>
-          <span class="perfil-card-value">{{ user.documento }}</span>
+          <span class="perfil-card-value">{{ user.email }}</span>
         </div>
         <div class="perfil-card">
           <span class="perfil-card-label">Nombre</span>
-          <span class="perfil-card-value">{{ user.first_name }}</span>
-        </div>
-        <div class="perfil-card">
-          <span class="perfil-card-label">Apellido</span>
-          <span class="perfil-card-value">{{ user.last_name }}</span>
+          <span class="perfil-card-value">{{ user.nombre }}</span>
         </div>
       </div>
 
@@ -58,7 +50,7 @@
 
         <div class="mb-2">
           <label class="form-label">Nombre</label>
-          <input type="text" name="nombre" class="form-control" value="{{ user.first_name }}" />
+          <input type="text" name="nombre" class="form-control" value="{{ user.nombre }}" />
         </div>
 
         <div class="mb-2">

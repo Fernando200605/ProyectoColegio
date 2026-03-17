@@ -95,6 +95,8 @@ urlpatterns = [
          AsistenciaupdateView.as_view(), name="editar_asistencia"),
     path('asistencia/eliminar/<int:pk>/',
          AsistenciaDeleteView.as_view(), name="eliminar_asistencia"),
+    path('asistencia/camara/',camara,name="Camara"),
+    path('registrar_asistencia/',AsistenciaQR.as_view(),name="Asistencia_qr"),
     path('asistencia/limpiar/', AsistenciaCleandView.as_view(),
          name="limpiar_asistencia"),
     path('reporte/asistencia/pdf', ExportarAsistenciaPDF.as_view(),

@@ -8,12 +8,33 @@ from app.forms import *
 from django.urls import reverse_lazy
 from django.contrib import messages
 from django.db import connection
+from django.http import JsonResponse
+import json
 # Create your views here.
 
 
-def index(request):
-    return render(request, 'index.html')
+def camara(request):
+    return render(request, 'asistencia/camara.html')
 
+class AsistenciaQR(View):
+    def post(self,request):
+        data = json.loads(request.body)
+        codigo = data.get('codigo')
+        estudiante = Estudiante.objects.filter(codigo = codigo).first()
+        if estudiante:
+            print("Retornado verdad")
+            return JsonResponse({
+				'estudiante': {
+						'codigo': estudiante.codigo,
+						'nombres': estudiante.usuario.nombre,
+						'correo': estudiante.usuario.email,
+					}
+			})
+        print("Retornando error")
+        return JsonResponse({
+			"estatus": "Error",
+			"mensaje": "El estudiante no existe",
+		})
 # Ejemplo Listar_Usuarios
 
 
