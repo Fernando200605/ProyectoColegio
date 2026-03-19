@@ -267,10 +267,9 @@ class DocenteForm(forms.ModelForm):
 class EstudianteForm(forms.ModelForm):
     class Meta:
         model = Estudiante
-        fields = ['codigo', 'fechaNacimiento',
+        fields = ['fechaNacimiento',
                   'estadoMatricula', 'fechaIngreso', 'cursoId']
         widgets = {
-            'codigo':          forms.TextInput(attrs={'class': 'form-control'}),
             'fechaNacimiento': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'estadoMatricula': forms.Select(attrs={'class': 'form-control'}),
             'fechaIngreso':    forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),

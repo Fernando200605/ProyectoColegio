@@ -152,3 +152,9 @@ def exportar_excel(titulo, columnas, datos, nombre_archivo):
     workbook.save(response)
 
     return response
+
+from django.contrib.auth.models import Group
+
+def asignar_rol(usuario, rol):
+    grupo = Group.objects.get(name=rol)
+    usuario.groups.add(grupo)

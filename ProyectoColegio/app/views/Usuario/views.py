@@ -15,8 +15,13 @@ from app.forms import UsuarioForm, UsuarioUpdateForm, AdministradorForm, Docente
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth import update_session_auth_hash
 from django.http import JsonResponse
+from django.contrib.auth.models import Group
 
-
+def asignar_grupo(usuario, rol):
+    usuario.groups.clear()  # eliminar roles anteriores
+    grupo = Group.objects.get(name=rol.capitalize())
+    usuario.groups.add(grupo)
+    
 def validar_formulario_rol(rol, data, instance=None):
     """
     Valida el formulario según el rol.
@@ -54,8 +59,8 @@ def guardar_perfil_rol(usuario, rol, data):
     elif rol == 'acudiente':
         Acudiente.objects.create(usuario=usuario, telefono=data.get(
             'telefono'), direccion=data.get('direccion'))
-
-
+    
+    asignar_grupo(usuario,rol)
 # --- VISTAS ---
 
 
@@ -130,7 +135,7 @@ class UsuarioCreateView(View):
             perfil = rol_form.save(commit=False)
             perfil.usuario = usuario
             perfil.save()
-
+            asignar_grupo(usuario, rol)
             messages.success(request, 'Usuario creado correctamente')
             return redirect(self.success_url)
 
@@ -228,7 +233,7 @@ class UsuarioUpdateView(UpdateView):
             obj = rol_form.save(commit=False)
             obj.usuario = usuario
             obj.save()
-
+        asignar_grupo(usuario, nuevo_rol)
         messages.success(self.request, 'Usuario actualizado correctamente')
         return redirect(self.success_url)
 
@@ -242,6 +247,7 @@ class UsuarioDetailView(View):
             'email': usuario.email,
             'rol': str(usuario.get_rol()),
             'estado': 'Activo' if usuario.estado else 'Inactivo',
+            'fecha_creacion': usuario.fecha_creacion
         }
 
         return JsonResponse(data)
@@ -253,7 +259,7 @@ class UsuarioCleandView(View):
         with connection.cursor() as cursor:
             nombre_tabla = Usuario._meta.db_table
             cursor.execute(
-                f"DELETE FROM sqlite_sequence WHERE name='{nombre_tabla}';")
+                f"ALTER TABLE {nombre_tabla} auto_increment = 1;")
 
         messages.success(
             self.request, "Todos los Usuarios han sido eliminados y el ID reiniciado.")

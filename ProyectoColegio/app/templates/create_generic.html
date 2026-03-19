@@ -30,7 +30,7 @@
                                         </label>
 
                                         {{ field|add_class:'form-control form-control-custom'|attr:'autocomplete:off'|attr:'style:resize:none' }}
-
+										<p class = "error" id="error_{{field.label}}"></p>
                                         {% if field.help_text %}
                                             <div class="form-text text-muted">{{ field.help_text }}</div>
                                         {% endif %}

@@ -22,15 +22,38 @@ class AsistenciaQR(View):
         codigo = data.get('codigo')
         estudiante = Estudiante.objects.filter(codigo = codigo).first()
         if estudiante:
+            fecha_hoy = timezone.localdate()
+            print(fecha_hoy)
+            asistencia_existe = Asistencia.objects.filter(
+				estudianteid=estudiante,
+				fecha=fecha_hoy
+    
+    
+			).exists()
+            print(asistencia_existe)
+            if asistencia_existe:
+                return JsonResponse({
+					"status":"error",
+					"mensaje":"La asistencia ya fue registrada"
+				})
+            hora_actual = timezone.localtime().time()
+            if hora_actual > time(7,15):
+                estado = "Tarde"
+            else:
+                estado = "Temprano"
+            Asistencia.objects.create(
+                estado= "A tiempo",
+                estudianteid=estudiante,
+                fecha=timezone.localdate(),
+                horaentrada=timezone.now(),
+                observaciones=estado,
+                horasalida=time(13,00)
+			)
             print("Retornado verdad")
             return JsonResponse({
-				'estudiante': {
-						'codigo': estudiante.codigo,
-						'nombres': estudiante.usuario.nombre,
-						'correo': estudiante.usuario.email,
-					}
+                'status': 'ok',
+                'mensaje': 'Registrado exitosamente',
 			})
-        print("Retornando error")
         return JsonResponse({
 			"estatus": "Error",
 			"mensaje": "El estudiante no existe",
@@ -139,7 +162,7 @@ class AsistenciaCleandView(View):
         with connection.cursor() as cursor:
             nombre_tabla = Asistencia._meta.db_table
             print(nombre_tabla)
-            cursor.execute(f"DELETE FROM sqlite_sequence WHERE name='{nombre_tabla}';")
+            cursor.execute(f"Alter table {nombre_tabla} auto_increment = 1;")
         
         messages.success(self.request, "Todas las asistencias han sido eliminadas y el ID reiniciado.")
         return redirect(reverse_lazy('app:index_asistencia'))

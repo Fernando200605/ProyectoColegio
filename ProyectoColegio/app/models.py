@@ -1,5 +1,8 @@
 from django.contrib.auth.models import AbstractUser, UserManager
 from django.db import models
+import qrcode
+from io import BytesIO
+from django.core.files import File
 
 estado_usuario = (
     (True, 'Activo'),
@@ -30,16 +33,8 @@ class Usuario(AbstractUser):
     # Eliminamos el save() que asignaba username para evitar errores de base de datos
 
     def get_rol(self):
-        if hasattr(self, 'administrador'):
-            return 'Administrador'
-        elif hasattr(self, 'docente'):
-            return 'Docente'
-        elif hasattr(self, 'estudiante'):
-            return 'Estudiante'
-        elif hasattr(self, 'acudiente'):
-            return 'Acudiente'
-        return 'Desconocido'
-
+     grupo = self.groups.first()
+     return grupo.name if grupo else "Sin rol"
     def __str__(self):
         return self.nombre
 
@@ -123,16 +118,33 @@ class Curso(models.Model):
     def __str__(self):
         return self.codigo
 class Estudiante(models.Model):
+
     usuario = models.OneToOneField(Usuario,on_delete=models.CASCADE,primary_key=True)
-    codigo = models.TextField(max_length=50, null=True, blank=True, verbose_name="Codigo")
     fechaNacimiento = models.DateField(verbose_name="Fecha de nacimiento")
-    estadoMatricula = models.TextField(max_length=20, null=True, blank=True, verbose_name="Estado de Matricula" , choices=Estado_Matricula)
+    estadoMatricula = models.TextField(max_length=20,null=True,blank=True,choices=Estado_Matricula)
     fechaIngreso = models.DateField(verbose_name="Fecha de Ingreso")
-    cursoId = models.ForeignKey(Curso,on_delete=models.CASCADE,verbose_name="Curso")
+    cursoId = models.ForeignKey(Curso,on_delete=models.CASCADE)
     
+    codigo = models.CharField(max_length=20, unique=True, blank=True)
+    
+    qr = models.ImageField(upload_to='usuarios/',blank=True)
+
+    def save(self,*args,**kwargs):
+
+        if not self.codigo:
+            self.codigo = f"EST-{self.usuario.id}"
+
+        qr_img = qrcode.make(self.codigo)
+
+        buffer = BytesIO()
+        qr_img.save(buffer,format='PNG')
+
+        self.qr.save(f'qr_{self.usuario.id}.png', File(buffer), save=False)
+
+        super().save(*args,**kwargs)
+
     def __str__(self):
         return self.usuario.nombre
-    
     class Meta:
         verbose_name = "Estudiante"
         verbose_name_plural = "Estudiantes" 
@@ -146,7 +158,7 @@ class Asistencia (models.Model):
     ]
     id =models.AutoField(primary_key=True)
     estudianteid = models.ForeignKey(Estudiante, on_delete=models.CASCADE)
-    fecha = models.DateTimeField(auto_now=True)
+    fecha = models.DateField(auto_now=True)
     horaentrada = models.TimeField ()
     horasalida = models.TimeField()
     estado = models.CharField(

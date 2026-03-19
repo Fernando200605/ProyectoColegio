@@ -30,7 +30,6 @@
     <i class="fas fa-tools me-2"></i>Acciones
   </th>
 {% endblock %}
-<<<<<<< HEAD
       {% block exportar %}
       <a href="#" class="btn-pdf" id="ExportarPdf">
         <i class="fas fa-file-pdf me-1"></i>
@@ -61,8 +60,6 @@
         </button>
     </div>
       {% endblock %}
-=======
->>>>>>> origin/luis_trabajo
 {% block rows %}
   {% for usuario in object_list %}
     <tr>
@@ -123,7 +120,7 @@
 
               <div>
                 <span class="fw-semibold text-muted">Fecha de creación</span><br>
-                <span>${data.fecha_creacion}</span>
+                <span>${new Date(data.fecha_creacion).toLocaleString('es-CO')}</span>
               </div>
             </div>
           `,

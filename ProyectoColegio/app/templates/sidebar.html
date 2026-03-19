@@ -9,9 +9,9 @@
     <p class="name" id = "name">{{ request.user.nombre }}</p>
     <p class="badge rounded-pill badge-primary rol">{{ request.user.get_rol }}</p>
     <div class="dropdown">
-      <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Dropdown button</button>
+      <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Backup</button>
       <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-        <a class="dropdown-item" href="{% url 'app:backup' %}">Action</a>
+        <a class="dropdown-item" href="{% url 'app:backup' %}">Ir a panel</a>
         <form method="POST" action="{% url 'app:backup' %}">
           {% csrf_token %} <input type="hidden" name="accion" value="backup_completo" />
           <button type="submit" class="dropdown-item">Realizar Respaldo</button>
