@@ -1,5 +1,8 @@
 {% extends 'body.html' %} {% load static %} {% block main %}
-<div id="reader" style="width: 500px"></div>
+<div class="contenedor-qr">
+  <h2>Escanear Asistencia</h2>
+  <div id="reader"></div>
+</div>
 {% endblock %} {% block js %}
 
 <script src="{% static 'Js/html5-qrcode.min.js' %}"></script>
@@ -31,19 +34,19 @@
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "X-CSRFToken": getCookie("csrftoken"),
+          "X-CSRFToken": "{{csrf_token}}",
         },
         body: JSON.stringify({
           codigo: decodedText,
-        })
-      	})
-    	.then((response) => response.json())
+        }),
+      })
+        .then((response) => response.json())
         .then((data) => {
-			if (data.status === "ok") {
-				alert("Estudiante" , data.nombre)
-			}else{
-				alert(data.mensaje)
-			}
+          if (data.status === "ok") {
+            alert("Estudiante " + data.mensaje);
+          } else {
+            alert(data.mensaje);
+          }
         })
         .catch((error) => {
           console.error("Error:", error);
@@ -55,4 +58,27 @@
     scanner.render(onScanSuccess);
   });
 </script>
+<style>
+  .contenedor-qr {
+    width: 420px;
+    margin: 60px auto;
+    padding: 25px;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.15);
+    text-align: center;
+  }
+
+  .contenedor-qr h2 {
+    margin-bottom: 20px;
+    color: #333;
+  }
+
+  #reader {
+    width: 100%;
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    padding: 10px;
+  }
+</style>
 {% endblock %}
