@@ -68,7 +68,7 @@
       <!-- ================= DOCENTE ================= -->
       {% if usuario_rol == 'Docente' %}
         <div class="col-md-4 mb-4">
-          <a href="{% url 'mis_grupos' %}" class="text-decoration-none text-dark">
+          <a href="#" class="text-decoration-none text-dark">
             <div class="card dashboard-card h-100 border-0 shadow-sm">
               <div class="card-body text-center">
                 <i class="fa-solid fa-layer-group dashboard-icon text-success"></i>
@@ -80,7 +80,7 @@
         </div>
 
         <div class="col-md-4 mb-4">
-          <a href="{% url 'registro_notas' %}" class="text-decoration-none text-dark">
+          <a href="#" class="text-decoration-none text-dark">
             <div class="card dashboard-card h-100 border-0 shadow-sm">
               <div class="card-body text-center">
                 <i class="fa-solid fa-pen-to-square dashboard-icon text-primary"></i>
@@ -92,7 +92,7 @@
         </div>
 
         <div class="col-md-4 mb-4">
-          <a href="{% url 'asistencia_docente' %}" class="text-decoration-none text-dark">
+          <a href="#" class="text-decoration-none text-dark">
             <div class="card dashboard-card h-100 border-0 shadow-sm">
               <div class="card-body text-center">
                 <i class="fa-solid fa-calendar-check dashboard-icon text-warning"></i>
@@ -103,72 +103,7 @@
           </a>
         </div>
       {% endif %}
-
-      <!-- ================= ESTUDIANTE ================= -->
-      {% if usuario_rol == 'Estudiante' %}
-        <div class="col-md-4 mb-4">
-          <a href="{% url 'mis_notas' %}" class="text-decoration-none text-dark">
-            <div class="card dashboard-card h-100 border-0 shadow-sm">
-              <div class="card-body text-center">
-                <i class="fa-solid fa-graduation-cap dashboard-icon text-primary"></i>
-                <h6 class="fw-bold">Mis notas</h6>
-                <p class="text-muted small">Consulta académica</p>
-              </div>
-            </div>
-          </a>
-        </div>
-
-        <div class="col-md-4 mb-4">
-          <a href="{% url 'mi_asistencia' %}" class="text-decoration-none text-dark">
-            <div class="card dashboard-card h-100 border-0 shadow-sm">
-              <div class="card-body text-center">
-                <i class="fa-solid fa-clipboard-check dashboard-icon text-success"></i>
-                <h6 class="fw-bold">Mi asistencia</h6>
-                <p class="text-muted small">Historial de asistencia</p>
-              </div>
-            </div>
-          </a>
-        </div>
-
-        <div class="col-md-4 mb-4">
-          <a href="{% url 'mi_perfil' %}" class="text-decoration-none text-dark">
-            <div class="card dashboard-card h-100 border-0 shadow-sm">
-              <div class="card-body text-center">
-                <i class="fa-solid fa-user dashboard-icon text-secondary"></i>
-                <h6 class="fw-bold">Mi perfil</h6>
-                <p class="text-muted small">Información personal</p>
-              </div>
-            </div>
-          </a>
-        </div>
-      {% endif %}
-
       <!-- ================= ACUDIENTE ================= -->
-      {% if usuario_rol == 'Acudiente' %}
-        <div class="col-md-6 mb-4">
-          <a href="{% url 'seguimiento_estudiante' %}" class="text-decoration-none text-dark">
-            <div class="card dashboard-card h-100 border-0 shadow-sm">
-              <div class="card-body text-center">
-                <i class="fa-solid fa-eye dashboard-icon text-primary"></i>
-                <h6 class="fw-bold">Seguimiento académico</h6>
-                <p class="text-muted small">Rendimiento y asistencia</p>
-              </div>
-            </div>
-          </a>
-        </div>
-
-        <div class="col-md-6 mb-4">
-          <a href="{% url 'comunicados' %}" class="text-decoration-none text-dark">
-            <div class="card dashboard-card h-100 border-0 shadow-sm">
-              <div class="card-body text-center">
-                <i class="fa-solid fa-bullhorn dashboard-icon text-secondary"></i>
-                <h6 class="fw-bold">Comunicados</h6>
-                <p class="text-muted small">Avisos institucionales</p>
-              </div>
-            </div>
-          </a>
-        </div>
-      {% endif %}
     </div>
     {% if usuario_rol == 'Administrador' or usuario_rol == 'Docente' %}
       <hr class="my-4" />
@@ -223,6 +158,7 @@
   <script>
     /* ================= ASISTENCIAS ================= */
     new ApexCharts(document.querySelector('#graficaAsistencias'), {
+
       chart: {
         type: 'line',
         height: 250,
@@ -231,11 +167,11 @@
       series: [
         {
           name: 'Asistencias',
-          data: [22, 28, 30, 35, 40]
+          data: {{data|safe}}
         }
       ],
       xaxis: {
-        categories: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie']
+        categories: {{ labels|safe }}
       },
       stroke: { curve: 'smooth' },
       colors: ['#0d6efd']
@@ -251,11 +187,11 @@
       series: [
         {
           name: 'Cantidad',
-          data: [120, 90, 60, 150]
+          data: {{datos_elemento|safe }}
         }
       ],
       xaxis: {
-        categories: ['Útiles', 'Libros', 'Equipos', 'Otros']
+        categories: {{labels_elemento|safe }}
       },
       colors: ['#198754']
     }).render()
