@@ -11,13 +11,14 @@ from app.views.Curso.views import *
 from app.views.Movimiento.views import *
 from app.views.Evento.views import *
 from app.views.Notificacion.views import *
-from app.views.Index.views import DashboardView
+from app.views.Index.views import DashboardView , NotificacionesView
 
 from app.views.reportes import *
 from app.views.backup import *
 app_name = 'app'
 urlpatterns = [
     path('dashboard/', DashboardView.as_view(), name="dashboard"),
+    path('mis_notificaciones/',NotificacionesView.as_view(),name="mis_notificaciones"),
     # path('Curso/',listar_curso,name="listar_curso" ),
     path('curso/', CursoListView.as_view(), name="index_curso"),
     path('curso/crear/', CursoCreateView.as_view(), name="crear_curso"),

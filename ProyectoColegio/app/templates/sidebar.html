@@ -8,6 +8,7 @@
     <a onclick = "abrirPerfil()" class="edit-profile"><i class="fa-solid fa-pencil"></i></a>
     <p class="name" id = "name">{{ request.user.nombre }}</p>
     <p class="badge rounded-pill badge-primary rol">{{ request.user.get_rol }}</p>
+	<a onclick = "abrirNotificacion()">Mis Notificaciones</a>
     <div class="dropdown">
       <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Backup</button>
       <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">

@@ -35,7 +35,7 @@ function abrirModalCreacion(url, fieldName) {
 	const modalElement = document.getElementById('modalGeneral');
 	const contenedor = document.getElementById('contenedorModal');
 
-	campoActivo = fieldName; // 👈 Guardamos el nombre del campo (ej: 'marca')
+	campoActivo = fieldName; 
 
 	fetch(url)
 		.then(response => response.text())
@@ -223,3 +223,16 @@ function abrirPerfil() {
 		.catch(err => console.error("Error al cargar perfil:", err));
 }
 
+function abrirNotificacion() {
+	const modalElement = document.getElementById('modalGeneral');
+	const contenedor = document.getElementById('contenedorModal');
+	fetch("/ejemplo/mis_notificaciones/")
+		.then(response => response.text())
+		.then(html => {
+			console.log(html)
+			contenedor.innerHTML = html;
+			if (miModalInstancia) { miModalInstancia.dispose(); }
+			miModalInstancia = new bootstrap.Modal(modalElement);
+			miModalInstancia.show();
+		})
+}
