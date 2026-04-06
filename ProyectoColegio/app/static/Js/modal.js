@@ -248,3 +248,129 @@ function abrirNotificacion() {
 			miModalInstancia.show();
 		})
 }
+// ------------------------------
+// ELEMENTOS DEL DOM
+// ------------------------------
+const chatBox = document.getElementById('chatBox');
+const input = document.getElementById('inputMensaje');
+const boton = document.getElementById('btnEnviar');
+
+const btnChat = document.getElementById("btnChat");
+const chatContainer = document.getElementById("chatContainer");
+const cerrar = document.getElementById("cerrarChat");
+
+// ------------------------------
+// FUNCIONES DE CONTROL DEL CHAT
+// ------------------------------
+
+// 🔥 Abrir chat
+function abrirChat() {
+  chatContainer.classList.add("chat-activo");
+  btnChat.classList.add("oculto");
+}
+
+// 🔥 Cerrar chat
+function cerrarChat() {
+  chatContainer.classList.remove("chat-activo");
+  btnChat.classList.remove("oculto");
+}
+
+// Eventos abrir/cerrar
+btnChat.addEventListener("click", abrirChat);
+cerrar.addEventListener("click", cerrarChat);
+
+// 🔥 Cerrar al hacer clic fuera
+document.addEventListener("click", function (e) {
+  const clickDentroChat = chatContainer.contains(e.target);
+  const clickBoton = btnChat.contains(e.target);
+
+  if (!clickDentroChat && !clickBoton) {
+    cerrarChat();
+  }
+});
+
+// ------------------------------
+// FUNCIONES DEL CHAT
+// ------------------------------
+
+// 💬 Agregar mensaje
+function agregarMensaje(texto, tipo) {
+  const mensaje = document.createElement('div');
+  mensaje.classList.add('mensaje', tipo);
+
+  // Etiqueta bonita (Tú / Bot)
+  const autor = tipo === 'usuario' ? 'Tú' : 'Bot';
+
+  mensaje.innerHTML = `<strong>${autor}:</strong> ${texto}`;
+
+  chatBox.appendChild(mensaje);
+
+  // Scroll automático
+  chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+// ⏳ Mostrar "escribiendo..."
+function mostrarEscribiendo() {
+  const mensaje = document.createElement('div');
+  mensaje.classList.add('mensaje', 'bot');
+  mensaje.id = "escribiendo";
+
+  mensaje.innerHTML = "Bot está escribiendo...";
+
+  chatBox.appendChild(mensaje);
+  chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+// ❌ Quitar "escribiendo..."
+function quitarEscribiendo() {
+  const escribiendo = document.getElementById("escribiendo");
+  if (escribiendo) escribiendo.remove();
+}
+
+// 📤 Enviar mensaje
+function enviarMensaje() {
+  const texto = input.value.trim();
+
+  if (texto === '') return;
+
+  // Mostrar mensaje usuario
+  agregarMensaje(texto, 'usuario');
+
+  // Limpiar input
+  input.value = '';
+
+  // Mostrar "escribiendo..."
+  mostrarEscribiendo();
+
+  // Petición al backend
+  fetch('/ejemplo/preguntas/', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ mensaje: texto }),
+  })
+    .then((res) => res.json())
+    .then((data) => {
+      quitarEscribiendo();
+      agregarMensaje(data.respuesta, 'bot');
+    })
+    .catch(() => {
+      quitarEscribiendo();
+      agregarMensaje('Error al conectar con el servidor', 'bot');
+    });
+}
+
+// ------------------------------
+// EVENTOS
+// ------------------------------
+
+// Botón enviar
+boton.addEventListener('click', enviarMensaje);
+
+// Enter para enviar
+input.addEventListener('keypress', function (e) {
+  if (e.key === 'Enter') {
+    enviarMensaje();
+  }
+});

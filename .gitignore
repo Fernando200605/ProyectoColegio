@@ -20,5 +20,5 @@ __pycache__/
 # Archivos de configuración de IDE
 .vscode/
 .idea/
-
+**/.env
 **/media/usuarios/*
