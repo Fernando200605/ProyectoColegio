@@ -42,6 +42,7 @@ urlpatterns = [
          UsuarioDetailView.as_view(), name="detalle_usuario"),
     path('usuario/limpiar/', UsuarioCleandView.as_view(), name="limpiar_usuario"),
     path('usuario/perfil/',PerfilView.as_view(),name="perfil"),
+    path('usuario/<int:user_id>/permisos/', GestionPermisosUsuarioView.as_view(), name='gestionar_permisos'),
     # INVENTARIO
     path('inventario/', InventarioListView.as_view(), name="index_inventario"),
     path('inventario/crear/', ElementoCreateView.as_view(), name="crear_elemento"),

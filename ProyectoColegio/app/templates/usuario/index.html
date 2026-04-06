@@ -76,6 +76,7 @@
         <button class="btn btn-sm btn-info btn-ver-usuario" data-url="{% url 'app:detalle_usuario' usuario.id %}">Ver</button>
         <a href="{% url 'app:editar_usuario' usuario.id %}" class="btn btn-sm me-1" style="background-color: #3054f7; color: #ffffff; border-radius: 8px;"><i class="fa-solid fa-pen-to-square"></i></a>
         <a href="{% url 'app:eliminar_usuario' usuario.id %}" class="btn btn-sm" style="background-color: #ff4d4d; color: white; border-radius: 8px;"><i class="fa-solid fa-trash"></i></a>
+        <a href="{% url 'app:gestionar_permisos' usuario.id %}" class="btn btn-sm" style="background-color: #ff4d4d; color: white; border-radius: 8px;"><i class="fa-solid fa-trash"></i></a>
       </td>
     </tr>
   {% endfor %}

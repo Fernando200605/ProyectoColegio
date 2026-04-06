@@ -27,10 +27,12 @@ def listar_curso(request):
     return render(request, 'curso/index.html', {'cursos': curso})
 
 
-class CursoListView(ListView):
+class CursoListView(PermissionRequiredMixin,ListView):
     model = Curso
     template_name = 'curso/index.html'
     context_object_name = 'cursos'
+    permission_required = 'app.view_curso'
+    raise_exception = True
     # Uso de DICCIONARIOS
     # Metodo Dispatch
     # @method_decorator(login_required)

@@ -35,7 +35,7 @@ function abrirModalCreacion(url, fieldName) {
 	const modalElement = document.getElementById('modalGeneral');
 	const contenedor = document.getElementById('contenedorModal');
 
-	campoActivo = fieldName; 
+	campoActivo = fieldName;
 
 	fetch(url)
 		.then(response => response.text())
@@ -46,7 +46,7 @@ function abrirModalCreacion(url, fieldName) {
 
 			miModalInstancia = new bootstrap.Modal(modalElement);
 			miModalInstancia.show();
-			
+
 			// Configurar botones de cerrar
 			const btnCerrar = contenedor.querySelectorAll('[data-bs-dismiss="modal"]');
 			btnCerrar.forEach(boton => {
@@ -119,7 +119,19 @@ function abrirPerfil() {
 	const nombre = document.getElementById('name')
 	const img = document.getElementById('img')
 
-	fetch("/ejemplo/usuario/perfil/")
+	fetch("/ejemplo/usuario/perfil/", {
+		headers: { 'X-Requested-With': 'XMLHttpRequest' }
+	})
+		.then(res => res.json().catch(() => null)) // intenta parsear JSON
+		.then(data => {
+			if (data && data.redirect) {
+				window.location.href = data.redirect; // usuario no logueado
+				return;
+			}
+
+			// si no es JSON, asumimos HTML (usuario logueado)
+			return fetch("/ejemplo/usuario/perfil/")
+		})
 		.then(response => response.text())
 		.then(html => {
 			contenedor.innerHTML = html;
@@ -136,7 +148,7 @@ function abrirPerfil() {
 			contraseña.addEventListener("input", () => {
 
 				const valor = contraseña.value;
-				errorBox.innerHTML = ""; 
+				errorBox.innerHTML = "";
 
 				let errores = [];
 				if (valor.length < 5) {

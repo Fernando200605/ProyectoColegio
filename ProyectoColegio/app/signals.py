@@ -9,40 +9,31 @@ from django.utils.html import strip_tags
 from app.models import Usuario, Notificacion
 
 
-# 🔹 1. CREAR ROLES AUTOMÁTICAMENTE
+
 @receiver(post_migrate)
 def inicializar_roles(sender, **kwargs):
-
     grupos = ['Administrador', 'Docente', 'Estudiante', 'Acudiente']
-
-    # Crear grupos
     for nombre in grupos:
         Group.objects.get_or_create(name=nombre)
-
-    # Administrador → todos los permisos
     admin, _ = Group.objects.get_or_create(name='Administrador')
     admin.permissions.set(Permission.objects.all())
-
-    # Docente → permisos específicos
     docente, _ = Group.objects.get_or_create(name='Docente')
     docente.permissions.set(
         Permission.objects.filter(
             codename__in=[
-                'view_usuario', 'change_usuario',
-                'view_curso', 'change_curso'
+                'view_usuario',
+                'view_curso',
             ]
         )
     )
 
 
-# 🔹 2. CREAR NOTIFICACIÓN Y ENVIAR CORREO
+
 @receiver(post_save, sender=Usuario)
 def notificar_usuario(sender, instance, created, **kwargs):
 
-    # Obtener administradores (ajusta según tu modelo)
     administradores = [u for u in Usuario.objects.all() if u.get_rol() == "Administrador"]
 
-    # Definir mensajes dinámicos
     if created:
         titulo = "Se ha creado un nuevo usuario"
         mensaje = f"Se creó el usuario {instance.nombre}"
@@ -54,7 +45,6 @@ def notificar_usuario(sender, instance, created, **kwargs):
         asunto = "Edición de cuenta"
         cuerpo = "Tu cuenta ha sido actualizada correctamente."
 
-    # 🔸 Crear notificaciones para administradores
     for admin in administradores:
         Notificacion.objects.create(
             titulo=titulo,
@@ -65,7 +55,6 @@ def notificar_usuario(sender, instance, created, **kwargs):
             receptor_id=admin.id
         )
 
-    # 🔸 Enviar correo al usuario afectado (HTML)
     try:
         html_content = render_to_string('emails/notificacion.html', {
             'titulo': titulo,
