@@ -12,7 +12,7 @@ from app.views.Movimiento.views import *
 from app.views.Evento.views import *
 from app.views.Notificacion.views import *
 from app.views.Index.views import DashboardView , NotificacionesView
-from app.views.IA.views import preguntar_ia
+from app.views.IA.views import preguntar_ia,preguntar_ia_local
 
 from app.views.reportes import *
 from app.views.backup import *
@@ -21,6 +21,7 @@ urlpatterns = [
 
     path('dashboard/', DashboardView.as_view(), name="dashboard"),
     path('preguntas/',preguntar_ia,name="preguntar"),
+    path('preguntas1/',preguntar_ia_local,name="preguntar2" ),
     path('mis_notificaciones/',NotificacionesView.as_view(),name="mis_notificaciones"),
     # path('Curso/',listar_curso,name="listar_curso" ),
     path('curso/', CursoListView.as_view(), name="index_curso"),

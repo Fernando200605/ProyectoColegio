@@ -343,7 +343,7 @@ function enviarMensaje() {
   mostrarEscribiendo();
 
   // Petición al backend
-  fetch('/ejemplo/preguntas/', {
+  fetch('/ejemplo/preguntas1/', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -353,6 +353,7 @@ function enviarMensaje() {
     .then((res) => res.json())
     .then((data) => {
       quitarEscribiendo();
+	  console.log(data.rutas_links)
       agregarMensaje(data.respuesta, 'bot');
     })
     .catch(() => {
@@ -374,3 +375,4 @@ input.addEventListener('keypress', function (e) {
     enviarMensaje();
   }
 });
+
