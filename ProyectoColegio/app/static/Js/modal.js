@@ -46,7 +46,6 @@ function abrirModalCreacion(url, fieldName) {
 
 			miModalInstancia = new bootstrap.Modal(modalElement);
 			miModalInstancia.show();
-
 			// Configurar botones de cerrar
 			const btnCerrar = contenedor.querySelectorAll('[data-bs-dismiss="modal"]');
 			btnCerrar.forEach(boton => {
