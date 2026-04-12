@@ -40,12 +40,49 @@ function abrirModalCreacion(url, fieldName) {
 	fetch(url)
 		.then(response => response.text())
 		.then(html => {
+			contenedor.innerHTML = "";
 			contenedor.innerHTML = html;
 
 			if (miModalInstancia) { miModalInstancia.dispose(); }
 
 			miModalInstancia = new bootstrap.Modal(modalElement);
 			miModalInstancia.show();
+			const guardar = document.getElementById('Guardar')
+			console.log(guardar)
+			const nombre = contenedor.querySelector('#id_nombre');
+			const error = document.getElementById("error_nombre")
+			nombre.addEventListener('input', function(){
+				error.innerHTML = ""
+				let errores = []
+				let valor = nombre.value
+					if (/[0-9]/.test(valor))
+						{ errores.push("No debe contener numeros") }
+					if(fieldName === "unidadMedidaId" && valor.length > 4){
+						errores.push("No debe contener mas de 4 digitos")
+					}
+					if (/[#$@+\-]/.test(valor)) 
+						{ errores.push("No debe tener caracteres especiales"); }
+					if(valor.length === 0){
+						guardar.disabled = true
+						error.classList.remove("error-box", "active" , "pass-box"); return; } 
+					if (errores.length > 0){ 
+						guardar.disabled = true
+						errores.forEach(err => { 
+							error.classList.add("error-box", "active"); 
+							error.classList.remove("pass-box"); 
+							console.log(err) 
+							const div = document.createElement("div") 
+							div.textContent = err; div.classList.add("error-item"); 
+							error.appendChild(div); });} 
+					else{
+						guardar.disabled = false
+						error.classList.add("pass-box", "active"); 
+						error.classList.remove("error-box"); 
+						const div = document.createElement("div") 
+						div.textContent = "No se encontraron errores"; 
+						div.classList.add("error-item"); 
+						error.appendChild(div); }
+			})
 			// Configurar botones de cerrar
 			const btnCerrar = contenedor.querySelectorAll('[data-bs-dismiss="modal"]');
 			btnCerrar.forEach(boton => {

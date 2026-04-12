@@ -25,7 +25,7 @@ def listar_inventario(request):
 
 class InventarioListView(LoginRequiredMixin,ListView):
     model = Elemento
-    template_name = 'inventario/index.html'
+    template_name = 'Inventario/index.html'
     context_object_name = 'elementos'
     paginate_by = 10  # Paginación como buena práctica
 
@@ -77,7 +77,7 @@ class InventarioListView(LoginRequiredMixin,ListView):
 class ElementoCreateView(LoginRequiredMixin,CreateView):
     model = Elemento
     form_class = ElementoForm
-    template_name = 'inventario/crear.html'
+    template_name = 'Inventario/crear.html'
     success_url = reverse_lazy('app:index_inventario')
 
     def get_context_data(self, **kwargs):
@@ -98,7 +98,7 @@ class ElementoCreateView(LoginRequiredMixin,CreateView):
 class ElementoUpdateView(LoginRequiredMixin,UpdateView):
     model = Elemento
     form_class = ElementoForm
-    template_name = 'inventario/crear.html'
+    template_name = 'Inventario/crear.html'
     success_url = reverse_lazy('app:index_inventario')
 
     def get_context_data(self, **kwargs):
@@ -118,7 +118,7 @@ class ElementoUpdateView(LoginRequiredMixin,UpdateView):
 
 class ElementoDeleteView(LoginRequiredMixin,DeleteView):
     model = Elemento
-    template_name = 'inventario/eliminar.html'
+    template_name = 'Inventario/eliminar.html'
     success_url = reverse_lazy('app:index_inventario')
 
     def get_context_data(self, **kwargs):
