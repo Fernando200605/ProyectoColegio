@@ -139,22 +139,54 @@
             </div>
           </div>
         </div>
-
-        <!-- ESTADO GENERAL -->
-        <div class="col-md-6 mb-4">
-          <div class="card border-0 shadow-sm h-100">
-            <div class="card-body">
-              <h6 class="fw-bold mb-3">
-                <i class="fa-solid fa-chart-pie text-warning me-2"></i>
-                Estado general
-              </h6>
-              <div id="graficaEstado"></div>
-            </div>
-          </div>
-        </div>
+        <div id='calendar'></div>
       </div>
     {% endif %}
   </div>
+    <script src='https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.20/index.global.min.js'></script>
+    <script src='https://cdn.jsdelivr.net/npm/@fullcalendar/daygrid@6.1.20/index.global.min.js'></script>
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
+
+    <script>
+      const { Calendar } = FullCalendar; 
+
+      document.addEventListener('DOMContentLoaded', function() {
+        const calendarEl = document.getElementById('calendar');
+
+        const calendar = new FullCalendar.Calendar(calendarEl, {
+          initialView: 'dayGridMonth', // Vista de cuadrícula clásica de Google
+          locale: 'es',                // Idioma Inglés
+          height: 'auto',              // Se ajusta al contenido
+          headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: ''                  // Limpio para Dashboard
+          },
+
+          // Configuración de visualización de eventos
+          eventDisplay: 'block',       // Hace que se vean como barras sólidas
+          displayEventTime: false,     // Oculta la hora para que se vea más limpio
+          
+          events: function(info, successCallback, failureCallback) {
+            fetch('/ejemplo/evento/calendario')
+              .then(res => res.json())
+              .then(data => {
+                const eventos = data.eventos.map(e => ({
+                  title: e.titulo,
+                  start: e.inicio,
+                  end: e.fin,
+                  backgroundColor: '#045ab1', // Azul estilo Google
+                  borderColor: '#031a31',
+                  allDay: true                // Importante para que ocupe todo el recuadro
+                }));
+                successCallback(eventos);
+              });
+          }
+        });
+
+        calendar.render();
+      });
+    </script>
   <script>
     /* ================= ASISTENCIAS ================= */
     new ApexCharts(document.querySelector('#graficaAsistencias'), {
@@ -196,16 +228,6 @@
       colors: ['#198754']
     }).render()
     
-    /* ================= ESTADO GENERAL ================= */
-    new ApexCharts(document.querySelector('#graficaEstado'), {
-      chart: {
-        type: 'donut',
-        height: 250
-      },
-      series: [70, 20, 10],
-      labels: ['Correcto', 'Pendiente', 'Crítico'],
-      colors: ['#198754', '#ffc107', '#dc3545'],
-      legend: { position: 'bottom' }
-    }).render()
   </script>
+
 {% endblock %}

@@ -1776,3 +1776,68 @@ button {
     transform: translateY(0);
   }
 }
+/* Contenedor principal */
+#calendar {
+    max-width: 900px;
+    margin: 20px auto;
+    background: #ffffff;
+    padding: 15px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.623); /* Sombra suave */
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+/* Encabezado (Título y botones) */
+.fc .fc-toolbar-title {
+    font-size: 1.4em !important;
+    font-weight: 600;
+    color: #2984ca; /* Gris oscuro de Google */
+}
+
+.fc .fc-button-primary {
+    background-color: #ffffff !important;
+    border: 1px solid #dadce0 !important;
+    color: #1a73e8 !important; /* Azul Google */
+    text-transform: capitalize;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.fc .fc-button-primary:hover {
+    background-color: #f1f3f4 !important;
+    border-color: #dadce0 !important;
+}
+
+/* Celdas de los días */
+.fc .fc-daygrid-day-number {
+    padding: 8px !important;
+    font-size: 0.9em;
+    color: #000000;
+    text-decoration: none !important;
+}
+
+.fc .fc-col-header-cell-cushion {
+    padding: 10px !important;
+    color: #3c85ce;
+    font-weight: 500;
+    text-transform: uppercase;
+    font-size: 0.8em;
+    text-decoration: none !important;
+}
+
+/* Estilo de los Eventos (Las barras de colores) */
+.fc-event {
+    border: none !important;
+    padding: 2px 8px !important;
+    border-radius: 4px !important;
+    font-size: 0.85em !important;
+    font-weight: 500 !important;
+    margin-top: 2px !important;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+/* Evento que dura varios días (continuidad) */
+.fc-daygrid-event {
+    margin-left: 2px !important;
+    margin-right: 2px !important;
+}

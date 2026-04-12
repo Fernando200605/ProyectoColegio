@@ -132,7 +132,7 @@ urlpatterns = [
          name="reporte_evento_pdf"),
     path('reporte/evento/excel', ExportarEventosExcel.as_view(),
          name="reporte_evento_excel"),
-
+    path('evento/calendario',listar_eventos,name="evento_calendario"),
     path('notificacion/', NotificacionListView.as_view(),
          name="index_notificacion"),
     path('notificacion/crear/', NotificacionCreateView.as_view(),
