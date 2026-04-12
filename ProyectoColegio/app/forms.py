@@ -108,7 +108,7 @@ class AsistenciaForm(forms.ModelForm):
             fecha_hoy = timezone.now().date()
             existe = Asistencia.objects.filter(
                 estudianteid=estudiante,
-                fecha__date=fecha_hoy
+                fecha=fecha_hoy
             ).exclude(pk=self.instance.pk).exists()
 
             if existe:
@@ -813,3 +813,4 @@ class EventoForm(forms.ModelForm):
             )
 
         return fecha_fin
+

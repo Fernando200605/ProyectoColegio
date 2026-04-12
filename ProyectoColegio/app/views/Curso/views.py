@@ -9,7 +9,7 @@ from django.urls import reverse_lazy
 from django.contrib import messages
 from django.db import connection
 # Create your views here.
-
+from django.contrib.auth.mixins import PermissionRequiredMixin
 
 def index(request):
     return render(request, 'index.html')
@@ -27,10 +27,12 @@ def listar_curso(request):
     return render(request, 'curso/index.html', {'cursos': curso})
 
 
-class CursoListView(ListView):
+class CursoListView(PermissionRequiredMixin,ListView):
     model = Curso
     template_name = 'curso/index.html'
     context_object_name = 'cursos'
+    permission_required = 'app.view_curso'
+    raise_exception = True
     # Uso de DICCIONARIOS
     # Metodo Dispatch
     # @method_decorator(login_required)
@@ -56,12 +58,13 @@ class CursoListView(ListView):
         return context
 
 
-class CursoCreateView(CreateView):
+class CursoCreateView(PermissionRequiredMixin,CreateView):
     model = Curso
     form_class = CursoForm
-    template_name = 'curso/crear.html'
-
+    template_name = 'curso/crear.html'    
     success_url = reverse_lazy('app:index_curso')
+    permission_required = 'app.add_curso'
+    raise_exception = True
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -75,11 +78,13 @@ class CursoCreateView(CreateView):
         return super().form_valid(form)
 
 
-class CursoupdateView(UpdateView):
+class CursoupdateView(PermissionRequiredMixin,UpdateView):
     model = Curso
     form_class = CursoForm
     template_name = 'curso/crear.html'
     success_url = reverse_lazy('app:index_curso')
+    permission_required = 'app.change_curso'
+    raise_exception = True
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

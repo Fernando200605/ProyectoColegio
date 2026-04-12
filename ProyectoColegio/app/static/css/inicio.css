@@ -1652,3 +1652,192 @@ body.is-large-text .guia-item p {
 .error-item {
 	margin: 2px 0;
 }
+/* BOTÓN FLOTANTE */
+.btn-chat {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: #4CAF50;
+  color: white;
+  font-size: 20px;
+  padding: 15px;
+  border-radius: 50%;
+  cursor: pointer;
+  z-index: 9999;
+  box-shadow: 0 0 10px rgba(0,0,0,0.3);
+  transition: 0.3s;
+}
+
+/* Ocultar botón */
+.oculto {
+  opacity: 0;
+  transform: scale(0.5);
+  pointer-events: none;
+}
+
+/* CHAT */
+.chat-container {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 350px;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.2);
+  overflow: hidden;
+
+  /* oculto */
+  transform: scale(0);
+  transform-origin: bottom right;
+  transition: 0.3s ease;
+
+  z-index: 9998;
+}
+
+/* Mostrar chat */
+.chat-activo {
+  transform: scale(1);
+}
+
+/* Header */
+.chat-header {
+  background: #4CAF50;
+  color: white;
+  padding: 10px;
+  display: flex;
+  justify-content: space-between;
+}
+
+/* Botón cerrar */
+.cerrar {
+  cursor: pointer;
+}
+
+/* Caja mensajes */
+.chat-box {
+  height: 300px;
+  padding: 10px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Input */
+.chat-input {
+  display: flex;
+}
+
+input {
+  flex: 1;
+  padding: 10px;
+  border: none;
+}
+
+button {
+  padding: 10px;
+  background: #4CAF50;
+  color: white;
+  border: none;
+}
+.mensaje {
+  max-width: 75%;
+  padding: 8px 12px;
+  margin: 5px 0;
+  border-radius: 15px;
+  font-size: 14px;
+  word-wrap: break-word;
+  animation: aparecer 0.2s ease;
+}
+
+/* Usuario (derecha) */
+.usuario {
+  align-self: flex-end;
+  background: #DCF8C6;
+  color: #000;
+  border-bottom-right-radius: 5px;
+  
+}
+
+/* Bot (izquierda) */
+.bot {
+  align-self: flex-start;
+  background: #F1F0F0;
+  color: #000;
+  border-bottom-left-radius: 5px;
+}
+
+@keyframes aparecer {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+/* Contenedor principal */
+#calendar {
+    max-width: 900px;
+    margin: 20px auto;
+    background: #ffffff;
+    padding: 15px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.623); /* Sombra suave */
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+/* Encabezado (Título y botones) */
+.fc .fc-toolbar-title {
+    font-size: 1.4em !important;
+    font-weight: 600;
+    color: #2984ca; /* Gris oscuro de Google */
+}
+
+.fc .fc-button-primary {
+    background-color: #ffffff !important;
+    border: 1px solid #dadce0 !important;
+    color: #1a73e8 !important; /* Azul Google */
+    text-transform: capitalize;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.fc .fc-button-primary:hover {
+    background-color: #f1f3f4 !important;
+    border-color: #dadce0 !important;
+}
+
+/* Celdas de los días */
+.fc .fc-daygrid-day-number {
+    padding: 8px !important;
+    font-size: 0.9em;
+    color: #000000;
+    text-decoration: none !important;
+}
+
+.fc .fc-col-header-cell-cushion {
+    padding: 10px !important;
+    color: #3c85ce;
+    font-weight: 500;
+    text-transform: uppercase;
+    font-size: 0.8em;
+    text-decoration: none !important;
+}
+
+/* Estilo de los Eventos (Las barras de colores) */
+.fc-event {
+    border: none !important;
+    padding: 2px 8px !important;
+    border-radius: 4px !important;
+    font-size: 0.85em !important;
+    font-weight: 500 !important;
+    margin-top: 2px !important;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+/* Evento que dura varios días (continuidad) */
+.fc-daygrid-event {
+    margin-left: 2px !important;
+    margin-right: 2px !important;
+}
