@@ -21,4 +21,6 @@ __pycache__/
 .vscode/
 .idea/
 **/.env
+**/token.json
 **/media/usuarios/*
+
