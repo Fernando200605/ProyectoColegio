@@ -11,7 +11,7 @@ document.addEventListener('input', function (e) {
 
 document.addEventListener('input', function (e) {
 
-    // 🔹 OBSERVACIONES (mín 10, máx 200)
+    // OBSERVACIONES (mín 10, máx 200)
     if (e.target.id === "id_observaciones") {
         const error = document.getElementById("error_Observaciones");
         error.innerText = "";
@@ -25,7 +25,7 @@ document.addEventListener('input', function (e) {
 })
 
 document.addEventListener('input', function (e) {
-    // 🔹 HORA ENTRADA → estado automático
+    // HORA ENTRADA → estado automático
     if (e.target.id === "id_horaentrada") {
         const estado = document.getElementById("id_estado");
 
@@ -37,7 +37,7 @@ document.addEventListener('input', function (e) {
 });
 
 document.addEventListener('input', function (e) { 
-    // 🔹 VALIDACIÓN HORAS (entrada < salida)
+    // VALIDACIÓN HORAS (entrada < salida)
     if (e.target.id === "id_horaentrada" || e.target.id === "id_horasalida") {
 
         const entrada = document.getElementById("id_horaentrada").value;
