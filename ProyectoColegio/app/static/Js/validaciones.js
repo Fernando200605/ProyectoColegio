@@ -4,13 +4,17 @@ document.addEventListener('input', function (e) {
 		error.innerText = ""
 		if (e.target.value.length < 10) {
 			error.innerText = "la descripción es demasiado muy corta"
+			error.classList.add('text-danger')
 		}
 		if (e.target.value.length > 200) {
 			error.innerText = "La descripción no puede superar los 200 caracteres"
+			error.classList.add('text-danger')
 		}
 		if (e.target.value.length == 0) {
 			error.innerText = "la descripción no puede estar vacia"
+			error.classList.add('text-danger')
 		}
+
 
 	}
 
@@ -22,10 +26,24 @@ document.addEventListener('input', function (e) {
 
 		if (/^\d+$/.test(e.target.value)){
 			error.innerText = "El título no puede contener solo números"
+			error.classList.add('text-danger')
 		}
 
 		if (!/^[a-zA-ZÁÉÍÓÚáéíóúÑñ0-9 ]+$/.test(e.target.value)){
 			error.innerText = "El título no puede contener caracteres especiales"
+			error.classList.add('text-danger')
+		}
+		if (e.target.value.length < 5) {
+			error.innerText = "título muy corto"
+			error.classList.add('text-danger')
+		}
+		if (e.target.value.length > 20) {
+			error.innerText = "el título no puede superar los 20 caracteres"
+			error.classList.add('text-danger')
+		}
+		if (e.target.value.length == 0) {
+			error.innerText = "el título no puede estar vacio"
+			error.classList.add('text-danger')
 		}
 	}
 
@@ -42,41 +60,26 @@ document.addEventListener('input', function (e) {
 
 			if (fechaInicio < ahora){
 				error.innerText = "La fecha de inicio no puede ser una fecha pasada"
+				error.classList.add('text-danger')
 			}
 		}
 	}
 
-	// FECHA FIN
+	// VALIDACIÓN FECHA FIN
+    if (e.target.id === "id_fecha_fin") {
+        const error = document.getElementById("error_Fecha fin");
+        error.innerText = "";
 
-	if (e.target.id === "id_fecha_fin"){
-		const error = document.getElementById("error_Fecha fin")
-		error.innerText = ""
+        const fechaInicio = document.getElementById("id_fecha_inicio").value;
+        const fechaFin = e.target.value;
 
-		if (e.target.value){
-			const fechaFin = new Date(e.target.value)
-			const ahora = new Date()
+        if (fechaInicio && fechaFin) {
+            if (new Date(fechaFin) <= new Date(fechaInicio)) {
+                error.innerText = "La fecha de fin debe ser mayor que la fecha de inicio";
+				error.classList.add('text-danger')
+            }
+        }
+    }
 
-			if (fechaFin < ahora){
-				error.innerText = "La fecha de fin no puede ser una fecha pasada"
-			}
-		}
-	}
+});
 
-
-	// VALIDACIÓN ENTRE FECHAS
-
-	const fechaInicioInput = document.getElementById("id_fecha_inicio")
-	const fechaFinInput = document.getElementById("id_fecha_fin")
-	const errorFechaFin = document.getElementById("error_fecha_fin")
-
-	if (fechaInicioInput && fechaFinInput){
-		if (fechaInicioInput.value && fechaFinInput.value){
-			const inicio = new Date(fechaInicioInput.value)
-			const fin = new Date(fechaFinInput.value)
-
-			if (inicio >= fin){
-				errorFechaFin.innerText = "La fecha de fin debe ser mayor que la fecha de inicio"
-			}
-		}
-	}
-})
