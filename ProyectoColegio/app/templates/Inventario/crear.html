@@ -1,4 +1,4 @@
-{% extends 'Create_generic.html' %}
+{% extends 'create_generic.html' %}
 {% load widget_tweaks %}
 {% load static %}
 
@@ -15,8 +15,7 @@
 
 
                 {{ field|add_class:'form-control form-control-custom'|attr:'autocomplete:off'|attr:'style:resize:None;' }}
-
-
+                <p class = "error" id="error_{{field.label}}"></p>
                 {% if 'data-crear-url' in field.field.widget.attrs %}
                     <div class="d-grid gap-2">
                         <button type="button" class="btn btn-sm btn-outline-primary mt-2 shadow-sm" 

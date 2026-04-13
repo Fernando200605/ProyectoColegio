@@ -158,3 +158,32 @@ from django.contrib.auth.models import Group
 def asignar_rol(usuario, rol):
     grupo = Group.objects.get(name=rol)
     usuario.groups.add(grupo)
+    
+
+
+from django.urls import URLResolver, URLPattern, get_resolver
+
+def obtener_rutas(resolver=None, base=''):
+    if resolver is None:
+        resolver = get_resolver()
+    
+    rutas = []
+
+    for pattern in resolver.url_patterns:
+        if isinstance(pattern, URLPattern):
+            ruta_completa = base + str(pattern.pattern)
+            
+            if not ruta_completa.startswith('admin/'):
+                if not ruta_completa.startswith('/'):
+                    ruta_completa = '/' + ruta_completa
+                
+
+                ruta_completa = ruta_completa.replace('^', '').replace('$', '')
+
+                if ruta_completa and ruta_completa != '/':
+                    rutas.append(ruta_completa)
+
+        elif isinstance(pattern, URLResolver):
+            rutas += obtener_rutas(pattern, base + str(pattern.pattern))
+    
+    return rutas

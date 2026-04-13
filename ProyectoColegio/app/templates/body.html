@@ -13,6 +13,22 @@
       {% block main %}
         {% include 'main.html' %}
       {% endblock %}
+      <!-- Botón flotante -->
+      <div class="btn-chat" id="btnChat"><i class="fa-solid fa-comment"></i></div>
+
+      <!-- Chat -->
+      <div class="chat-container" id="chatContainer">
+        <div class="chat-header">🤖 Chatbot
+          <span id="cerrarChat" class="cerrar">✖</span>
+        </div>
+
+        <div class="chat-box" id="chatBox"></div>
+
+        <div class="chat-input">
+          <input type="text" id="inputMensaje" placeholder="Escribe un mensaje..." />
+          <button id="btnEnviar">Enviar</button>
+        </div>
+      </div>
       <div class="modal fade" id="modalGeneral" tabindex="-1" aria-hidden="true">
         <div id="contenedorModal"></div>
       </div>
@@ -36,7 +52,7 @@
 
     <!-- SweetAlert -->
     <script src="{% static 'lib/sweetalert2/sweetalert2.all.min.js' %}"></script>
-    <!--Qr code-->
+    <!-- Qr code -->
 
     <script>
       const hamburger = document.getElementById('hamburger')

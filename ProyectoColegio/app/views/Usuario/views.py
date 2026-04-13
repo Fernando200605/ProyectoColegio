@@ -285,7 +285,13 @@ class UsuarioDeleteView(DeleteView):
 
 class PerfilView(LoginRequiredMixin, View):
     template_name = "modals/perfil.html"
-
+    
+    def handle_no_permission(self):
+        if self.request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            # Devuelve JSON indicando redirección
+            return JsonResponse({'redirect': '/login/'}, status=401)
+        # Redirección normal si no es AJAX
+        return redirect('/login/?next=' + self.request.path)
     def get(self, request):
         return render(request, self.template_name, {
             'user': request.user
@@ -330,3 +336,56 @@ class PerfilView(LoginRequiredMixin, View):
             return JsonResponse({'success': True, 'message': 'Perfil actualizado correctamente.' , 'nombre':usuario.nombre})
         except Exception as e:
             return JsonResponse({'success': False, 'message': 'Error al guardar los cambios.'})
+        
+
+from django.views import View
+from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Group, Permission
+from django.shortcuts import render, get_object_or_404, redirect
+from collections import defaultdict
+
+User = get_user_model()
+
+class GestionPermisosUsuarioView(View):
+    template_name = 'usuario/permisos_usuario.html'
+    def get(self, request, user_id):
+        usuario = get_object_or_404(User, id=user_id)
+        grupos = Group.objects.prefetch_related('permissions').all()
+        permisos = Permission.objects.select_related('content_type').all()
+        permisos_por_modelo = defaultdict(list)
+        for p in permisos:
+            permisos_por_modelo[p.content_type.model].append(p)
+            grupos_permisos_map = {
+			grupo.id: list(grupo.permissions.values_list('id', flat=True))
+			for grupo in grupos
+		}
+        return render(request, self.template_name, {
+			'usuario': usuario,
+			'grupos': grupos,
+			'permisos_por_modelo': dict(permisos_por_modelo),
+			'grupos_actuales': set(usuario.groups.values_list('id', flat=True)),
+			'permisos_actuales': set(usuario.user_permissions.values_list('id', flat=True)),
+			'grupos_permisos_map': grupos_permisos_map,  # ✅ NUEVO
+		})
+
+    def post(self, request, user_id):
+        usuario = get_object_or_404(User, id=user_id)
+
+        # ✅ NUEVO: ACTUALIZAR GRUPOS
+        grupos_post = request.POST.getlist('grupos')       # name="grupos" en el HTML
+        grupos_ids = [int(g) for g in grupos_post if g]
+        usuario.groups.set(grupos_ids)
+
+        # ACTUALIZAR PERMISOS INDIVIDUALES (tu código original, sin cambios)
+        permisos_post = request.POST.getlist('permisos')   # name="permisos" en el HTML
+        permisos_ids = [int(p) for p in permisos_post if p]
+        usuario.user_permissions.set(permisos_ids)
+
+        # ✅ NUEVO: Limpiar caché de permisos de la instancia
+        for attr in ('_perm_cache', '_user_perm_cache', '_group_perm_cache'):
+            if hasattr(usuario, attr):
+                delattr(usuario, attr)
+
+        print(f"Grupos: {usuario.groups.all()} | Permisos: {usuario.user_permissions.all()}")
+
+        return redirect('app:index_usuario')

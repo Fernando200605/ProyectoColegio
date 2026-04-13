@@ -11,13 +11,18 @@ from app.views.Curso.views import *
 from app.views.Movimiento.views import *
 from app.views.Evento.views import *
 from app.views.Notificacion.views import *
-from app.views.Index.views import DashboardView
+from app.views.Index.views import DashboardView , NotificacionesView
+from app.views.IA.views import preguntar_ia,preguntar_ia_local
 
 from app.views.reportes import *
 from app.views.backup import *
 app_name = 'app'
 urlpatterns = [
+
     path('dashboard/', DashboardView.as_view(), name="dashboard"),
+    path('preguntas/',preguntar_ia,name="preguntar"),
+    path('preguntas1/',preguntar_ia_local,name="preguntar2" ),
+    path('mis_notificaciones/',NotificacionesView.as_view(),name="mis_notificaciones"),
     # path('Curso/',listar_curso,name="listar_curso" ),
     path('curso/', CursoListView.as_view(), name="index_curso"),
     path('curso/crear/', CursoCreateView.as_view(), name="crear_curso"),
@@ -41,6 +46,7 @@ urlpatterns = [
          UsuarioDetailView.as_view(), name="detalle_usuario"),
     path('usuario/limpiar/', UsuarioCleandView.as_view(), name="limpiar_usuario"),
     path('usuario/perfil/',PerfilView.as_view(),name="perfil"),
+    path('usuario/<int:user_id>/permisos/', GestionPermisosUsuarioView.as_view(), name='gestionar_permisos'),
     # INVENTARIO
     path('inventario/', InventarioListView.as_view(), name="index_inventario"),
     path('inventario/crear/', ElementoCreateView.as_view(), name="crear_elemento"),
@@ -126,7 +132,7 @@ urlpatterns = [
          name="reporte_evento_pdf"),
     path('reporte/evento/excel', ExportarEventosExcel.as_view(),
          name="reporte_evento_excel"),
-
+    path('evento/calendario',listar_eventos,name="evento_calendario"),
     path('notificacion/', NotificacionListView.as_view(),
          name="index_notificacion"),
     path('notificacion/crear/', NotificacionCreateView.as_view(),

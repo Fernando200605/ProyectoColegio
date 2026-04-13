@@ -8,6 +8,9 @@ from app.forms import *
 from django.urls import reverse_lazy
 from django.contrib import messages
 from django.db import connection
+from app.google_api import obtener_servicio
+from datetime import datetime,timedelta
+from django.http import JsonResponse
 # Create your views here.
 def index(request):
     return render(request, 'index.html')
@@ -118,3 +121,25 @@ class EventoCleandView(View):
         
         messages.success(self.request, "Todos los Eventos han sido eliminados y el ID reiniciado.")
         return redirect(reverse_lazy('app:index_evento'))
+
+
+def listar_eventos(request):
+    servicio = obtener_servicio()
+
+    ahora = datetime.utcnow().isoformat() + 'Z'
+    eventos_resultado = servicio.events().list(
+        calendarId='primary', timeMin=ahora,
+        maxResults=10, singleEvents=True,
+        orderBy='startTime'
+    ).execute()
+    eventos = eventos_resultado.get('items', [])
+
+    lista = []
+    for evento in eventos:
+        lista.append({
+            'titulo': evento.get('summary'),
+            'inicio': evento['start'].get('dateTime', evento['start'].get('date')),
+            'fin': evento['end'].get('dateTime', evento['end'].get('date'))
+        })
+
+    return JsonResponse({'eventos': lista})

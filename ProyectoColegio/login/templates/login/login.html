@@ -84,7 +84,7 @@
         <div class="separator">O</div>
 
         <!-- Recuperar contraseña -->
-        <button type="button" class="btn-recuperar" onclick="location.href='app'">¿Olvidaste tu contraseña?</button>
+        <a type="button" class="btn-recuperar" href = "{% url 'login:reset_password' %}">¿Olvidaste tu contraseña?</a>
       </form>
     </div>
     <script src="{% static 'lib/sweetalert2/sweetalert2.all.min.js' %}"></script>

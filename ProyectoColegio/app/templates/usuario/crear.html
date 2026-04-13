@@ -25,6 +25,10 @@
             <i id="eye_password" class="fas fa-eye"></i>
           </button>
         </div>
+        <div class="progress mt-2" style="height: 8px; background-color: #e9ecef;">
+          <div id="barra-fuerza" class="progress-bar" role="progressbar" style="width: 0%;"></div>
+        </div>
+        <span id="error_password" class="small"></span>
       {% elif fiel.name == 'img_usuario' %}
         <div class="mb-4">
         <label class="form-label fw-bold">Foto de Perfil</label>
@@ -32,6 +36,13 @@
       </div>
       {% else %}
         {{ field|add_class:'form-control form-control-custom' }}
+        {% if field.name == 'email' %}
+            <span id="error_email" class="small d-block mt-1"></span>
+        {% elif field.name == 'nombre' %}
+            <span id="error_nombre" class="small d-block mt-1"></span>
+        {% else %}
+            <span id="error_{{ field.name }}" class="small d-block mt-1"></span>
+        {% endif %}
       {% endif %}
 
       {% if field.errors %}
@@ -61,6 +72,7 @@
             <i id="eye_confirmar" class="fas fa-eye"></i>
           </button>
         </div>
+        <span id="error_confirmar_password" class="small"></span>
       </div>
     {% endif %}
   {% endfor %}
@@ -198,5 +210,7 @@
       toggleRolForm();
     });
   </script>
-
+  {% load static %} {% block javascript %}
+    <script src="{% static 'Js/validaciones.js' %}"></script>
+  {% endblock %}
 {% endblock %}
