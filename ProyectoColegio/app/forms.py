@@ -411,6 +411,7 @@ class ElementoForm(forms.ModelForm):
 
     def clean_nombre(self):
         nombre = self.cleaned_data['nombre']
+
         exist = Elemento.objects.filter(nombre=nombre).exclude(
             pk=self.instance.pk).exists()
         patron = r"^[A-Za-z 0-9 ÁÉÍÓÚáéíóúÑñ ]+$"
@@ -419,11 +420,7 @@ class ElementoForm(forms.ModelForm):
             self.fields["nombre"].widget.attrs["class"] = "form-control-invalid"
             raise forms.ValidationError(
                 "Este Elemento ya se encuentra Registrado")
-        if not re.match(patron, nombre):
-            raise forms.ValidationError(
-                "El Nombre No es Valido (No se usan caracteres especiales ni numeros)")
         return nombre
-
     def clean_stockActual(self):
         stock = self.cleaned_data.get("stockActual")
         if stock < 0:

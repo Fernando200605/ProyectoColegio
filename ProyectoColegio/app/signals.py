@@ -5,8 +5,10 @@ from django.utils.timezone import now
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
-
-from app.models import Usuario, Notificacion
+from email.mime.image import MIMEImage
+from app.models import Usuario, Notificacion ,Curso
+import os
+from django.conf import settings
 
 
 
@@ -31,6 +33,10 @@ def inicializar_roles(sender, **kwargs):
 
 @receiver(post_save, sender=Usuario)
 def notificar_usuario(sender, instance, created, **kwargs):
+    update_fields = kwargs.get('update_fields')
+
+    if update_fields and 'last_login' in update_fields and len(update_fields) == 1:
+        return
 
     administradores = [u for u in Usuario.objects.all() if u.get_rol() == "Administrador"]
 
@@ -55,6 +61,9 @@ def notificar_usuario(sender, instance, created, **kwargs):
             receptor_id=admin.id
         )
 
+    if not instance.email:
+        return
+
     try:
         html_content = render_to_string('emails/notificacion.html', {
             'titulo': titulo,
@@ -73,7 +82,74 @@ def notificar_usuario(sender, instance, created, **kwargs):
         )
 
         correo.attach_alternative(html_content, "text/html")
+        ruta_imagen = os.path.join(settings.BASE_DIR, 'app/static/img/Logo.jpeg')
+
+        with open(ruta_imagen, "rb") as img:
+            mime_img = MIMEImage(img.read())
+            mime_img.add_header('Content-ID', '<logo_colegio>')
+            mime_img.add_header('Content-Disposition', 'inline', filename="Logo.jpeg")
+            correo.attach(mime_img)
         correo.send()
 
     except Exception as e:
-        print("Error enviando correo:", e)
+        print(f"Error enviando correo: {e}")
+
+@receiver(post_save, sender=Curso)
+def notificar_curso(sender, instance, created, **kwargs):
+
+
+    administradores = [u for u in Usuario.objects.all() if u.get_rol() == "Administrador"]
+
+
+    if created:
+        titulo = "Se ha creado un nuevo curso"
+        mensaje = f"Se creó el curso {instance.codigo} — Grado: {instance.grado}"
+        asunto = "Nuevo curso creado"
+        cuerpo = f"El curso {instance.codigo} ha sido creado y está disponible en el sistema."
+    else:
+        titulo = "Se ha actualizado un curso"
+        mensaje = f"Se editó el curso {instance.codigo} — Grado: {instance.grado}"
+        asunto = "Curso actualizado"
+        cuerpo = f"El curso {instance.codigo} ha sido actualizado en el sistema."
+
+    for admin in administradores:
+        Notificacion.objects.create(
+            titulo=titulo,
+            mensaje=mensaje,
+            fecha_envio=now().date(),
+            estado='Activo',
+            tipo="Actualización",
+            receptor=admin
+        )
+    try:
+        if instance.docenteid and hasattr(instance.docenteid, 'usuario'):
+            docente_usuario = instance.docenteid.usuario
+            html_content = render_to_string('emails/notificacion.html', {
+                'titulo': titulo,
+                'nombre': docente_usuario.nombre,
+                'mensaje': cuerpo,
+                'enlace': 'http://127.0.0.1:8000/login/'
+            })
+
+            text_content = strip_tags(html_content)
+
+            correo = EmailMultiAlternatives(
+                asunto,
+                text_content,
+                'davidfernandomonroy932@gmail.com',
+                [docente_usuario.email]
+            )
+
+            correo.attach_alternative(html_content, "text/html")
+            
+            ruta_imagen = os.path.join(settings.BASE_DIR, 'app/static/img/Logo.jpeg')
+
+            with open(ruta_imagen, "rb") as img:
+                mime_img = MIMEImage(img.read())
+                mime_img.add_header('Content-ID', '<logo_colegio>')
+                mime_img.add_header('Content-Disposition', 'inline', filename="Logo.jpeg")
+                correo.attach(mime_img)
+            correo.send()
+
+    except Exception as e:
+        print("Error enviando correo al docente:", e)

@@ -14,7 +14,7 @@
                     <div class="d-flex justify-content-between">
                         <div>
                             <p class="text-muted mb-0">{{ total_text }}</p>
-                            <h3 class="fw-bold">{% block total_count %}0{% endblock %}</h3>
+                            <h3 class="fw-bold">{{total_count}}</h3>
                         </div>
                         <i class="fa-solid {{icon_primary}} fa-2x"></i>
                     </div>
@@ -45,17 +45,22 @@
             </h5>
             <div class="mt-2 mt-md-0 d-flex gap-2">
                 {% block options %}
+                {% if puede_crear %}
                 <a href="{{ crear_url }}" class="btn btn-create">
                     <i class="fas fa-plus-circle me-1"></i> Nuevo Registro
                 </a>
+                {% endif %}
+                {% if puede_eliminar %}
                 <form action="{{ limpiar_url }}" method="post" id="Eliminar_Todo">
                     {% csrf_token %}
                     <button type="submit" class="btn btn-outline-danger btn-rounded-custom">
                         <i class="fas fa-trash-alt me-1"></i> Vaciar Lista
                     </button>
                 </form>
+                {% endif %}
                 {% endblock options %}
             </div>
+
         </div>
     </div>
     <div class="contenedor-exportar">
