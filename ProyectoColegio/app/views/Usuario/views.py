@@ -9,7 +9,7 @@ from django.views.generic import ListView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from django.contrib import messages
 from django.db import transaction
-from app.models import Usuario, Administrador, docente, Estudiante, Acudiente
+from app.models import Usuario, Administrador, docente, Estudiante, Acudiente, Estudianteacudiente
 
 from app.forms import UsuarioForm, UsuarioUpdateForm, AdministradorForm, DocenteForm, EstudianteForm, AcudienteForm
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -46,7 +46,7 @@ def guardar_perfil_rol(usuario, rol, data):
         docente.objects.create(
             usuario=usuario, especialidad=data.get('especialidad'))
     elif rol == 'estudiante':
-        Estudiante.objects.create(
+        estudiante = Estudiante.objects.create(
             usuario=usuario,
             codigo=data.get('codigo'),
             fechaNacimiento=data.get('fechaNacimiento'),
@@ -55,10 +55,16 @@ def guardar_perfil_rol(usuario, rol, data):
             cursoId_id=data.get('cursoId')
         )
         # El acudiente se crea junto con el estudiante
-        Acudiente.objects.create(
+        acudiente = Acudiente.objects.create(
             usuario=usuario,
+            nombre=data.get('nombre', ''),
             telefono=data.get('telefono'),
             direccion=data.get('direccion')
+        )
+        # Vincular estudiante con acudiente en la tabla intermedia
+        Estudianteacudiente.objects.create(
+            estudianteId=estudiante,
+            acudienteId=acudiente
         )
     
     asignar_grupo(usuario,rol)
@@ -148,11 +154,17 @@ class UsuarioCreateView(View):
             perfil.usuario = usuario
             perfil.save()
 
-            # Si es estudiante, guardar también el acudiente
+            # Si es estudiante, guardar también el acudiente y vincularlo
             if rol == 'estudiante' and acudiente_form_post:
                 acu = acudiente_form_post.save(commit=False)
                 acu.usuario = usuario
                 acu.save()
+                # Vincular estudiante con acudiente en la tabla intermedia
+                est = Estudiante.objects.get(usuario=usuario)
+                Estudianteacudiente.objects.get_or_create(
+                    estudianteId=est,
+                    acudienteId=acu
+                )
 
             asignar_grupo(usuario, rol)
             messages.success(request, 'Usuario creado correctamente')
@@ -255,6 +267,12 @@ class UsuarioUpdateView(UpdateView):
                     acu = acu_form.save(commit=False)
                     acu.usuario = usuario
                     acu.save()
+                    # Asegurar vínculo en la tabla intermedia
+                    est = Estudiante.objects.get(usuario=usuario)
+                    Estudianteacudiente.objects.get_or_create(
+                        estudianteId=est,
+                        acudienteId=acu
+                    )
         asignar_grupo(usuario, nuevo_rol)
         messages.success(self.request, 'Usuario actualizado correctamente')
         return redirect(self.success_url)
