@@ -11,7 +11,7 @@ from django.contrib import messages
 from django.db import transaction
 from app.models import Usuario, Administrador, docente, Estudiante, Acudiente, Estudianteacudiente
 
-from app.forms import UsuarioForm, UsuarioUpdateForm, AdministradorForm, DocenteForm, EstudianteForm, AcudienteForm
+from app.forms import UsuarioForm, UsuarioUpdateForm, AdministradorForm, DocenteForm, EstudianteForm, AcudienteForm ,UsuarioEstudianteForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth import update_session_auth_hash
 from django.http import JsonResponse
@@ -122,51 +122,90 @@ class UsuarioCreateView(View):
 
     @transaction.atomic
     def post(self, request):
-        # Esto muestra todos los archivos enviados
+
         usuario_form = UsuarioForm(request.POST, request.FILES)
-        print(request.FILES)
         rol = request.POST.get('rol')
+
         if rol == 'estudiante':
+            usuario_form = UsuarioEstudianteForm(request.POST, request.FILES)  # ← este
             rol_form = EstudianteForm(request.POST, request.FILES)
+            acudiente_form_post = AcudienteForm(request.POST)
         elif rol == 'docente':
             rol_form = DocenteForm(request.POST, request.FILES)
+            acudiente_form_post = None
         elif rol == 'administrador':
             rol_form = AdministradorForm(request.POST, request.FILES)
+            acudiente_form_post = None
         else:
             rol_form = None
+            acudiente_form_post = None
 
-        # Formulario de acudiente se valida junto con estudiante
-        acudiente_form_post = AcudienteForm(request.POST) if rol == 'estudiante' else None
-
-        print("FORM USUARIO VALIDO:", usuario_form.is_valid())
-        print("FORM ROL VALIDO:", rol_form.is_valid() if rol_form else None)
-        print("ERRORES ROL:", rol_form.errors if rol_form else None)
+        if not rol_form:
+            messages.error(request, "Seleccione un rol válido")
+            return redirect(request.path)
 
         acu_valido = (acudiente_form_post is None) or acudiente_form_post.is_valid()
+        print("=" * 60)
+        print("ROL:", rol)
+        print("POST DATA:", request.POST)
+        print("usuario_form válido:", usuario_form.is_valid())
+        print("usuario_form errores:", usuario_form.errors)
+        print("rol_form válido:", rol_form.is_valid())
+        print("rol_form errores:", rol_form.errors)
+        if acudiente_form_post:
+            print("acudiente_form válido:", acudiente_form_post.is_valid())
+            print("acudiente_form errores:", acudiente_form_post.errors)
+        print("=" * 60)
+    # ====================================
+        if usuario_form.is_valid() and rol_form.is_valid() and acu_valido:
 
-        if usuario_form.is_valid() and rol_form and rol_form.is_valid() and acu_valido:
-
+            # =========================
+            # USUARIO PRINCIPAL
+            # =========================
             usuario = usuario_form.save(commit=False)
-            usuario.set_password(usuario_form.cleaned_data['password'])
+
+            if rol in ['estudiante']:
+                usuario.set_unusable_password()
+            else:
+                usuario.set_password(usuario_form.cleaned_data['password'])
+
             usuario.save()
 
+            # =========================
+            # PERFIL
+            # =========================
             perfil = rol_form.save(commit=False)
             perfil.usuario = usuario
             perfil.save()
 
-            # Si es estudiante, guardar también el acudiente y vincularlo
+            # =========================
+            # ESTUDIANTE → ACUDIENTE
+            # =========================
             if rol == 'estudiante' and acudiente_form_post:
+
+                usuario_acu = Usuario.objects.create(
+                    email=acudiente_form_post.cleaned_data.get('email_acudiente'),
+                    nombre=acudiente_form_post.cleaned_data.get('nombre_acudiente'),
+                    estado=True
+                )
+                usuario_acu.set_unusable_password()
+                usuario_acu.save()
+
                 acu = acudiente_form_post.save(commit=False)
-                acu.usuario = usuario
+                acu.usuario = usuario_acu
                 acu.save()
-                # Vincular estudiante con acudiente en la tabla intermedia
-                est = Estudiante.objects.get(usuario=usuario)
+
                 Estudianteacudiente.objects.get_or_create(
-                    estudianteId=est,
+                    estudianteId=perfil,
                     acudienteId=acu
                 )
 
+                asignar_grupo(usuario_acu, 'acudiente')
+            # =========================
+            # ROL PRINCIPAL
+            # =========================
             asignar_grupo(usuario, rol)
+
             messages.success(request, 'Usuario creado correctamente')
             return redirect(self.success_url)
 
@@ -175,10 +214,10 @@ class UsuarioCreateView(View):
             self.template_name,
             self.get_context(
                 usuario_form=usuario_form,
-                rol_actual=rol
+                rol_actual=rol,
+                acudiente_form=acudiente_form_post
             )
         )
-
 
 class UsuarioUpdateView(UpdateView):
     model = Usuario

@@ -172,7 +172,6 @@ class Asistencia(models.Model):
 
 class Acudiente(models.Model):
     usuario = models.OneToOneField(Usuario, on_delete=models.CASCADE, primary_key=True)
-    nombre = models.CharField(max_length=100, verbose_name="Nombre del Acudiente", default='')  # ✅ NUEVO
     telefono = models.TextField(max_length=10, null=True, blank=True, verbose_name="Telefono")
     direccion = models.TextField(max_length=150, null=True, blank=True, verbose_name="Direccion")
 

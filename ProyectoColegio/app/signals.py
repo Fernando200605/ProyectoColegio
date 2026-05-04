@@ -14,21 +14,43 @@ from django.conf import settings
 
 @receiver(post_migrate)
 def inicializar_roles(sender, **kwargs):
-    grupos = ['Administrador', 'Docente', 'Estudiante', 'Acudiente']
-    for nombre in grupos:
-        Group.objects.get_or_create(name=nombre)
+
+    # =========================
+    # CREAR GRUPOS
+    # =========================
     admin, _ = Group.objects.get_or_create(name='Administrador')
-    admin.permissions.set(Permission.objects.all())
     docente, _ = Group.objects.get_or_create(name='Docente')
+    estudiante, _ = Group.objects.get_or_create(name='Estudiante')
+    acudiente, _ = Group.objects.get_or_create(name='Acudiente')
+
+    # =========================
+    # ADMINISTRADOR (TODO)
+    # =========================
+    admin.permissions.set(Permission.objects.all())
+
+    # =========================
+    # DOCENTE (PERMISOS LIMITADOS)
+    # =========================
     docente.permissions.set(
         Permission.objects.filter(
+            content_type__app_label='app',
             codename__in=[
                 'view_usuario',
                 'view_curso',
+                'view_asistencia',
             ]
         )
     )
 
+    # =========================
+    # ESTUDIANTE (SIN ACCESO)
+    # =========================
+    estudiante.permissions.clear()
+
+    # =========================
+    # ACUDIENTE (SIN ACCESO)
+    # =========================
+    acudiente.permissions.clear()
 
 
 

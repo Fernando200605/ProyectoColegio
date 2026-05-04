@@ -201,7 +201,19 @@ class UsuarioForm(forms.ModelForm):
 
 
 # ── Formulario para Editar Usuario
+class UsuarioEstudianteForm(UsuarioForm):
+    """UsuarioForm sin validación de password para estudiante y acudiente"""
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['password'].required = False
 
+    def clean_password(self):
+        return self.cleaned_data.get('password', '')
+
+    def clean(self):
+        # Omitir validación de confirmación de contraseña
+        return super(forms.ModelForm, self).clean()
 class UsuarioUpdateForm(forms.ModelForm):
     class Meta:
         model = Usuario
@@ -270,34 +282,61 @@ class EstudianteForm(forms.ModelForm):
 
 
 class AcudienteForm(forms.ModelForm):
+    email_acudiente = forms.EmailField(
+        required=True,
+        widget=forms.EmailInput(attrs={
+            'class': 'form-control form-control-custom',
+            'placeholder': 'correo@ejemplo.com'
+        })
+    )
+    nombre_acudiente = forms.CharField(
+        required=True,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control form-control-custom',
+            'placeholder': 'Nombre del acudiente'
+        })
+    )
+
     class Meta:
         model = Acudiente
-        fields = ['nombre', 'telefono', 'direccion']
+        fields = ['telefono', 'direccion']  # ← nombre ya no está
         widgets = {
-            'nombre': forms.TextInput(attrs={           # ✅ corregido: coma y sintaxis correcta
+            'telefono': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'Nombre del acudiente'
+                'maxlength': '10'
             }),
-            'telefono': forms.TextInput(attrs={'class': 'form-control', 'maxlength': '10'}),
-            'direccion': forms.Textarea(attrs={'class': 'form-control', 'rows': 2}),
+            'direccion': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 2
+            }),
         }
 
-    # ✅ Métodos fuera de Meta, correctamente en la clase
-    def clean_nombre(self):
-        return solo_letras(self.cleaned_data.get('nombre', ''), "El nombre del acudiente")
+    def clean_nombre_acudiente(self):
+        return solo_letras(
+            self.cleaned_data.get('nombre_acudiente', ''),
+            "El nombre del acudiente"
+        )
+
+    def clean_email_acudiente(self):
+        email = self.cleaned_data.get('email_acudiente', '').lower()
+        dominios_permitidos = ['gmail.com', 'hotmail.com', 'outlook.com', 'yahoo.com']
+        partes = email.split('@')
+        if len(partes) > 1 and partes[1] not in dominios_permitidos:
+            raise forms.ValidationError(
+                f"Solo se permiten correos de: {', '.join(dominios_permitidos)}"
+            )
+        if Usuario.objects.filter(email=email).exists():
+            raise forms.ValidationError("Este correo ya está registrado.")
+        return email
 
     def clean_telefono(self):
         telefono = self.cleaned_data.get('telefono', '')
         if not re.match(r'^\d{7,10}$', telefono):
-            raise forms.ValidationError(
-                "El teléfono debe contener solo dígitos (7 a 10 cifras)."
-            )
+            raise forms.ValidationError("El teléfono debe contener solo dígitos (7 a 10 cifras).")
         return telefono
 
     def clean_direccion(self):
         return self.cleaned_data.get('direccion', '')
-
-
 class TipoElementoForm(forms.ModelForm):
     class Meta:
         model = tipoelemento

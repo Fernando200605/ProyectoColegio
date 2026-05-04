@@ -33,8 +33,8 @@
       {% endfor %}
     </div>
 
-    {# Columna derecha: password + confirmar #}
-    <div class="col-md-6">
+    {# Columna derecha: password + confirmar (ocultos para estudiante) #}
+    <div class="col-md-6" id="col-password">
       {% for field in usuario_form.visible_fields %}
         {% if field.name != 'nombre' and field.name != 'email' and field.name != 'codigo' and field.name != 'img_usuario' %}
           <div class="mb-3">
@@ -150,29 +150,53 @@
         {{ estudiante_form.cursoId|add_class:'form-control' }}
       </div>
     </div>
-
     <hr class="my-3">
-    <h6 class="fw-bold mb-3" style="color:#1C2E4A;"><i class="fas fa-user-friends me-2"></i>Datos del Acudiente</h6>
-    <div class="row">
-      {# ✅ NUEVO: Campo nombre del acudiente #}
-      <div class="col-md-6 mb-3">
-        <label class="form-label fw-bold">Nombre del Acudiente</label>
-        {{ acudiente_form.nombre|add_class:'form-control form-control-custom' }}
-        {% if acudiente_form.nombre.errors %}
-          {% for error in acudiente_form.nombre.errors %}
-            <div class="text-danger mt-1 small"><i class="fas fa-exclamation-circle me-1"></i> {{ error }}</div>
-          {% endfor %}
-        {% endif %}
-      </div>
-      <div class="col-md-6 mb-3">
-        <label class="form-label fw-bold">Teléfono del Acudiente</label>
-        {{ acudiente_form.telefono|add_class:'form-control' }}
-      </div>
-      <div class="col-md-6 mb-3">
-        <label class="form-label fw-bold">Dirección del Acudiente</label>
-        {{ acudiente_form.direccion|add_class:'form-control' }}
-      </div>
-    </div>
+<h6 class="fw-bold mb-3" style="color:#1C2E4A;">
+  <i class="fas fa-user-friends me-2"></i>Datos del Acudiente
+</h6>
+<div class="row">
+
+  <div class="col-md-6 mb-3">
+    <label class="form-label fw-bold">Nombre</label>
+    {{ acudiente_form.nombre_acudiente|add_class:'form-control form-control-custom' }}
+    {% if acudiente_form.nombre_acudiente.errors %}
+      {% for error in acudiente_form.nombre_acudiente.errors %}
+        <div class="text-danger mt-1 small"><i class="fas fa-exclamation-circle me-1"></i> {{ error }}</div>
+      {% endfor %}
+    {% endif %}
+  </div>
+
+  <div class="col-md-6 mb-3">
+    <label class="form-label fw-bold">Email</label>
+    {{ acudiente_form.email_acudiente|add_class:'form-control form-control-custom' }}
+    {% if acudiente_form.email_acudiente.errors %}
+      {% for error in acudiente_form.email_acudiente.errors %}
+        <div class="text-danger mt-1 small"><i class="fas fa-exclamation-circle me-1"></i> {{ error }}</div>
+      {% endfor %}
+    {% endif %}
+  </div>
+
+  <div class="col-md-6 mb-3">
+    <label class="form-label fw-bold">Teléfono</label>
+    {{ acudiente_form.telefono|add_class:'form-control' }}
+    {% if acudiente_form.telefono.errors %}
+      {% for error in acudiente_form.telefono.errors %}
+        <div class="text-danger mt-1 small"><i class="fas fa-exclamation-circle me-1"></i> {{ error }}</div>
+      {% endfor %}
+    {% endif %}
+  </div>
+
+  <div class="col-md-6 mb-3">
+    <label class="form-label fw-bold">Dirección</label>
+    {{ acudiente_form.direccion|add_class:'form-control' }}
+    {% if acudiente_form.direccion.errors %}
+      {% for error in acudiente_form.direccion.errors %}
+        <div class="text-danger mt-1 small"><i class="fas fa-exclamation-circle me-1"></i> {{ error }}</div>
+      {% endfor %}
+    {% endif %}
+  </div>
+
+</div>
   </div>
 
   <script>
@@ -206,21 +230,34 @@
         });
       }
 
-      // ✅ Se agrega input[name="nombre_acudiente"] al bloqueo de solo letras
       bloquearTeclas(
         'input[name="nombre"], input[name="cargo"], input[name="especialidad"], input[name="nombre_acudiente"]',
         SOLO_LETRAS
       );
-
       bloquearTeclas(
         'input[name="codigo"], input[name="telefono"]',
         SOLO_DIGITOS
       );
 
-      const rolSelect = document.getElementById('rol-select');
-      const rolForms  = document.querySelectorAll('.rol-form');
+      const rolSelect  = document.getElementById('rol-select');
+      const rolForms   = document.querySelectorAll('.rol-form');
+      const colPassword = document.getElementById('col-password');
+
+      // Inputs de contraseña para deshabilitar/habilitar
+      const passwordInput  = document.getElementById('id_password');
+      const confirmarInput = document.getElementById('id_confirmar_password');
 
       function toggleRolForm() {
+        const esEstudiante = rolSelect.value === 'estudiante';
+
+        // Ocultar/mostrar columna de contraseñas completa
+        colPassword.style.display = esEstudiante ? 'none' : '';
+
+        // Deshabilitar inputs ocultos para que no se envíen ni validen
+        if (passwordInput)  passwordInput.disabled  = esEstudiante;
+        if (confirmarInput) confirmarInput.disabled = esEstudiante;
+
+        // Mostrar/ocultar formularios por rol
         rolForms.forEach(div => {
           div.style.display = 'none';
           div.querySelectorAll('input, select, textarea').forEach(inp => {
@@ -242,7 +279,7 @@
       rolSelect.addEventListener('change', toggleRolForm);
       toggleRolForm();
 
-      // Validación: fecha de nacimiento no puede ser hoy (solo para estudiante)
+      // Validación: fecha de nacimiento no puede ser hoy
       const fechaNacInput = document.getElementById('id_fechaNacimiento');
       if (fechaNacInput) {
         fechaNacInput.addEventListener('change', function () {
@@ -258,7 +295,7 @@
         });
       }
 
-      // Bloquear envío si la fecha de nacimiento es hoy (cuando el rol es estudiante)
+      // Bloquear envío si fecha de nacimiento es hoy (rol estudiante)
       const formulario = document.querySelector('form');
       if (formulario) {
         formulario.addEventListener('submit', function (e) {
