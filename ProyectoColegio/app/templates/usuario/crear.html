@@ -128,6 +128,14 @@
       <div class="col-md-6 mb-3">
         <label class="form-label fw-bold">Fecha de Nacimiento</label>
         {{ estudiante_form.fechaNacimiento|add_class:'form-control'|attr:'type:date' }}
+        <div id="error-fechaNacimiento" class="text-danger mt-1 small" style="display:none;">
+          <i class="fas fa-exclamation-circle me-1"></i> La fecha de nacimiento no puede ser el día de hoy.
+        </div>
+        {% if estudiante_form.fechaNacimiento.errors %}
+          {% for error in estudiante_form.fechaNacimiento.errors %}
+            <div class="text-danger mt-1 small"><i class="fas fa-exclamation-circle me-1"></i> {{ error }}</div>
+          {% endfor %}
+        {% endif %}
       </div>
       <div class="col-md-6 mb-3">
         <label class="form-label fw-bold">Estado Matrícula</label>
@@ -233,6 +241,42 @@
 
       rolSelect.addEventListener('change', toggleRolForm);
       toggleRolForm();
+
+      // Validación: fecha de nacimiento no puede ser hoy (solo para estudiante)
+      const fechaNacInput = document.getElementById('id_fechaNacimiento');
+      if (fechaNacInput) {
+        fechaNacInput.addEventListener('change', function () {
+          const errorDiv = document.getElementById('error-fechaNacimiento');
+          const hoy = new Date().toISOString().split('T')[0];
+          if (this.value === hoy) {
+            errorDiv.style.display = 'block';
+            this.classList.add('is-invalid');
+          } else {
+            errorDiv.style.display = 'none';
+            this.classList.remove('is-invalid');
+          }
+        });
+      }
+
+      // Bloquear envío si la fecha de nacimiento es hoy (cuando el rol es estudiante)
+      const formulario = document.querySelector('form');
+      if (formulario) {
+        formulario.addEventListener('submit', function (e) {
+          if (rolSelect.value === 'estudiante') {
+            const fechaNacInput = document.getElementById('id_fechaNacimiento');
+            if (fechaNacInput) {
+              const hoy = new Date().toISOString().split('T')[0];
+              if (fechaNacInput.value === hoy) {
+                e.preventDefault();
+                const errorDiv = document.getElementById('error-fechaNacimiento');
+                errorDiv.style.display = 'block';
+                fechaNacInput.classList.add('is-invalid');
+                fechaNacInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              }
+            }
+          }
+        });
+      }
     });
   </script>
   {% load static %} {% block javascript %}

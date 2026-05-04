@@ -260,6 +260,14 @@ class EstudianteForm(forms.ModelForm):
             'cursoId':         forms.Select(attrs={'class': 'form-control'}),
         }
 
+    def clean_fechaNacimiento(self):
+        fecha = self.cleaned_data.get('fechaNacimiento')
+        if fecha and fecha == timezone.localdate():
+            raise forms.ValidationError(
+                "La fecha de nacimiento no puede ser el día de hoy."
+            )
+        return fecha
+
 
 class AcudienteForm(forms.ModelForm):
     class Meta:
