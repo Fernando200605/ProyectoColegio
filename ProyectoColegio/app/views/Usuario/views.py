@@ -32,8 +32,6 @@ def validar_formulario_rol(rol, data, instance=None):
         form = DocenteForm(data, instance=instance)
     elif rol == 'estudiante':
         form = EstudianteForm(data, instance=instance)
-    elif rol == 'acudiente':
-        form = AcudienteForm(data, instance=instance)
     else:
         return False, None
 
@@ -56,9 +54,12 @@ def guardar_perfil_rol(usuario, rol, data):
             fechaIngreso=data.get('fechaIngreso'),
             cursoId_id=data.get('cursoId')
         )
-    elif rol == 'acudiente':
-        Acudiente.objects.create(usuario=usuario, telefono=data.get(
-            'telefono'), direccion=data.get('direccion'))
+        # El acudiente se crea junto con el estudiante
+        Acudiente.objects.create(
+            usuario=usuario,
+            telefono=data.get('telefono'),
+            direccion=data.get('direccion')
+        )
     
     asignar_grupo(usuario,rol)
 # --- VISTAS ---
@@ -117,16 +118,19 @@ class UsuarioCreateView(View):
             rol_form = DocenteForm(request.POST, request.FILES)
         elif rol == 'administrador':
             rol_form = AdministradorForm(request.POST, request.FILES)
-        elif rol == 'acudiente':
-            rol_form = AcudienteForm(request.POST, request.FILES)
         else:
             rol_form = None
+
+        # Formulario de acudiente se valida junto con estudiante
+        acudiente_form_post = AcudienteForm(request.POST) if rol == 'estudiante' else None
 
         print("FORM USUARIO VALIDO:", usuario_form.is_valid())
         print("FORM ROL VALIDO:", rol_form.is_valid() if rol_form else None)
         print("ERRORES ROL:", rol_form.errors if rol_form else None)
 
-        if usuario_form.is_valid() and rol_form and rol_form.is_valid():
+        acu_valido = (acudiente_form_post is None) or acudiente_form_post.is_valid()
+
+        if usuario_form.is_valid() and rol_form and rol_form.is_valid() and acu_valido:
 
             usuario = usuario_form.save(commit=False)
             usuario.set_password(usuario_form.cleaned_data['password'])
@@ -135,6 +139,13 @@ class UsuarioCreateView(View):
             perfil = rol_form.save(commit=False)
             perfil.usuario = usuario
             perfil.save()
+
+            # Si es estudiante, guardar también el acudiente
+            if rol == 'estudiante' and acudiente_form_post:
+                acu = acudiente_form_post.save(commit=False)
+                acu.usuario = usuario
+                acu.save()
+
             asignar_grupo(usuario, rol)
             messages.success(request, 'Usuario creado correctamente')
             return redirect(self.success_url)
@@ -184,11 +195,10 @@ class UsuarioUpdateView(UpdateView):
         if est:
             context.update({'rol_actual': 'estudiante',
                            'estudiante_form': EstudianteForm(instance=est)})
-
-        acu = Acudiente.objects.filter(usuario=usuario).first()
-        if acu:
-            context.update({'rol_actual': 'acudiente',
-                           'acudiente_form': AcudienteForm(instance=acu)})
+            # Cargar datos del acudiente dentro del form de estudiante
+            acu = Acudiente.objects.filter(usuario=usuario).first()
+            if acu:
+                context.update({'acudiente_form': AcudienteForm(instance=acu)})
 
         return context
 
@@ -212,8 +222,6 @@ class UsuarioUpdateView(UpdateView):
             instancia_a_validar = p_doc
         elif nuevo_rol == 'estudiante':
             instancia_a_validar = p_est
-        elif nuevo_rol == 'acudiente':
-            instancia_a_validar = p_acu
 
         # Validar pasando la instancia para que Django sepa que es una EDICIÓN
         valido, rol_form = validar_formulario_rol(
@@ -225,14 +233,20 @@ class UsuarioUpdateView(UpdateView):
 
         # Lógica de guardado
         if perfil_previo and instancia_a_validar is None:
-
             perfil_previo.delete()
             guardar_perfil_rol(usuario, nuevo_rol, self.request.POST)
         else:
-
             obj = rol_form.save(commit=False)
             obj.usuario = usuario
             obj.save()
+
+            # Si es estudiante, actualizar o crear el acudiente también
+            if nuevo_rol == 'estudiante':
+                acu_form = AcudienteForm(self.request.POST, instance=p_acu)
+                if acu_form.is_valid():
+                    acu = acu_form.save(commit=False)
+                    acu.usuario = usuario
+                    acu.save()
         asignar_grupo(usuario, nuevo_rol)
         messages.success(self.request, 'Usuario actualizado correctamente')
         return redirect(self.success_url)
