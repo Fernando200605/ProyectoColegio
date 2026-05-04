@@ -27,19 +27,19 @@ class NotificacionListView(ListView):
     model = Notificacion
     template_name = 'notificacion/index.html'
     context_object_name = 'notificacion'
-    # Uso de DICCIONARIOS
-    # Metodo Dispatch
-    # @method_decorator(login_required)
 
     def dispatch(self, request, *args, **kwargs):
         # if request.method == "GET":
         # return redirect('app:listar_curso')
         return super().dispatch(request, *args, **kwargs)
-# metodo Post
-
-    def post(self, request, *args, **kwargs):
-        pass
-
+    
+    def get_queryset(self):
+        usuario = self.request.user
+        rol = usuario.get_rol()
+        if rol == "Administrador":
+            return Notificacion.objects.all()
+        else:
+            return Notificacion.objects.filter(receptor=usuario.id)
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)  # Herencia por medio de super
         context['titulo'] = 'Listado de Notificaciones'
