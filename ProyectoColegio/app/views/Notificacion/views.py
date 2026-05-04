@@ -27,19 +27,19 @@ class NotificacionListView(ListView):
     model = Notificacion
     template_name = 'notificacion/index.html'
     context_object_name = 'notificacion'
-    # Uso de DICCIONARIOS
-    # Metodo Dispatch
-    # @method_decorator(login_required)
 
     def dispatch(self, request, *args, **kwargs):
         # if request.method == "GET":
         # return redirect('app:listar_curso')
         return super().dispatch(request, *args, **kwargs)
-# metodo Post
-
-    def post(self, request, *args, **kwargs):
-        pass
-
+    
+    def get_queryset(self):
+        usuario = self.request.user
+        rol = usuario.get_rol()
+        if rol == "Administrador":
+            return Notificacion.objects.all()
+        else:
+            return Notificacion.objects.filter(receptor=usuario.id)
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)  # Herencia por medio de super
         context['titulo'] = 'Listado de Notificaciones'
@@ -51,6 +51,13 @@ class NotificacionListView(ListView):
         context['total_text'] = "Total de Notificaciones"
         context['icon_primary'] = "fa-arrow-up"
         context['icon_secodary'] = "fa-arrow-down"
+        user = self.request.user
+        app_label = self.model._meta.app_label
+        model_name = self.model._meta.model_name
+
+        context['puede_crear'] = user.has_perm(f'{app_label}.add_{model_name}')
+        context['puede_editar'] = user.has_perm(f'{app_label}.change_{model_name}')
+        context['puede_eliminar'] = user.has_perm(f'{app_label}.delete_{model_name}')
         return context
 
 

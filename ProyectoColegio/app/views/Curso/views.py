@@ -8,6 +8,7 @@ from app.forms import *
 from django.urls import reverse_lazy
 from django.contrib import messages
 from django.db import connection
+from django.http import Http404
 # Create your views here.
 from django.contrib.auth.mixins import PermissionRequiredMixin
 
@@ -27,36 +28,64 @@ def listar_curso(request):
     return render(request, 'curso/index.html', {'cursos': curso})
 
 
-class CursoListView(PermissionRequiredMixin,ListView):
+from django.views.generic import ListView
+from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.http import Http404
+from django.urls import reverse_lazy
+
+class CursoListView(PermissionRequiredMixin, ListView):
     model = Curso
     template_name = 'curso/index.html'
     context_object_name = 'cursos'
     permission_required = 'app.view_curso'
     raise_exception = True
-    # Uso de DICCIONARIOS
-    # Metodo Dispatch
-    # @method_decorator(login_required)
 
-    def dispatch(self, request, *args, **kwargs):
-        # if request.method == "GET":
-        # return redirect('app:listar_curso')
-        return super().dispatch(request, *args, **kwargs)
-# metodo Post
+    def handle_no_permission(self):
+        raise Http404("No se encontro la paginas")
 
-    def post(self, request, *args, **kwargs):
-        pass
+    def get_queryset(self):
+        user = self.request.user
+        rol = user.get_rol()
+        if rol == "Administrador":
+            return Curso.objects.all()
+        else:
+            return Curso.objects.filter(docenteid=user.id)
 
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)  # Herencia por medio de super
-        context['titulo'] = 'Listado de Cursos'
-        context['subtitulo'] = 'Bienvenido al listado de cursos'
-        context['crear_url'] = reverse_lazy('app:crear_curso')
-        context['text'] = "Cursos con estado inactivo"
-        context['total_text'] = "Total de Cursos"
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+        rol = user.get_rol()
+
+        if rol != "Administrador":
+            curso = Curso.objects.filter(docenteid=user.id).first()
+            context['curso'] = curso
+            context['estudiantes'] = curso.estudiante_set.all() if curso else []
+            context['titulo'] = 'Listado de Estudiantes'
+            context['subtitulo'] = 'Bienvenido al listado de estudiantes de tu curso'
+            context['text'] = "Estudiantes inscritos en tu curso"
+            context['total_text'] = "Total de Estudiantes"
+            context['total_count'] = context['estudiantes'].count()
+        else:
+            context['titulo'] = 'Listado de Cursos'
+            context['subtitulo'] = 'Bienvenido al listado de cursos'
+            context['crear_url'] = reverse_lazy('app:crear_curso')
+            context['text'] = "Cursos con estado inactivo"
+            context['total_text'] = "Total de Cursos"
+
+        # 🔹 PERMISOS DINÁMICOS
+        app_label = self.model._meta.app_label
+        model_name = self.model._meta.model_name
+
+        context['puede_crear'] = user.has_perm(f'{app_label}.add_{model_name}')
+        context['puede_editar'] = user.has_perm(f'{app_label}.change_{model_name}')
+        context['puede_eliminar'] = user.has_perm(f'{app_label}.delete_{model_name}')
+
         context['icon_primary'] = "fa-arrow-up"
         context['icon_secodary'] = "fa-arrow-down"
-        return context
+        context['rol'] = rol
+        context['modo'] = 'cursos' if rol == "Administrador" else 'estudiantes'
 
+        return context
 
 class CursoCreateView(PermissionRequiredMixin,CreateView):
     model = Curso
@@ -65,7 +94,8 @@ class CursoCreateView(PermissionRequiredMixin,CreateView):
     success_url = reverse_lazy('app:index_curso')
     permission_required = 'app.add_curso'
     raise_exception = True
-
+    def handle_no_permission(self):
+        raise Http404("No se encontro la paginas")
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['titulo'] = "Crear Curso"
@@ -85,6 +115,9 @@ class CursoupdateView(PermissionRequiredMixin,UpdateView):
     success_url = reverse_lazy('app:index_curso')
     permission_required = 'app.change_curso'
     raise_exception = True
+
+    def handle_no_permission(self):
+        raise Http404("No se encontro la paginas")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

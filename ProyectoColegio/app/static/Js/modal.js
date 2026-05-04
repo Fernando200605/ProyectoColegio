@@ -172,7 +172,7 @@ function abrirPerfil() {
 		.then(html => {
 			contenedor.innerHTML = html;
 
-			// ✅ Mismo patrón que abrirModalCreacion
+
 			if (miModalInstancia) { miModalInstancia.dispose(); }
 			miModalInstancia = new bootstrap.Modal(modalElement);
 			miModalInstancia.show();

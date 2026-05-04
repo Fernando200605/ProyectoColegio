@@ -6,30 +6,33 @@ from django.http import JsonResponse
 import json
 from django.views.decorators.csrf import csrf_exempt
 from app.utils import obtener_rutas
-client = OpenAI(api_key=os.getenv("KEY_PASSWORD_IA") ,base_url="https://api.deepseek.com")
+
+client = OpenAI(
+    api_key=os.getenv("KEY_PASSWORD_IA"), base_url="https://api.deepseek.com"
+)
 import re
+
+
 @csrf_exempt
 def preguntar_ia(request):
     if request.method == "POST":
         data = json.loads(request.body)
         mensaje = data.get("mensaje")
-        
+
         respuesta = client.chat.completions.create(
-            model="deepseek-chat",
-            messages=[
-                {"role": "user", "content": mensaje}
-            ]
+            model="deepseek-chat", messages=[{"role": "user", "content": mensaje}]
         )
-        return JsonResponse({
-            "respuesta": respuesta.choices[0].message.content
-        })
-        
+        return JsonResponse({"respuesta": respuesta.choices[0].message.content})
+
+
 LOCAL_HOST = "http://127.0.0.1:8000"
 
+
 def normalizar_ruta(r):
-    r = '/' + r.strip('/ \t')
-    r = r.replace('^', '').replace('$', '')
+    r = "/" + r.strip("/ \t")
+    r = r.replace("^", "").replace("$", "")
     return r
+
 
 @csrf_exempt
 def preguntar_ia_local(request):
@@ -52,17 +55,22 @@ def preguntar_ia_local(request):
         respuesta = requests.post(
             "http://localhost:11434/api/generate",
             json={
-                "model": "llama3.1:8b",
+                "model": "deepseek-coder:6.7b",
                 "prompt": prompt_completo,
-                "stream": False
-            }
+                "stream": False,
+                "options": {
+                    "num_predict": 50,  # Máximo número de tokens (limita longitud de respuesta)
+                    "temperature": 0.3,  # Menor valor = respuestas más precisas
+                    "top_k": 20,  # Reduce aleatoriedad → mejora coherencia y velocidad
+                },
+            },
         )
 
         resultado = respuesta.json()
         ia_texto = resultado.get("response", "")
         print("Texto IA:", ia_texto)
 
-        rutas_detectadas = re.findall(r'`(/[^`]+)`', ia_texto)
+        rutas_detectadas = re.findall(r"`(/[^`]+)`", ia_texto)
         print("Rutas detectadas:", rutas_detectadas)
 
         ia_texto_con_links = ia_texto
@@ -75,16 +83,14 @@ def preguntar_ia_local(request):
             ruta_match = None
             if ruta_limpia in rutas_normalizadas:
                 ruta_match = ruta_limpia
-            elif ruta_limpia + '/' in rutas_normalizadas:
-                ruta_match = ruta_limpia + '/'
-            elif ruta_limpia.rstrip('/') in rutas_normalizadas:
-                ruta_match = ruta_limpia.rstrip('/')
+            elif ruta_limpia + "/" in rutas_normalizadas:
+                ruta_match = ruta_limpia + "/"
+            elif ruta_limpia.rstrip("/") in rutas_normalizadas:
+                ruta_match = ruta_limpia.rstrip("/")
 
             if ruta_match:
-                url_completa = f'{LOCAL_HOST}{ruta_match}'
+                url_completa = f"{LOCAL_HOST}{ruta_match}"
                 link_html = f'<a href="{url_completa}" target="_blank">{ruta_match}</a>'
-                ia_texto_con_links = ia_texto_con_links.replace(
-                    f'`{ruta}`', link_html
-                )
+                ia_texto_con_links = ia_texto_con_links.replace(f"`{ruta}`", link_html)
 
         return JsonResponse({"respuesta": ia_texto_con_links})

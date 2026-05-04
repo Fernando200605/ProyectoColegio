@@ -10,51 +10,92 @@ from datetime import timedelta
 from django.views import View
 from django.http import JsonResponse
 import json
+from app.models import Curso,Estudiante,Movimiento
 from django.shortcuts import render
 class DashboardView(LoginRequiredMixin,RolMixin, TemplateView):
     template_name = 'index/dashboard.html'
-    login_url = reverse_lazy('app:login')
+    login_url = reverse_lazy('login:login')
     roles_permitidos = ['Administrador', 'Docente']
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         user = self.request.user
+        rol = user.get_rol()
 
         context['usuario_nombre'] = user.nombre
-        context['usuario_rol'] = user.get_rol()
+        context['usuario_rol'] = rol
         context['usuario_estado'] = 'Activo' if user.estado else 'Inactivo'
+
         hoy = now().date()
         inicio = hoy - timedelta(days=6)
-        datos = (
-            Asistencia.objects
-            .filter(fecha__range=[inicio,hoy])
-            .values('fecha')
-            .annotate(total=Count('id'))
-            .order_by('fecha')
-		)
-        print(datos)
+
+        if rol == 'Docente':
+            cursos = Curso.objects.filter(docenteid=user.id)
+
+            estudiantes_ids = Estudiante.objects.filter(
+                cursoId__in=cursos
+            ).values_list('usuario_id', flat=True)
+
+            datos = (
+                Asistencia.objects
+                .filter(fecha__range=[inicio, hoy], estudianteid__in=estudiantes_ids)
+                .values('fecha')
+                .annotate(total=Count('id'))
+                .order_by('fecha')
+            )
+
+            datos_inventario = (
+                Movimiento.objects
+                .filter(cursoId__in=cursos)
+                .values('elementoId__categoriaId__nombre') 
+                .annotate(total=Sum('elementoId__stockActual'))
+                .order_by('elementoId__categoriaId__nombre')
+            )
+
+        else:
+            datos = (
+                Asistencia.objects
+                .filter(fecha__range=[inicio, hoy])
+                .values('fecha')
+                .annotate(total=Count('id'))
+                .order_by('fecha')
+            )
+
+            datos_inventario = (
+                Elemento.objects
+                .values('categoriaId__nombre')
+                .annotate(total=Sum('stockActual'))
+                .order_by('categoriaId__nombre')
+            )
+
+        # 🔹 ASISTENCIAS
         labels = []
         data = []
+
         for item in datos:
             if item['fecha']:
                 labels.append(item['fecha'].strftime('%d %b'))
                 data.append(item['total'])
+
         context['labels'] = json.dumps(labels)
         context['data'] = json.dumps(data)
-        
-        datos_inventario = (
-            Elemento.objects
-            .values('categoriaId__nombre')
-            .annotate(total = Sum('stockActual'))
-            .order_by('categoriaId__nombre')
-		)
-        labels_Elemento = []
-        datos_Elemento =  []
-        print(datos_inventario)
+
+        # 🔹 INVENTARIO (SIN IF RARO)
+        labels_elemento = []
+        datos_elemento = []
+
         for item in datos_inventario:
-            labels_Elemento.append(item['categoriaId__nombre'])
-            datos_Elemento.append(item['total'])
-        context['labels_elemento'] = json.dumps(labels_Elemento)
-        context['datos_elemento'] = json.dumps(datos_Elemento)
+            # 🔹 soporta ambos casos sin romperse
+            nombre_categoria = (
+                item.get('categoriaId__nombre') or
+                item.get('elementoId__categoriaId__nombre')
+            )
+
+            labels_elemento.append(nombre_categoria)
+            datos_elemento.append(item['total'])
+
+        context['labels_elemento'] = json.dumps(labels_elemento)
+        context['datos_elemento'] = json.dumps(datos_elemento)
+
         return context
 
 class Qr_code(TemplateView):

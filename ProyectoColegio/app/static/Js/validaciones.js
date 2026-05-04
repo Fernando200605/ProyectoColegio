@@ -115,6 +115,7 @@ document.addEventListener('input', function (e) {
 		const error = document.getElementById("error_Descripcion")
 		error.innerText = ""
 		if (e.target.value.length < 10) {
+            error.classList.add("text-danger");
 			error.innerText = "la descripción es demasiado muy corta"
 		}
 		if (e.target.value.length > 200) {

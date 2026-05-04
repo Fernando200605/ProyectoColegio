@@ -43,7 +43,7 @@ INSTALLED_APPS = [
     'widget_tweaks',
     'app', 
     'login',
-    'import_export'
+    'import_export',
 ]
 
 MIDDLEWARE = [

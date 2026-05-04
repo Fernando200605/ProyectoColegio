@@ -67,7 +67,13 @@ class InventarioListView(LoginRequiredMixin,ListView):
         ).count()
         context['text'] = "Elementos con stock bajo"
         context['total_text'] = "Total de Elementos"
+        user = self.request.user
+        app_label = self.model._meta.app_label
+        model_name = self.model._meta.model_name
 
+        context['puede_crear'] = user.has_perm(f'{app_label}.add_{model_name}')
+        context['puede_editar'] = user.has_perm(f'{app_label}.change_{model_name}')
+        context['puede_eliminar'] = user.has_perm(f'{app_label}.delete_{model_name}')
         return context
 
 # ===============================

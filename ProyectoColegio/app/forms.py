@@ -397,18 +397,50 @@ class ElementoForm(forms.ModelForm):
             })
 
         }
-
     def clean_nombre(self):
         nombre = self.cleaned_data['nombre']
         exist = Elemento.objects.filter(nombre=nombre).exclude(
             pk=self.instance.pk).exists()
-        patron = r"^[A-Za-z 0-9 ÁÉÍÓÚáéíóúÑñ ]+$"
-        if exist:
-            print('aqui')
+
+        patron = r"^[A-Za-zÁÉÍÓÚáéíóúÑñ][A-Za-z ÁÉÍÓÚáéíóúÑñ]*$"
+
+        if not re.match(patron, nombre):
             self.fields["nombre"].widget.attrs["class"] = "form-control-invalid"
             raise forms.ValidationError(
-                "Este Elemento ya se encuentra Registrado")
+                "El Nombre no es válido (debe iniciar con letra y no usar caracteres especiales ni números)"
+            )
 
+        if exist:
+            self.fields["nombre"].widget.attrs["class"] = "form-control-invalid"
+            raise forms.ValidationError(
+                "Este elemento ya se encuentra registrado"
+            )
+
+        return nombre
+    def clean_descripcion(self):
+        descripcion = self.cleaned_data.get('descripcion', '').strip()
+
+        # Validar que no esté vacía
+        if not descripcion:
+            self.fields["descripcion"].widget.attrs["class"] = "form-control-invalid"
+            raise forms.ValidationError("La descripción no puede estar vacía.")
+
+        # Validar longitud
+        if len(descripcion) > 200:
+            self.fields["descripcion"].widget.attrs["class"] = "form-control-invalid"
+            raise forms.ValidationError(
+                "La descripción no puede superar los 200 caracteres."
+            )
+
+        # Validar que empiece con letra
+        patron = r"^[A-Za-zÁÉÍÓÚáéíóúÑñ][A-Za-z0-9 ÁÉÍÓÚáéíóúÑñ.,;:()\-]*$"
+        if not re.match(patron, descripcion):
+            self.fields["descripcion"].widget.attrs["class"] = "form-control-invalid"
+            raise forms.ValidationError(
+                "La descripción debe iniciar con una letra y no contener caracteres especiales inválidos."
+            )
+
+        return descripcion
     def clean_stockActual(self):
         stock = self.cleaned_data.get("stockActual")
         if stock is not None:
