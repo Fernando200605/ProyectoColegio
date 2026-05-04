@@ -116,12 +116,15 @@ document.addEventListener('input', function (e) {
 		error.innerText = ""
 		if (e.target.value.length < 10) {
 			error.innerText = "la descripción es demasiado muy corta"
+            error.classList.add('text-danger')
 		}
 		if (e.target.value.length > 200) {
 			error.innerText = "La descripción no puede superar los 200 caracteres"
+            error.classList.add('text-danger')
 		}
 		if (e.target.value.length == 0) {
 			error.innerText = "la descripción no puede estar vacia"
+            error.classList.add('text-danger')
 		}
 
 	}
@@ -134,10 +137,12 @@ document.addEventListener('input', function (e) {
 
 		if (/^\d+$/.test(e.target.value)){
 			error.innerText = "El título no puede contener solo números"
+            error.classList.add('text-danger')
 		}
 
 		if (!/^[a-zA-ZÁÉÍÓÚáéíóúÑñ0-9 ]+$/.test(e.target.value)){
 			error.innerText = "El título no puede contener caracteres especiales"
+            error.classList.add('text-danger')
 		}
 	}
 
@@ -154,6 +159,7 @@ document.addEventListener('input', function (e) {
 
 			if (fechaInicio < ahora){
 				error.innerText = "La fecha de inicio no puede ser una fecha pasada"
+                error.classList.add('text-danger')
 			}
 		}
 	}
@@ -170,6 +176,7 @@ document.addEventListener('input', function (e) {
 
 			if (fechaFin < ahora){
 				error.innerText = "La fecha de fin no puede ser una fecha pasada"
+                error.classList.add('text-danger')
 			}
 		}
 	}
@@ -288,4 +295,53 @@ document.addEventListener("input",function (e){
 		error.innerHTML ="No se aceptan caracteres especiales"
 	}
 	}
+
+    document.addEventListener('input', function (e) {
+
+    // 🔹 CANTIDAD (> 0)
+    if (e.target.id === "id_cantidad") {
+        const error = document.getElementById("error_Cantidad");
+
+        if (!error) return;
+
+        error.innerText = "";
+
+        const valor = parseFloat(e.target.value);
+
+        if (!e.target.value) {
+            error.innerText = "Este campo es obligatorio.";
+            error.classList.add('text-danger')
+        } 
+        else if (isNaN(valor) || valor <= 0) {
+            error.innerText = "La cantidad debe ser mayor a 0.";
+            error.classList.add('text-danger')
+        }
+    }
+
+    // 🔹 MOTIVO (10 - 200 caracteres)
+    if (e.target.id === "id_motivo") {
+        const error = document.getElementById("error_Motivo");
+
+        if (!error) return;
+
+        error.innerText = "";
+
+        const texto = e.target.value.trim();
+
+        if (texto.length === 0) {
+            error.innerText = "Este campo no puede estar vacío.";
+            error.classList.add('text-danger')
+        } 
+        else if (texto.length < 10) {
+            error.innerText = "Mínimo 10 caracteres.";
+            error.classList.add('text-danger')
+        } 
+        else if (texto.length > 200) {
+            error.innerText = "Máximo 200 caracteres.";
+            error.classList.add('text-danger')
+        }
+    }
+
+});
+
 })
