@@ -57,19 +57,23 @@ def exportar_pdf(request, titulo, columnas, datos, nombre_archivo):
 
 
 # ====== EXPORTACION A EXCEL ======
+from django.http import HttpResponse
+from openpyxl import Workbook
+from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
+from datetime import datetime, date
+from django.utils.timezone import is_aware
+
+
 def exportar_excel(titulo, columnas, datos, nombre_archivo):
-    # Crear un nuevo libro de Excel
     workbook = Workbook()
     worksheet = workbook.active
     worksheet.title = "Reporte"
 
-    # Configurar estilos para el título
+    # ===== TÍTULO =====
     title_font = Font(name='Arial', size=14, bold=True, color='FFFFFF')
-    title_fill = PatternFill(start_color='366092',
-                             end_color='366092', fill_type='solid')
+    title_fill = PatternFill(start_color='366092', end_color='366092', fill_type='solid')
     title_alignment = Alignment(horizontal='center', vertical='center')
 
-    # Agregar titulo
     worksheet.merge_cells('A1:' + chr(64 + len(columnas)) + '1')
     titulo_cell = worksheet['A1']
     titulo_cell.value = titulo
@@ -78,14 +82,11 @@ def exportar_excel(titulo, columnas, datos, nombre_archivo):
     titulo_cell.alignment = title_alignment
     worksheet.row_dimensions[1].height = 25
 
-    # Configurar estilos para los encabezados
+    # ===== ENCABEZADOS =====
     header_font = Font(name='Arial', size=11, bold=True, color='FFFFFF')
-    header_fill = PatternFill(start_color='4472C4',
-                              end_color='4472C4', fill_type='solid')
-    header_alignment = Alignment(
-        horizontal='center', vertical='center', wrap_text=True)
+    header_fill = PatternFill(start_color='4472C4', end_color='4472C4', fill_type='solid')
+    header_alignment = Alignment(horizontal='center', vertical='center', wrap_text=True)
 
-    # Agregar encabezados de columnas
     for col_num, columna in enumerate(columnas, 1):
         cell = worksheet.cell(row=3, column=col_num)
         cell.value = columna
@@ -95,7 +96,7 @@ def exportar_excel(titulo, columnas, datos, nombre_archivo):
 
     worksheet.row_dimensions[3].height = 20
 
-    # Configurar estilos para los datos
+    # ===== ESTILO DATOS =====
     data_alignment = Alignment(horizontal='left', vertical='center')
     data_border = Border(
         left=Side(style='thin'),
@@ -104,30 +105,44 @@ def exportar_excel(titulo, columnas, datos, nombre_archivo):
         bottom=Side(style='thin')
     )
 
-    # Agregar datos al Excel
-    data_fill_alternated = PatternFill(
-        start_color='D9E1F2', end_color='D9E1F2', fill_type='solid')
+    data_fill_alternated = PatternFill(start_color='D9E1F2', end_color='D9E1F2', fill_type='solid')
 
+    # ===== INSERTAR DATOS =====
     for row_num, fila in enumerate(datos, 4):
-        # Convertir diccionario a tupla si es necesario
+
         if isinstance(fila, dict):
-            valores = [fila.get(col.lower().replace(' ', '_'), '')
-                       for col in columnas]
+            valores = [
+                fila.get(col.lower().replace(' ', '_'), '')
+                for col in columnas
+            ]
         else:
             valores = fila
 
-        # Llenar las celdas con datos
         for col_num, valor in enumerate(valores, 1):
             cell = worksheet.cell(row=row_num, column=col_num)
+
+            # 🔥 CONVERSIÓN SEGURA COMPLETA
+            if valor is None:
+                valor = ''
+
+            elif isinstance(valor, datetime):
+                if is_aware(valor):
+                    valor = valor.replace(tzinfo=None)
+
+            elif isinstance(valor, (int, float, str, bool, date)):
+                pass
+
+            else:
+                valor = str(valor)  # objetos Django
+
             cell.value = valor
             cell.alignment = data_alignment
             cell.border = data_border
 
-            # Colorear filas alternas para mejor legibilidad
             if (row_num - 4) % 2 == 0:
                 cell.fill = data_fill_alternated
 
-    # Ajustar ancho de columnas automaticamente
+    # ===== AJUSTAR COLUMNAS =====
     for col_num, columna in enumerate(columnas, 1):
         max_length = len(str(columna))
         column_letter = chr(64 + col_num)
@@ -142,17 +157,15 @@ def exportar_excel(titulo, columnas, datos, nombre_archivo):
 
         worksheet.column_dimensions[column_letter].width = max_length + 2
 
-    # Crear respuesta HTTP con el Excel
+    # ===== RESPUESTA HTTP =====
     response = HttpResponse(
         content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     )
     response['Content-Disposition'] = f'attachment; filename="{nombre_archivo}.xlsx"'
 
-    # Guardar el libro en la respuesta
     workbook.save(response)
 
     return response
-
 from django.contrib.auth.models import Group
 
 def asignar_rol(usuario, rol):

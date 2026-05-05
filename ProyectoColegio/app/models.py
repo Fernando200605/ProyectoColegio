@@ -3,14 +3,16 @@ from django.db import models
 import qrcode
 from io import BytesIO
 from django.core.files import File
+from django.core.exceptions import ValidationError
 
 estado_usuario = (
-    (True, 'Activo'),
-    (False, 'Inactivo'),
+    (True, "Activo"),
+    (False, "Inactivo"),
 )
 
+
 class Usuario(AbstractUser):
-    img_usuario = models.ImageField(upload_to='usuarios/', blank=True, null=True)
+    img_usuario = models.ImageField(upload_to="usuarios/", blank=True, null=True)
     nombre = models.CharField(max_length=100, unique=True)
     email = models.EmailField(unique=True)
     estado = models.BooleanField(default=True, choices=estado_usuario)
@@ -19,8 +21,8 @@ class Usuario(AbstractUser):
     fecha_actualizacion = models.DateTimeField(auto_now=True)
 
     username = None
-    USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['nombre']
+    USERNAME_FIELD = "email"
+    REQUIRED_FIELDS = ["nombre"]
 
     objects = UserManager()
 
@@ -80,26 +82,26 @@ class docente(models.Model):
 
 
 GRADOS_CURSO = [
-    ('Preescolar', 'Preescolar'),
-    ('1', '1°'),
-    ('2', '2°'),
-    ('3', '3°'),
-    ('4', '4°'),
-    ('5', '5°'),
-    ('6', '6°'),
-    ('7', '7°'),
-    ('8', '8°'),
-    ('9', '9°'),
-    ('10', '10°'),
-    ('11', '11°'),
+    ("Preescolar", "Preescolar"),
+    ("1", "1°"),
+    ("2", "2°"),
+    ("3", "3°"),
+    ("4", "4°"),
+    ("5", "5°"),
+    ("6", "6°"),
+    ("7", "7°"),
+    ("8", "8°"),
+    ("9", "9°"),
+    ("10", "10°"),
+    ("11", "11°"),
 ]
 
 Estado_Matricula = [
-    ('Matriculado', 'Matriculado'),
-    ('No Matriculado', 'No Matriculado'),
-    ('Retirado', 'Retirado'),
-    ('Graduado', 'Graduado'),
-    ('Sancionado', 'Sancionado'),
+    ("Matriculado", "Matriculado"),
+    ("No Matriculado", "No Matriculado"),
+    ("Retirado", "Retirado"),
+    ("Graduado", "Graduado"),
+    ("Sancionado", "Sancionado"),
 ]
 
 
@@ -124,20 +126,36 @@ class Curso(models.Model):
 class Estudiante(models.Model):
     usuario = models.OneToOneField(Usuario, on_delete=models.CASCADE, primary_key=True)
     fechaNacimiento = models.DateField(verbose_name="Fecha de nacimiento")
-    estadoMatricula = models.TextField(max_length=20, null=True, blank=True, choices=Estado_Matricula)
+    estadoMatricula = models.TextField(
+        max_length=20, null=True, blank=True, choices=Estado_Matricula
+    )
     fechaIngreso = models.DateField(verbose_name="Fecha de Ingreso")
     cursoId = models.ForeignKey(Curso, on_delete=models.CASCADE)
     codigo = models.CharField(max_length=20, unique=True, blank=True)
-    qr = models.ImageField(upload_to='usuarios/', blank=True)
+    qr = models.ImageField(upload_to="usuarios/", blank=True)
+
+    def clean(self):
+        if self.cursoId:
+            total = Estudiante.objects.filter(cursoId=self.cursoId).count()
+            if self.pk:
+                total = (
+                    Estudiante.objects.filter(cursoId=self.cursoId)
+                    .exclude(pk=self.pk)
+                    .count()
+                )
+            if total >= self.cursoId.capacidad:
+                raise ValidationError(
+                    {"cursoId": "El curso ya ha alcanzado su capacidad máxima."}
+                )
 
     def save(self, *args, **kwargs):
+        self.full_clean()
         if not self.codigo:
             self.codigo = f"EST-{self.usuario.id}"
-
         qr_img = qrcode.make(self.codigo)
         buffer = BytesIO()
-        qr_img.save(buffer, format='PNG')
-        self.qr.save(f'qr_{self.usuario.id}.png', File(buffer), save=False)
+        qr_img.save(buffer, format="PNG")
+        self.qr.save(f"qr_{self.usuario.id}.png", File(buffer), save=False)
 
         super().save(*args, **kwargs)
 
@@ -152,9 +170,9 @@ class Estudiante(models.Model):
 
 class Asistencia(models.Model):
     choise = [
-        ('A tiempo', 'A tiempo'),
-        ('Tarde', 'Tarde'),
-        ('Inasistencia', 'Inasistencia'),
+        ("A tiempo", "A tiempo"),
+        ("Tarde", "Tarde"),
+        ("Inasistencia", "Inasistencia"),
     ]
     id = models.AutoField(primary_key=True)
     estudianteid = models.ForeignKey(Estudiante, on_delete=models.CASCADE)
@@ -172,8 +190,12 @@ class Asistencia(models.Model):
 
 class Acudiente(models.Model):
     usuario = models.OneToOneField(Usuario, on_delete=models.CASCADE, primary_key=True)
-    telefono = models.TextField(max_length=10, null=True, blank=True, verbose_name="Telefono")
-    direccion = models.TextField(max_length=150, null=True, blank=True, verbose_name="Direccion")
+    telefono = models.TextField(
+        max_length=10, null=True, blank=True, verbose_name="Telefono"
+    )
+    direccion = models.TextField(
+        max_length=150, null=True, blank=True, verbose_name="Direccion"
+    )
 
     def __str__(self):
         return self.nombre  # ✅ ahora muestra su propio nombre
@@ -282,9 +304,9 @@ class Movimiento(models.Model):
     motivo = models.TextField()
 
     class Meta:
-        verbose_name = 'Movimiento'
-        verbose_name_plural = 'Movimiento'
-        db_table = 'movimiento'
+        verbose_name = "Movimiento"
+        verbose_name_plural = "Movimiento"
+        db_table = "movimiento"
 
     def __str__(self):
         return self.tipo
@@ -292,13 +314,13 @@ class Movimiento(models.Model):
 
 class Notificacion(models.Model):
     choiseE = [
-        ('Activo', 'Activo'),
-        ('Inactivo', 'Inactivo'),
+        ("Activo", "Activo"),
+        ("Inactivo", "Inactivo"),
     ]
     choiseT = [
-        ('Aviso', 'Aviso'),
-        ('Actualización', 'Actualización'),
-        ('Otro', 'Otro'),
+        ("Aviso", "Aviso"),
+        ("Actualización", "Actualización"),
+        ("Otro", "Otro"),
     ]
     titulo = models.CharField(max_length=200)
     mensaje = models.TextField()

@@ -145,10 +145,22 @@
         <label class="form-label fw-bold">Fecha de Ingreso</label>
         {{ estudiante_form.fechaIngreso|add_class:'form-control'|attr:'type:date' }}
       </div>
-      <div class="col-md-6 mb-3">
-        <label class="form-label fw-bold">Curso</label>
-        {{ estudiante_form.cursoId|add_class:'form-control' }}
-      </div>
+    <div class="col-md-6 mb-3">
+      <label class="form-label fw-bold">Curso</label>
+      
+      {{ estudiante_form.cursoId|add_class:'form-control' }}
+      <script>
+        console.log("Aqui va el error del curso:", "{{ estudiante_form.cursoId.error}}");
+      </script>
+
+      {% if estudiante_form.cursoId.errors %}
+        {% for error in estudiante_form.cursoId.errors %}
+          <div class="text-danger mt-1 small">
+            <i class="fas fa-exclamation-circle me-1"></i> {{ error }}
+          </div>
+        {% endfor %}
+      {% endif %}
+    </div>
     </div>
     <hr class="my-3">
 <h6 class="fw-bold mb-3" style="color:#1C2E4A;">

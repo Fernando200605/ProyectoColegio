@@ -9,28 +9,45 @@ from django.views.generic import ListView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from django.contrib import messages
 from django.db import transaction
-from app.models import Usuario, Administrador, docente, Estudiante, Acudiente, Estudianteacudiente
+from app.models import (
+    Usuario,
+    Administrador,
+    docente,
+    Estudiante,
+    Acudiente,
+    Estudianteacudiente,
+)
 
-from app.forms import UsuarioForm, UsuarioUpdateForm, AdministradorForm, DocenteForm, EstudianteForm, AcudienteForm ,UsuarioEstudianteForm
+from app.forms import (
+    UsuarioForm,
+    UsuarioUpdateForm,
+    AdministradorForm,
+    DocenteForm,
+    EstudianteForm,
+    AcudienteForm,
+    UsuarioEstudianteForm,
+)
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth import update_session_auth_hash
 from django.http import JsonResponse
 from django.contrib.auth.models import Group
 
+
 def asignar_grupo(usuario, rol):
     usuario.groups.clear()  # eliminar roles anteriores
     grupo = Group.objects.get(name=rol.capitalize())
     usuario.groups.add(grupo)
-    
+
+
 def validar_formulario_rol(rol, data, instance=None):
     """
     Valida el formulario según el rol.
     """
-    if rol == 'administrador':
+    if rol == "administrador":
         form = AdministradorForm(data, instance=instance)
-    elif rol == 'docente':
+    elif rol == "docente":
         form = DocenteForm(data, instance=instance)
-    elif rol == 'estudiante':
+    elif rol == "estudiante":
         form = EstudianteForm(data, instance=instance)
     else:
         return False, None
@@ -40,79 +57,79 @@ def validar_formulario_rol(rol, data, instance=None):
 
 def guardar_perfil_rol(usuario, rol, data):
     """Crea un perfil nuevo."""
-    if rol == 'administrador':
-        Administrador.objects.create(usuario=usuario, cargo=data.get('cargo'))
-    elif rol == 'docente':
-        docente.objects.create(
-            usuario=usuario, especialidad=data.get('especialidad'))
-    elif rol == 'estudiante':
+    if rol == "administrador":
+        Administrador.objects.create(usuario=usuario, cargo=data.get("cargo"))
+    elif rol == "docente":
+        docente.objects.create(usuario=usuario, especialidad=data.get("especialidad"))
+    elif rol == "estudiante":
         estudiante = Estudiante.objects.create(
             usuario=usuario,
-            codigo=data.get('codigo'),
-            fechaNacimiento=data.get('fechaNacimiento'),
-            estadoMatricula=data.get('estadoMatricula'),
-            fechaIngreso=data.get('fechaIngreso'),
-            cursoId_id=data.get('cursoId')
+            codigo=data.get("codigo"),
+            fechaNacimiento=data.get("fechaNacimiento"),
+            estadoMatricula=data.get("estadoMatricula"),
+            fechaIngreso=data.get("fechaIngreso"),
+            cursoId_id=data.get("cursoId"),
         )
         # El acudiente se crea junto con el estudiante
         acudiente = Acudiente.objects.create(
             usuario=usuario,
-            nombre=data.get('nombre', ''),
-            telefono=data.get('telefono'),
-            direccion=data.get('direccion')
+            nombre=data.get("nombre", ""),
+            telefono=data.get("telefono"),
+            direccion=data.get("direccion"),
         )
         # Vincular estudiante con acudiente en la tabla intermedia
         Estudianteacudiente.objects.create(
-            estudianteId=estudiante,
-            acudienteId=acudiente
+            estudianteId=estudiante, acudienteId=acudiente
         )
-    
-    asignar_grupo(usuario,rol)
+
+    asignar_grupo(usuario, rol)
+
+
 # --- VISTAS ---
 
 
 class UsuarioListView(ListView):
     model = Usuario
-    template_name = 'usuario/index.html'
+    template_name = "usuario/index.html"
 
     def get_context_data(self, **kwargs):
         user = self.request.user
         context = super().get_context_data(**kwargs)
-        context['titulo'] = 'Listado de Usuarios'
-        context['subtitulo'] = 'Bienvenido al listado de usuarios'
-        context['crear_url'] = reverse_lazy('app:crear_usuario')
-        context['limpiar_url'] = reverse_lazy('app:limpiar_usuario')
-        context['table'] = "Usuarios"
-        context['text'] = "Usuarios con estado inactivo"
-        context['total_text'] = "Total de Usuarios"
-        context['table'] = "Usuarios"
-        context['icon_primary'] = "fa-arrow-up"
-        context['icon_secodary'] = "fa-arrow-down"
+        context["titulo"] = "Listado de Usuarios"
+        context["subtitulo"] = "Bienvenido al listado de usuarios"
+        context["crear_url"] = reverse_lazy("app:crear_usuario")
+        context["limpiar_url"] = reverse_lazy("app:limpiar_usuario")
+        context["table"] = "Usuarios"
+        context["text"] = "Usuarios con estado inactivo"
+        context["total_text"] = "Total de Usuarios"
+        context["table"] = "Usuarios"
+        context["icon_primary"] = "fa-arrow-up"
+        context["icon_secodary"] = "fa-arrow-down"
         app_label = self.model._meta.app_label
         model_name = self.model._meta.model_name
 
-        context['puede_crear'] = user.has_perm(f'{app_label}.add_{model_name}')
-        context['puede_editar'] = user.has_perm(f'{app_label}.change_{model_name}')
-        context['puede_eliminar'] = user.has_perm(f'{app_label}.delete_{model_name}')
+        context["puede_crear"] = user.has_perm(f"{app_label}.add_{model_name}")
+        context["puede_editar"] = user.has_perm(f"{app_label}.change_{model_name}")
+        context["puede_eliminar"] = user.has_perm(f"{app_label}.delete_{model_name}")
 
         return context
-    
+
 
 class UsuarioCreateView(View):
-    template_name = 'usuario/crear.html'
-    success_url = reverse_lazy('app:index_usuario')
+    template_name = "usuario/crear.html"
+    success_url = reverse_lazy("app:index_usuario")
 
     def get_context(self, **kwargs):
         context = {
-            'usuario_form': UsuarioForm(),
-            'admin_form': AdministradorForm(),
-            'docente_form': DocenteForm(),
-            'estudiante_form': EstudianteForm(),
-            'acudiente_form': AcudienteForm(),
-            'titulo': 'Crear Usuario',
-            'listar_url': reverse_lazy('app:index_usuario'),
-            'rol_actual': '',
-            'btn_name': 'Guardar'
+            "usuario_form": UsuarioForm(),
+            "admin_form": AdministradorForm(),
+            "docente_form": DocenteForm(),
+            "estudiante_form": EstudianteForm(),
+            "acudiente_form": AcudienteForm(),
+            "titulo": "Crear Usuario",
+            "listar_url": reverse_lazy("app:index_usuario"),
+            "rol_actual": "",
+            "btn_name": "Guardar",
         }
         context.update(kwargs)
         return context
@@ -124,16 +141,16 @@ class UsuarioCreateView(View):
     def post(self, request):
 
         usuario_form = UsuarioForm(request.POST, request.FILES)
-        rol = request.POST.get('rol')
+        rol = request.POST.get("rol")
 
-        if rol == 'estudiante':
+        if rol == "estudiante":
             usuario_form = UsuarioEstudianteForm(request.POST, request.FILES)  # ← este
             rol_form = EstudianteForm(request.POST, request.FILES)
             acudiente_form_post = AcudienteForm(request.POST)
-        elif rol == 'docente':
+        elif rol == "docente":
             rol_form = DocenteForm(request.POST, request.FILES)
             acudiente_form_post = None
-        elif rol == 'administrador':
+        elif rol == "administrador":
             rol_form = AdministradorForm(request.POST, request.FILES)
             acudiente_form_post = None
         else:
@@ -156,7 +173,7 @@ class UsuarioCreateView(View):
             print("acudiente_form válido:", acudiente_form_post.is_valid())
             print("acudiente_form errores:", acudiente_form_post.errors)
         print("=" * 60)
-    # ====================================
+        # ====================================
         if usuario_form.is_valid() and rol_form.is_valid() and acu_valido:
 
             # =========================
@@ -164,10 +181,10 @@ class UsuarioCreateView(View):
             # =========================
             usuario = usuario_form.save(commit=False)
 
-            if rol in ['estudiante']:
+            if rol in ["estudiante"]:
                 usuario.set_unusable_password()
             else:
-                usuario.set_password(usuario_form.cleaned_data['password'])
+                usuario.set_password(usuario_form.cleaned_data["password"])
 
             usuario.save()
 
@@ -181,12 +198,12 @@ class UsuarioCreateView(View):
             # =========================
             # ESTUDIANTE → ACUDIENTE
             # =========================
-            if rol == 'estudiante' and acudiente_form_post:
+            if rol == "estudiante" and acudiente_form_post:
 
                 usuario_acu = Usuario.objects.create(
-                    email=acudiente_form_post.cleaned_data.get('email_acudiente'),
-                    nombre=acudiente_form_post.cleaned_data.get('nombre_acudiente'),
-                    estado=True
+                    email=acudiente_form_post.cleaned_data.get("email_acudiente"),
+                    nombre=acudiente_form_post.cleaned_data.get("nombre_acudiente"),
+                    estado=True,
                 )
                 usuario_acu.set_unusable_password()
                 usuario_acu.save()
@@ -196,17 +213,16 @@ class UsuarioCreateView(View):
                 acu.save()
 
                 Estudianteacudiente.objects.get_or_create(
-                    estudianteId=perfil,
-                    acudienteId=acu
+                    estudianteId=perfil, acudienteId=acu
                 )
 
-                asignar_grupo(usuario_acu, 'acudiente')
+                asignar_grupo(usuario_acu, "acudiente")
             # =========================
             # ROL PRINCIPAL
             # =========================
             asignar_grupo(usuario, rol)
 
-            messages.success(request, 'Usuario creado correctamente')
+            messages.success(request, "Usuario creado correctamente")
             return redirect(self.success_url)
 
         return render(
@@ -215,55 +231,70 @@ class UsuarioCreateView(View):
             self.get_context(
                 usuario_form=usuario_form,
                 rol_actual=rol,
-                acudiente_form=acudiente_form_post
-            )
+                acudiente_form=acudiente_form_post,
+                estudiante_form=rol_form if rol == "estudiante" else EstudianteForm(),
+                docente_form=rol_form if rol == "docente" else DocenteForm(),
+                admin_form=rol_form if rol == "administrador" else AdministradorForm(),
+            ),
         )
+
 
 class UsuarioUpdateView(UpdateView):
     model = Usuario
     form_class = UsuarioUpdateForm
-    template_name = 'usuario/crear.html'
-    success_url = reverse_lazy('app:index_usuario')
+    template_name = "usuario/crear.html"
+    success_url = reverse_lazy("app:index_usuario")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         usuario = self.object
-        context.update({
-            'titulo': 'Editar Usuario',
-            'listar_url': self.success_url,
-            'usuario_form': context.get('form'),
-            'admin_form': AdministradorForm(),
-            'docente_form': DocenteForm(),
-            'estudiante_form': EstudianteForm(),
-            'acudiente_form': AcudienteForm(),
-            'btn_name': 'Actualizar'
-        })
+        context.update(
+            {
+                "titulo": "Editar Usuario",
+                "listar_url": self.success_url,
+                "usuario_form": context.get("form"),
+                "admin_form": AdministradorForm(),
+                "docente_form": DocenteForm(),
+                "estudiante_form": EstudianteForm(),
+                "acudiente_form": AcudienteForm(),
+                "btn_name": "Actualizar",
+            }
+        )
 
         # Cargar perfiles existentes para mostrar datos en los campos
         admin = Administrador.objects.filter(usuario=usuario).first()
         if admin:
-            context.update({'rol_actual': 'administrador',
-                           'admin_form': AdministradorForm(instance=admin)})
+            context.update(
+                {
+                    "rol_actual": "administrador",
+                    "admin_form": AdministradorForm(instance=admin),
+                }
+            )
 
         doc = docente.objects.filter(usuario=usuario).first()
         if doc:
             context.update(
-                {'rol_actual': 'docente', 'docente_form': DocenteForm(instance=doc)})
+                {"rol_actual": "docente", "docente_form": DocenteForm(instance=doc)}
+            )
 
         est = Estudiante.objects.filter(usuario=usuario).first()
         if est:
-            context.update({'rol_actual': 'estudiante',
-                           'estudiante_form': EstudianteForm(instance=est)})
+            context.update(
+                {
+                    "rol_actual": "estudiante",
+                    "estudiante_form": EstudianteForm(instance=est),
+                }
+            )
             # Cargar datos del acudiente dentro del form de estudiante
             acu = Acudiente.objects.filter(usuario=usuario).first()
             if acu:
-                context.update({'acudiente_form': AcudienteForm(instance=acu)})
+                context.update({"acudiente_form": AcudienteForm(instance=acu)})
 
         return context
 
     def form_valid(self, form):
         usuario = form.save()
-        nuevo_rol = self.request.POST.get('rol')
+        nuevo_rol = self.request.POST.get("rol")
 
         # Buscar qué perfil tiene actualmente el usuario
         p_admin = Administrador.objects.filter(usuario=usuario).first()
@@ -275,19 +306,20 @@ class UsuarioUpdateView(UpdateView):
 
         # Identificar la instancia que coincide con el rol seleccionado
         instancia_a_validar = None
-        if nuevo_rol == 'administrador':
+        if nuevo_rol == "administrador":
             instancia_a_validar = p_admin
-        elif nuevo_rol == 'docente':
+        elif nuevo_rol == "docente":
             instancia_a_validar = p_doc
-        elif nuevo_rol == 'estudiante':
+        elif nuevo_rol == "estudiante":
             instancia_a_validar = p_est
 
         # Validar pasando la instancia para que Django sepa que es una EDICIÓN
         valido, rol_form = validar_formulario_rol(
-            nuevo_rol, self.request.POST, instance=instancia_a_validar)
+            nuevo_rol, self.request.POST, instance=instancia_a_validar
+        )
 
         if not valido:
-            messages.error(self.request, 'Errores en los campos del perfil.')
+            messages.error(self.request, "Errores en los campos del perfil.")
             return self.render_to_response(self.get_context_data(form=form))
 
         # Lógica de guardado
@@ -300,7 +332,7 @@ class UsuarioUpdateView(UpdateView):
             obj.save()
 
             # Si es estudiante, actualizar o crear el acudiente también
-            if nuevo_rol == 'estudiante':
+            if nuevo_rol == "estudiante":
                 acu_form = AcudienteForm(self.request.POST, instance=p_acu)
                 if acu_form.is_valid():
                     acu = acu_form.save(commit=False)
@@ -309,11 +341,10 @@ class UsuarioUpdateView(UpdateView):
                     # Asegurar vínculo en la tabla intermedia
                     est = Estudiante.objects.get(usuario=usuario)
                     Estudianteacudiente.objects.get_or_create(
-                        estudianteId=est,
-                        acudienteId=acu
+                        estudianteId=est, acudienteId=acu
                     )
         asignar_grupo(usuario, nuevo_rol)
-        messages.success(self.request, 'Usuario actualizado correctamente')
+        messages.success(self.request, "Usuario actualizado correctamente")
         return redirect(self.success_url)
 
 
@@ -322,11 +353,11 @@ class UsuarioDetailView(View):
         usuario = Usuario.objects.get(pk=pk)
 
         data = {
-            'nombre': usuario.nombre,
-            'email': usuario.email,
-            'rol': str(usuario.get_rol()),
-            'estado': 'Activo' if usuario.estado else 'Inactivo',
-            'fecha_creacion': usuario.fecha_creacion
+            "nombre": usuario.nombre,
+            "email": usuario.email,
+            "rol": str(usuario.get_rol()),
+            "estado": "Activo" if usuario.estado else "Inactivo",
+            "fecha_creacion": usuario.fecha_creacion,
         }
 
         return JsonResponse(data)
@@ -337,85 +368,91 @@ class UsuarioCleandView(View):
         Usuario.objects.all().delete()
         with connection.cursor() as cursor:
             nombre_tabla = Usuario._meta.db_table
-            cursor.execute(
-                f"ALTER TABLE {nombre_tabla} auto_increment = 1;")
+            cursor.execute(f"ALTER TABLE {nombre_tabla} auto_increment = 1;")
 
         messages.success(
-            self.request, "Todos los Usuarios han sido eliminados y el ID reiniciado.")
-        return redirect(reverse_lazy('app:index_usuario'))
+            self.request, "Todos los Usuarios han sido eliminados y el ID reiniciado."
+        )
+        return redirect(reverse_lazy("app:index_usuario"))
 
 
 class UsuarioDeleteView(DeleteView):
     model = Usuario
-    template_name = 'usuario/eliminar.html'
-    success_url = reverse_lazy('app:index_usuario')
+    template_name = "usuario/eliminar.html"
+    success_url = reverse_lazy("app:index_usuario")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['titulo'] = 'Eliminar Usuario'
-        context['subtitulo'] = '¿Está seguro de eliminar este usuario?'
-        context['listar_url'] = reverse_lazy('app:index_usuario')
+        context["titulo"] = "Eliminar Usuario"
+        context["subtitulo"] = "¿Está seguro de eliminar este usuario?"
+        context["listar_url"] = reverse_lazy("app:index_usuario")
         return context
 
     def form_valid(self, form):
-        messages.success(self.request, 'Usuario eliminado exitosamente.')
+        messages.success(self.request, "Usuario eliminado exitosamente.")
         return super().form_valid(form)
 
 
 class PerfilView(LoginRequiredMixin, View):
     template_name = "modals/perfil.html"
-    
+
     def handle_no_permission(self):
-        if self.request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        if self.request.headers.get("x-requested-with") == "XMLHttpRequest":
             # Devuelve JSON indicando redirección
-            return JsonResponse({'redirect': '/login/'}, status=401)
+            return JsonResponse({"redirect": "/login/"}, status=401)
         # Redirección normal si no es AJAX
-        return redirect('/login/?next=' + self.request.path)
+        return redirect("/login/?next=" + self.request.path)
+
     def get(self, request):
-        return render(request, self.template_name, {
-            'user': request.user
-        })
+        return render(request, self.template_name, {"user": request.user})
 
     def post(self, request):
         usuario = request.user
         errores = []
 
-        nombre = request.POST.get('nombre', '').strip()
+        nombre = request.POST.get("nombre", "").strip()
         print("nombre", nombre)
         if nombre:
             usuario.nombre = nombre
             print("nombre recibido", usuario.nombre)
         else:
-            errores.append('El nombre no puede estar vacío.')
-        if 'img_usuario' in request.FILES:
-            foto = request.FILES['img_usuario']
-            tipos_permitidos = ['image/jpeg', 'image/png', 'image/webp']
+            errores.append("El nombre no puede estar vacío.")
+        if "img_usuario" in request.FILES:
+            foto = request.FILES["img_usuario"]
+            tipos_permitidos = ["image/jpeg", "image/png", "image/webp"]
             if foto.content_type not in tipos_permitidos:
-                errores.append('Solo se permiten imágenes JPG, PNG o WEBP.')
+                errores.append("Solo se permiten imágenes JPG, PNG o WEBP.")
             elif foto.size > 5 * 1024 * 1024:
-                errores.append('La imagen no puede superar 5MB.')
+                errores.append("La imagen no puede superar 5MB.")
             else:
                 usuario.img_usuario = foto
 
-        password = request.POST.get('password', '').strip()
+        password = request.POST.get("password", "").strip()
         if password:
             if len(password) < 8:
-                errores.append(
-                    'La contraseña debe tener al menos 8 caracteres.')
+                errores.append("La contraseña debe tener al menos 8 caracteres.")
             else:
                 usuario.set_password(password)
 
         if errores:
-            return JsonResponse({'success': False, 'message': ' '.join(errores)})
+            return JsonResponse({"success": False, "message": " ".join(errores)})
 
         try:
             usuario.save()
             if password and len(password) >= 8:
                 update_session_auth_hash(request, usuario)
-            return JsonResponse({'success': True, 'message': 'Perfil actualizado correctamente.' , 'nombre':usuario.nombre})
+            return JsonResponse(
+                {
+                    "success": True,
+                    "message": "Perfil actualizado correctamente.",
+                    "nombre": usuario.nombre,
+                }
+            )
         except Exception as e:
-            return JsonResponse({'success': False, 'message': 'Error al guardar los cambios.'})
-        
+            return JsonResponse(
+                {"success": False, "message": "Error al guardar los cambios."}
+            )
+
 
 from django.views import View
 from django.contrib.auth import get_user_model
@@ -425,46 +462,56 @@ from collections import defaultdict
 
 User = get_user_model()
 
+
 class GestionPermisosUsuarioView(View):
-    template_name = 'usuario/permisos_usuario.html'
+    template_name = "usuario/permisos_usuario.html"
+
     def get(self, request, user_id):
         usuario = get_object_or_404(User, id=user_id)
-        grupos = Group.objects.prefetch_related('permissions').all()
-        permisos = Permission.objects.select_related('content_type').all()
+        grupos = Group.objects.prefetch_related("permissions").all()
+        permisos = Permission.objects.select_related("content_type").all()
         permisos_por_modelo = defaultdict(list)
         for p in permisos:
             permisos_por_modelo[p.content_type.model].append(p)
             grupos_permisos_map = {
-			grupo.id: list(grupo.permissions.values_list('id', flat=True))
-			for grupo in grupos
-		}
-        return render(request, self.template_name, {
-			'usuario': usuario,
-			'grupos': grupos,
-			'permisos_por_modelo': dict(permisos_por_modelo),
-			'grupos_actuales': set(usuario.groups.values_list('id', flat=True)),
-			'permisos_actuales': set(usuario.user_permissions.values_list('id', flat=True)),
-			'grupos_permisos_map': grupos_permisos_map,  # ✅ NUEVO
-		})
+                grupo.id: list(grupo.permissions.values_list("id", flat=True))
+                for grupo in grupos
+            }
+        return render(
+            request,
+            self.template_name,
+            {
+                "usuario": usuario,
+                "grupos": grupos,
+                "permisos_por_modelo": dict(permisos_por_modelo),
+                "grupos_actuales": set(usuario.groups.values_list("id", flat=True)),
+                "permisos_actuales": set(
+                    usuario.user_permissions.values_list("id", flat=True)
+                ),
+                "grupos_permisos_map": grupos_permisos_map,  # ✅ NUEVO
+            },
+        )
 
     def post(self, request, user_id):
         usuario = get_object_or_404(User, id=user_id)
 
         # ✅ NUEVO: ACTUALIZAR GRUPOS
-        grupos_post = request.POST.getlist('grupos')       # name="grupos" en el HTML
+        grupos_post = request.POST.getlist("grupos")  # name="grupos" en el HTML
         grupos_ids = [int(g) for g in grupos_post if g]
         usuario.groups.set(grupos_ids)
 
         # ACTUALIZAR PERMISOS INDIVIDUALES (tu código original, sin cambios)
-        permisos_post = request.POST.getlist('permisos')   # name="permisos" en el HTML
+        permisos_post = request.POST.getlist("permisos")  # name="permisos" en el HTML
         permisos_ids = [int(p) for p in permisos_post if p]
         usuario.user_permissions.set(permisos_ids)
 
         # ✅ NUEVO: Limpiar caché de permisos de la instancia
-        for attr in ('_perm_cache', '_user_perm_cache', '_group_perm_cache'):
+        for attr in ("_perm_cache", "_user_perm_cache", "_group_perm_cache"):
             if hasattr(usuario, attr):
                 delattr(usuario, attr)
 
-        print(f"Grupos: {usuario.groups.all()} | Permisos: {usuario.user_permissions.all()}")
+        print(
+            f"Grupos: {usuario.groups.all()} | Permisos: {usuario.user_permissions.all()}"
+        )
 
-        return redirect('app:index_usuario')
+        return redirect("app:index_usuario")

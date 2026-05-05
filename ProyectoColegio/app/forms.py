@@ -278,8 +278,11 @@ class EstudianteForm(forms.ModelForm):
             raise forms.ValidationError(
                 "La fecha de nacimiento no puede ser el día de hoy."
             )
+        if fecha and fecha > timezone.localdate():
+            raise forms.ValidationError(
+                "La fecha de nacimiento no puede ser una fecha futura."
+            )
         return fecha
-
 
 class AcudienteForm(forms.ModelForm):
     email_acudiente = forms.EmailField(

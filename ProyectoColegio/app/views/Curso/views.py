@@ -12,6 +12,7 @@ from django.http import Http404
 # Create your views here.
 from django.contrib.auth.mixins import PermissionRequiredMixin
 
+
 def index(request):
     return render(request, 'index.html')
 

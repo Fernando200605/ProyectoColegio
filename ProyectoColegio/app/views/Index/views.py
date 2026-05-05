@@ -12,6 +12,7 @@ from django.http import JsonResponse
 import json
 from app.models import Curso,Estudiante,Movimiento
 from django.shortcuts import render
+
 class DashboardView(LoginRequiredMixin,RolMixin, TemplateView):
     template_name = 'index/dashboard.html'
     login_url = reverse_lazy('login:login')
