@@ -1,4 +1,3 @@
-
 document.addEventListener('input', function (e) {
     const target = e.target;
 
@@ -349,3 +348,89 @@ document.addEventListener("input",function (e){
 });
 
 })
+
+//  Validaciones en tiempo real — Formulario de Curso
+
+
+document.addEventListener('input', function (e) {
+    const target = e.target;
+
+    // --- Código ---
+    if (target.id === 'id_codigo') {
+        const error = document.getElementById('error_Codigo');
+        if (!error) return;
+        error.className = 'small d-block mt-1';
+        const valor = target.value.trim();
+
+        if (valor.length === 0) {
+            error.textContent = 'El código no puede estar vacío.';
+            error.classList.add('text-danger');
+        } else if (!/^\d+$/.test(valor)) {
+            error.textContent = 'El código debe contener solo números.';
+            error.classList.add('text-danger');
+        } else if (parseInt(valor) <= 0) {
+            error.textContent = 'El código debe ser un número positivo.';
+            error.classList.add('text-danger');
+        } else {
+            error.textContent = 'Código válido.';
+            error.classList.add('text-success');
+        }
+    }
+
+    // --- Capacidad ---
+    if (target.id === 'id_capacidad') {
+        const error = document.getElementById('error_Capacidad');
+        if (!error) return;
+        error.className = 'small d-block mt-1';
+        const valor = target.value.trim();
+        const num = parseInt(valor);
+
+        if (valor.length === 0) {
+            error.textContent = 'La capacidad es obligatoria.';
+            error.classList.add('text-danger');
+        } else if (!/^\d+$/.test(valor)) {
+            error.textContent = 'La capacidad debe ser un número entero (sin decimales).';
+            error.classList.add('text-danger');
+        } else if (num <= 0) {
+            error.textContent = 'La capacidad debe ser mayor a 0.';
+            error.classList.add('text-danger');
+        } else if (num > 100) {
+            error.textContent = 'La capacidad no puede superar los 100 estudiantes.';
+            error.classList.add('text-danger');
+        } else {
+            error.textContent = 'Capacidad válida.';
+            error.classList.add('text-success');
+        }
+    }
+});
+
+// --- Grado y Docente (selects) ---
+document.addEventListener('change', function (e) {
+    const target = e.target;
+
+    if (target.id === 'id_grado') {
+        const error = document.getElementById('error_Grado');
+        if (!error) return;
+        error.className = 'small d-block mt-1';
+        if (!target.value) {
+            error.textContent = 'Debe seleccionar un grado.';
+            error.classList.add('text-danger');
+        } else {
+            error.textContent = 'Grado seleccionado correctamente.';
+            error.classList.add('text-success');
+        }
+    }
+
+    if (target.id === 'id_docenteid') {
+        const error = document.getElementById('error_Docenteid');
+        if (!error) return;
+        error.className = 'small d-block mt-1';
+        if (!target.value) {
+            error.textContent = 'Debe seleccionar un docente.';
+            error.classList.add('text-danger');
+        } else {
+            error.textContent = 'Docente seleccionado correctamente.';
+            error.classList.add('text-success');
+        }
+    }
+});

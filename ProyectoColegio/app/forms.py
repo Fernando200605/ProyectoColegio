@@ -56,9 +56,16 @@ class CursoForm(forms.ModelForm):
     def clean_jornada(self):
         return solo_letras(self.cleaned_data.get('jornada', ''), "La jornada")
 
+    def clean_codigo(self):
+        codigo = self.cleaned_data.get('codigo')
+        if codigo is not None and codigo <= 0:
+            raise forms.ValidationError(
+                "El código debe ser un número positivo.")
+        return codigo
+
     def clean_capacidad(self):
         capacidad = self.cleaned_data.get('capacidad')
-        if capacidad <= 0:
+        if capacidad is not None and capacidad <= 0:
             raise forms.ValidationError(
                 "La capacidad debe ser un número positivo.")
         return capacidad

@@ -1,5 +1,142 @@
 {% extends "create_generic.html" %}
+{% load widget_tweaks %}
+{% load static %}
+
 {% block titulo %}
-Crear Curso
+{{ titulo }}
 {% endblock titulo %}
 
+{% block js %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    function validarPositivo(input, errorId, nombreCampo) {
+        input.addEventListener('input', function () {
+            const valor = parseInt(this.value);
+            const errorEl = document.getElementById(errorId);
+
+            if (this.value === '' || isNaN(valor)) {
+                errorEl.textContent = '';
+                this.classList.remove('is-invalid');
+                return;
+            }
+
+            if (valor <= 0) {
+                errorEl.innerHTML = '<i class="fas fa-exclamation-circle me-1"></i>' + nombreCampo + ' debe ser un número positivo.';
+                errorEl.style.color = '#dc3545';
+                this.classList.add('is-invalid');
+            } else {
+                errorEl.textContent = '';
+                this.classList.remove('is-invalid');
+                this.classList.add('is-valid');
+            }
+        });
+
+        // Bloquear la tecla "-" y "e" directamente
+        input.addEventListener('keydown', function (e) {
+            if (e.key === '-' || e.key === 'e' || e.key === '+') {
+                e.preventDefault();
+            }
+        });
+    }
+
+    const codigoInput = document.querySelector('[name="codigo"]');
+    const capacidadInput = document.querySelector('[name="capacidad"]');
+
+    if (codigoInput) validarPositivo(codigoInput, 'error_Codigo', 'El código');
+    if (capacidadInput) validarPositivo(capacidadInput, 'error_Capacidad', 'La capacidad');
+
+    // Bloquear envío si hay campos inválidos
+    const form = document.querySelector('form');
+    if (form) {
+        form.addEventListener('submit', function (e) {
+            let hayError = false;
+
+            [codigoInput, capacidadInput].forEach(function (input) {
+                if (!input) return;
+                const valor = parseInt(input.value);
+                if (!isNaN(valor) && valor <= 0) {
+                    hayError = true;
+                    input.classList.add('is-invalid');
+                }
+            });
+
+            if (hayError) {
+                e.preventDefault();
+            }
+        });
+    }
+});
+</script>
+{% endblock js %}
+
+{% block form %}
+{% csrf_token %}
+<div class="row">
+
+    {# ── Grado ── #}
+    <div class="col-md-4 mb-4">
+        <label class="form-label fw-bold" style="color: #1C2E4A;">
+            {{ form.grado.label }}
+        </label>
+        {{ form.grado|add_class:'form-control form-control-custom' }}
+        <p class="error small d-block mt-1" id="error_Grado"></p>
+        {% if form.grado.errors %}
+            {% for error in form.grado.errors %}
+                <div class="text-danger mt-1 small">
+                    <i class="fas fa-exclamation-circle me-1"></i> {{ error }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+
+    {# ── Código ── #}
+    <div class="col-md-4 mb-4">
+        <label class="form-label fw-bold" style="color: #1C2E4A;">
+            {{ form.codigo.label }}
+        </label>
+        {{ form.codigo|add_class:'form-control form-control-custom'|attr:'autocomplete:off'|attr:'placeholder:Ej: 101' }}
+        <p class="error small d-block mt-1" id="error_Codigo"></p>
+        {% if form.codigo.errors %}
+            {% for error in form.codigo.errors %}
+                <div class="text-danger mt-1 small">
+                    <i class="fas fa-exclamation-circle me-1"></i> {{ error }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+
+    {# ── Capacidad ── #}
+    <div class="col-md-4 mb-4">
+        <label class="form-label fw-bold" style="color: #1C2E4A;">
+            {{ form.capacidad.label }}
+        </label>
+        {{ form.capacidad|add_class:'form-control form-control-custom'|attr:'autocomplete:off'|attr:'placeholder:Ej: 30'|attr:'min:1'|attr:'max:100' }}
+        <p class="error small d-block mt-1" id="error_Capacidad"></p>
+        {% if form.capacidad.errors %}
+            {% for error in form.capacidad.errors %}
+                <div class="text-danger mt-1 small">
+                    <i class="fas fa-exclamation-circle me-1"></i> {{ error }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+
+    {# ── Docente ── #}
+    <div class="col-md-4 mb-4">
+        <label class="form-label fw-bold" style="color: #1C2E4A;">
+            {{ form.docenteid.label }}
+        </label>
+        {{ form.docenteid|add_class:'form-control form-control-custom' }}
+        <p class="error small d-block mt-1" id="error_Docenteid"></p>
+        {% if form.docenteid.errors %}
+            {% for error in form.docenteid.errors %}
+                <div class="text-danger mt-1 small">
+                    <i class="fas fa-exclamation-circle me-1"></i> {{ error }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+
+</div>
+{% endblock form %}

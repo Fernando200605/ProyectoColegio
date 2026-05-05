@@ -7,9 +7,9 @@ import json
 from django.views.decorators.csrf import csrf_exempt
 from app.utils import obtener_rutas
 
-client = OpenAI(
+'''client = OpenAI(
     api_key=os.getenv("KEY_PASSWORD_IA"), base_url="https://api.deepseek.com"
-)
+)'''
 import re
 
 
