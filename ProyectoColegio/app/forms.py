@@ -58,9 +58,14 @@ class CursoForm(forms.ModelForm):
 
     def clean_codigo(self):
         codigo = self.cleaned_data.get('codigo')
-        if codigo is not None and codigo <= 0:
-            raise forms.ValidationError(
-                "El código debe ser un número positivo.")
+        if codigo is not None:
+            try:
+                if int(codigo) <= 0:
+                    raise forms.ValidationError(
+                        "El código debe ser un número positivo.")
+            except (ValueError, TypeError):
+                raise forms.ValidationError(
+                    "El código debe ser un número válido.")
         return codigo
 
     def clean_capacidad(self):
