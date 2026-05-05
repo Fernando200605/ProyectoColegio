@@ -210,8 +210,10 @@ document.addEventListener('input', function (e) {
 
         if (e.target.value.length > 200) {
             error.innerText = "Las observaciones no pueden tener mas de 200 caracteres.";
+            error.classList.add('text-danger')
         } else if (e.target.value.length < 10 && e.target.value.length > 0) {
             error.innerText = "Las observaciones deben tener minimo 10 caracteres";
+            error.classList.add('text-danger')
         }
     }
 })
@@ -241,6 +243,7 @@ document.addEventListener('input', function (e) {
         if (entrada && salida) {
             if (entrada >= salida) {
                 error.innerText = "La hora de salida debe ser posterior a la de entrada.";
+                error.classList.add('text-danger')
             }
         }
 
