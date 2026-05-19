@@ -11,7 +11,7 @@ from app.views.Curso.views import *
 from app.views.Movimiento.views import *
 from app.views.Evento.views import *
 from app.views.Notificacion.views import *
-from app.views.Index.views import DashboardView , NotificacionesView
+from app.views.Index.views import DashboardView , NotificacionesView,MarcarComoleidasNotificaciones
 from app.views.IA.views import preguntar_ia,preguntar_ia_local
 
 from app.views.reportes import *
@@ -23,6 +23,7 @@ urlpatterns = [
     path('preguntas/',preguntar_ia,name="preguntar"),
     path('preguntas1/',preguntar_ia_local,name="preguntar2" ),
     path('mis_notificaciones/',NotificacionesView.as_view(),name="mis_notificaciones"),
+    path("mis_notificaciones/<int:pk>/leer/", MarcarComoleidasNotificaciones.as_view(), name="notificacion_leida"),
     # path('Curso/',listar_curso,name="listar_curso" ),
     path('curso/', CursoListView.as_view(), name="index_curso"),
     path('curso/crear/', CursoCreateView.as_view(), name="crear_curso"),

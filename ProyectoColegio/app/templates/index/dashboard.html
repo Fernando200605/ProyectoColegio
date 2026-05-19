@@ -148,45 +148,96 @@
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
 
     <script>
-      const { Calendar } = FullCalendar; 
 
-      document.addEventListener('DOMContentLoaded', function() {
+    const { Calendar } = FullCalendar;
+
+    document.addEventListener('DOMContentLoaded', function() {
+
         const calendarEl = document.getElementById('calendar');
 
         const calendar = new FullCalendar.Calendar(calendarEl, {
-          initialView: 'dayGridMonth', // Vista de cuadrícula clásica de Google
-          locale: 'es',                // Idioma Inglés
-          height: 'auto',              // Se ajusta al contenido
-          headerToolbar: {
-            left: 'prev,next today',
-            center: 'title',
-            right: ''                  // Limpio para Dashboard
-          },
 
-          // Configuración de visualización de eventos
-          eventDisplay: 'block',       // Hace que se vean como barras sólidas
-          displayEventTime: false,     // Oculta la hora para que se vea más limpio
-          
-          events: function(info, successCallback, failureCallback) {
-            fetch('/ejemplo/evento/calendario')
-              .then(res => res.json())
-              .then(data => {
-                const eventos = data.eventos.map(e => ({
-                  title: e.titulo,
-                  start: e.inicio,
-                  end: e.fin,
-                  backgroundColor: '#045ab1', // Azul estilo Google
-                  borderColor: '#031a31',
-                  allDay: true                // Importante para que ocupe todo el recuadro
-                }));
-                successCallback(eventos);
-              });
-          }
+            initialView: 'dayGridMonth',
+
+            locale: 'es',
+
+            height: 'auto',
+
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: ''
+            },
+
+            eventDisplay: 'block',
+
+            displayEventTime: false,
+
+            events: function(info, successCallback, failureCallback) {
+
+                fetch('/ejemplo/evento/calendario')
+
+                    .then(res => res.json())
+
+                    .then(data => {
+
+                        const eventos = data.eventos.map(e => ({
+
+                            title: e.titulo,
+
+                            start: e.inicio,
+
+                            end: e.fin,
+
+                            description: e.descripcion,
+
+                            backgroundColor: '#045ab1',
+
+                            borderColor: '#031a31',
+
+                            allDay: false
+                        }));
+
+                        successCallback(eventos);
+                    });
+            },
+
+            // Tooltip descripción
+            eventDidMount: function(info) {
+
+                info.el.title =
+                    info.event.extendedProps.description;
+            },
+
+            // Mostrar descripción dentro del evento
+            eventContent: function(arg) {
+
+                return {
+
+                    html: `
+                        <div>
+
+                            <strong>
+                                ${arg.event.title}
+                            </strong>
+
+                            <br>
+
+                            <small>
+                                ${arg.event.extendedProps.description || ''}
+                            </small>
+
+                        </div>
+                    `
+                };
+            }
+
         });
 
         calendar.render();
-      });
-    </script>
+    });
+
+</script>
   <script>
     /* ================= ASISTENCIAS ================= */
     new ApexCharts(document.querySelector('#graficaAsistencias'), {

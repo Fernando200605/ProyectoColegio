@@ -15,14 +15,13 @@ import os
 from dotenv import load_dotenv
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
+load_dotenv(BASE_DIR / '.env')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-#-htnytw7g*va6-7(w+!b=0d8lb6qk46&-y_hjy2if4p5a$m=8'
-load_dotenv(BASE_DIR / '.env')
+SECRET_KEY = os.getenv('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
@@ -83,10 +82,9 @@ WSGI_APPLICATION = 'config.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'colegio_db',
+        'NAME': os.getenv('MYSQL_DATABASE'),
         'USER': 'root',
-        'PASSWORD': 'mamitas39',
-        'HOST': 'localhost',
+        'PASSWORD': os.getenv('MYSQL_ROOT_PASSWORD')
     }
 }
 

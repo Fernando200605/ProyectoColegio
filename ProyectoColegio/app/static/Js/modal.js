@@ -1,3 +1,31 @@
+
+function obtenerCSRFToken() {
+
+    let cookieValue = null;
+
+    const name = 'csrftoken';
+
+    if (document.cookie && document.cookie !== '') {
+
+        const cookies = document.cookie.split(';');
+
+        for (let cookie of cookies) {
+
+            cookie = cookie.trim();
+
+            if (cookie.startsWith(name + '=')) {
+
+                cookieValue = decodeURIComponent(
+                    cookie.substring(name.length + 1)
+                );
+
+                break;
+            }
+        }
+    }
+
+    return cookieValue;
+}
 let miModalInstancia = null;
 let campoActivo = null; // 👈 Variable para saber qué select actualizar
 
@@ -271,18 +299,177 @@ function abrirPerfil() {
 		.catch(err => console.error("Error al cargar perfil:", err));
 }
 
-function abrirNotificacion() {
-	const modalElement = document.getElementById('modalGeneral');
-	const contenedor = document.getElementById('contenedorModal');
-	fetch("/ejemplo/mis_notificaciones/")
-		.then(response => response.text())
-		.then(html => {
-			console.log(html)
-			contenedor.innerHTML = html;
-			if (miModalInstancia) { miModalInstancia.dispose(); }
-			miModalInstancia = new bootstrap.Modal(modalElement);
-			miModalInstancia.show();
-		})
+async function abrirNotificacion() {
+
+    const modalElement =
+        document.getElementById('modalGeneral');
+
+    const contenedor =
+        document.getElementById('contenedorModal');
+
+    // Loader
+    contenedor.innerHTML = `
+
+        <div class="text-center p-4">
+
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">
+                    Cargando...
+                </span>
+            </div>
+
+            <p class="mt-2 mb-0">
+                Cargando notificaciones...
+            </p>
+
+        </div>
+    `;
+
+    try {
+
+        const response = await fetch(
+            "/ejemplo/mis_notificaciones/",
+            {
+                headers: {
+                    "X-Requested-With": "XMLHttpRequest"
+                }
+            }
+        );
+
+        if (!response.ok) {
+
+            throw new Error(
+                `Error HTTP: ${response.status}`
+            );
+        }
+
+        const html = await response.text();
+
+        contenedor.innerHTML = html;
+
+        // Cerrar modal anterior
+        if (miModalInstancia) {
+
+            miModalInstancia.hide();
+            miModalInstancia.dispose?.();
+        }
+
+        // Crear modal nuevo
+        miModalInstancia =
+            new bootstrap.Modal(modalElement);
+
+        miModalInstancia.show();
+
+        // =========================
+        // MARCAR NOTIFICACIÓN LEÍDA (CLICK)
+        // =========================
+
+        const botones =
+            contenedor.querySelectorAll(
+                ".btn-marcar-leida"
+            );
+
+        botones.forEach(boton => {
+
+            boton.addEventListener("click", async function () {
+				console.log("aqui en el boton")
+                const item =
+                    this.closest("[data-notificacion-id]");
+
+                const id =
+                    item.dataset.notificacionId;
+
+                try {
+
+                    const response = await fetch(
+
+                        `/ejemplo/mis_notificaciones/${id}/leer/`,
+
+                        {
+                            method: "POST",
+
+                            headers: {
+
+                                "X-Requested-With":
+                                    "XMLHttpRequest",
+
+                                "X-CSRFToken":
+                                    obtenerCSRFToken()
+                            }
+                        }
+                    );
+
+                    const data =
+                        await response.json();
+
+                    if (data.success) {
+
+                        // Cambiar estilo visual
+                        item.classList.remove("no-leida");
+                        item.classList.add("leida");
+
+                        // Desactivar botón
+                        this.textContent = "Leída";
+                        this.disabled = true;
+
+                        this.classList.remove("btn-primary");
+                        this.classList.add("btn-secondary");
+                    }
+
+                } catch (err) {
+
+                    console.error(
+                        "Error marcando leída:",
+                        err
+                    );
+                }
+            });
+        });
+
+        // =========================
+        // BOTONES CERRAR MODAL
+        // =========================
+
+        const btnCerrar =
+            contenedor.querySelectorAll(
+                '[data-bs-dismiss="modal"]'
+            );
+
+        btnCerrar.forEach(boton => {
+
+            boton.onclick = () =>
+                miModalInstancia.hide();
+        });
+
+        // =========================
+        // LIMPIEZA AL CERRAR
+        // =========================
+
+        modalElement.addEventListener(
+            "hidden.bs.modal",
+            () => {
+
+                contenedor.innerHTML = "";
+            },
+            { once: true }
+        );
+
+    } catch (error) {
+
+        console.error(
+            "Error al cargar notificaciones:",
+            error
+        );
+
+        contenedor.innerHTML = `
+
+            <div class="alert alert-danger m-3">
+
+                No se pudieron cargar las notificaciones.
+
+            </div>
+        `;
+    }
 }
 // ------------------------------
 // ELEMENTOS DEL DOM

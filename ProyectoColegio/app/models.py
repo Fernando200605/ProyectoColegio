@@ -1,9 +1,36 @@
-from django.contrib.auth.models import AbstractUser, UserManager
+from django.contrib.auth.models import AbstractUser
 from django.db import models
 import qrcode
 from io import BytesIO
 from django.core.files import File
 from django.core.exceptions import ValidationError
+
+from django.contrib.auth.base_user import BaseUserManager
+
+
+class UserManager(BaseUserManager):
+
+    def create_user(self, email, nombre, password=None, **extra_fields):
+        if not email:
+            raise ValueError("El email es obligatorio")
+
+        email = self.normalize_email(email)
+        user = self.model(email=email, nombre=nombre, **extra_fields)
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+
+    def create_superuser(self, email, nombre, password=None, **extra_fields):
+        extra_fields.setdefault("is_staff", True)
+        extra_fields.setdefault("is_superuser", True)
+
+        if extra_fields.get("is_staff") is not True:
+            raise ValueError("Superuser debe tener is_staff=True")
+        if extra_fields.get("is_superuser") is not True:
+            raise ValueError("Superuser debe tener is_superuser=True")
+
+        return self.create_user(email, nombre, password, **extra_fields)
+
 
 estado_usuario = (
     (True, "Activo"),
@@ -58,6 +85,7 @@ class Evento(models.Model):
     fecha_inicio = models.DateTimeField()
     fecha_fin = models.DateTimeField()
     creador_por = models.ForeignKey(Administrador, on_delete=models.CASCADE)
+    google_event_id = models.CharField(max_length=255, blank=True, null=True)
 
     class Meta:
         verbose_name = "Evento"

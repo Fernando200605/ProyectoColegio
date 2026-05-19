@@ -103,7 +103,7 @@ class Qr_code(TemplateView):
     template_name = "escaner/escaner.html"
     
 
-class NotificacionesView(LoginRequiredMixin, View):
+class NotificacionesView(View):
     template_name = "modals/modals_notificaciones.html"
 
     def get(self, request):
@@ -114,3 +114,24 @@ class NotificacionesView(LoginRequiredMixin, View):
         return render(request, self.template_name, {
             'notificaciones': notificaciones
         })
+        
+    
+class MarcarComoleidasNotificaciones(View):
+    def post(self,request,pk):
+        try:
+            notificacion = Notificacion.objects.get(
+                pk = pk,
+                receptor_id = request.user.id
+            )
+            notificacion.estado = 'Inactiva'
+            notificacion.save()
+            return JsonResponse({
+                "success": True,
+                "message" : "Notificacion marcada como leida"
+            })
+        except Notificacion.DoesNotExist:
+            return JsonResponse({
+                "success":False,
+                "message": "No se encontro el mensaje"
+            },status=404)
+            
