@@ -6,11 +6,22 @@ from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 from googleapiclient.errors import HttpError
-
+from django.conf import settings
 
 SCOPES = [
-    'https://www.googleapis.com/auth/calendar'
+    "https://www.googleapis.com/auth/calendar"
 ]
+
+
+TOKEN_PATH = os.path.join(
+    settings.BASE_DIR,
+    "token.json"
+)
+
+CREDENTIALS_PATH = os.path.join(
+    settings.BASE_DIR,
+    "credentials.json"
+)
 
 
 def obtener_servicio():
@@ -18,38 +29,48 @@ def obtener_servicio():
     creds = None
 
     # Leer token guardado
-    if os.path.exists('token.json'):
+    if os.path.exists(TOKEN_PATH):
 
         creds = Credentials.from_authorized_user_file(
-            'token.json',
+            TOKEN_PATH,
             SCOPES
         )
 
     # Si no existe o expiró
     if not creds or not creds.valid:
 
-        # Refrescar token
-        if creds and creds.expired and creds.refresh_token:
+        # Refrescar automáticamente
+        if (
+            creds
+            and creds.expired
+            and creds.refresh_token
+        ):
 
             creds.refresh(Request())
 
         else:
-
+            # Solo la primera vez
             flow = InstalledAppFlow.from_client_secrets_file(
-                'credentials.json',
+                CREDENTIALS_PATH,
                 SCOPES
             )
 
-            creds = flow.run_local_server(port=0)
+            creds = flow.run_local_server(
+                port=8080,
+                prompt="consent",
+                access_type="offline"
+            )
 
-        # Guardar token nuevo
-        with open('token.json', 'w') as token:
+        # Guardar token actualizado
+        with open(TOKEN_PATH, "w") as token:
 
-            token.write(creds.to_json())
+            token.write(
+                creds.to_json()
+            )
 
     service = build(
-        'calendar',
-        'v3',
+        "calendar",
+        "v3",
         credentials=creds
     )
 

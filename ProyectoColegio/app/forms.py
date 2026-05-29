@@ -45,6 +45,14 @@ class CursoForm(forms.ModelForm):
     class Meta:
         model = Curso
         fields = "__all__"
+
+        labels = {
+            "grado": "Grado",
+            "codigo": "Código",
+            "capacidad": "Capacidad",
+            "docenteid": "Docente",
+        }
+
         widgets = {
             "grado": forms.Select(attrs={"class": "form-control"}),
             "codigo": forms.NumberInput(attrs={"class": "form-control"}),
