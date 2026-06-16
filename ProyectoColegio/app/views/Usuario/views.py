@@ -25,6 +25,7 @@ from app.forms import (
     DocenteForm,
     EstudianteForm,
     AcudienteForm,
+    AcudienteReadOnlyForm,
     UsuarioEstudianteForm,
 )
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -95,23 +96,33 @@ class UsuarioListView(ListView):
     def get_context_data(self, **kwargs):
         user = self.request.user
         context = super().get_context_data(**kwargs)
-        context["titulo"] = "Listado de Usuarios"
-        context["subtitulo"] = "Bienvenido al listado de usuarios"
+
+        total = Usuario.objects.count()
+        activos = Usuario.objects.filter(estado=True).count()
+        inactivos = Usuario.objects.filter(estado=False).count()
+        estudiantes = Estudiante.objects.count()
+        docentes = docente.objects.count()
+        administradores = Administrador.objects.count()
+
+        context["titulo"] = "Gestión de Usuarios"
+        context["subtitulo"] = "Administración de usuarios del sistema"
         context["crear_url"] = reverse_lazy("app:crear_usuario")
         context["limpiar_url"] = reverse_lazy("app:limpiar_usuario")
-        context["table"] = "Usuarios"
-        context["text"] = "Usuarios con estado inactivo"
+        context["total_count"] = total
         context["total_text"] = "Total de Usuarios"
-        context["table"] = "Usuarios"
-        context["icon_primary"] = "fa-arrow-up"
-        context["icon_secodary"] = "fa-arrow-down"
+        context["text"] = "Usuarios inactivos"
+        context["low_stock"] = inactivos
+        context["icon_primary"] = "fa-users"
+        context["icon_secodary"] = "fa-user-slash"
+        context["activos"] = activos
+        context["estudiantes_count"] = estudiantes
+        context["docentes_count"] = docentes
+        context["administradores_count"] = administradores
         app_label = self.model._meta.app_label
         model_name = self.model._meta.model_name
-
         context["puede_crear"] = user.has_perm(f"{app_label}.add_{model_name}")
         context["puede_editar"] = user.has_perm(f"{app_label}.change_{model_name}")
         context["puede_eliminar"] = user.has_perm(f"{app_label}.delete_{model_name}")
-
         return context
 
 
@@ -285,10 +296,23 @@ class UsuarioUpdateView(UpdateView):
                     "estudiante_form": EstudianteForm(instance=est),
                 }
             )
-            # Cargar datos del acudiente dentro del form de estudiante
-            acu = Acudiente.objects.filter(usuario=usuario).first()
-            if acu:
-                context.update({"acudiente_form": AcudienteForm(instance=acu)})
+            # Buscar el acudiente real a través del vínculo Estudianteacudiente
+            vinculo = Estudianteacudiente.objects.filter(estudianteId=est).select_related(
+                "acudienteId__usuario"
+            ).first()
+            if vinculo:
+                acu = vinculo.acudienteId
+                context.update({
+                    "acudiente_form": AcudienteReadOnlyForm(initial={
+                        "nombre_acudiente": acu.usuario.nombre,
+                        "email_acudiente": acu.usuario.email,
+                        "telefono": acu.telefono or "",
+                        "direccion": acu.direccion or "",
+                    }),
+                    "acudiente_readonly": True,
+                })
+            else:
+                context.update({"acudiente_form": AcudienteForm()})
 
         return context
 
@@ -398,9 +422,8 @@ class PerfilView(LoginRequiredMixin, View):
 
     def handle_no_permission(self):
         if self.request.headers.get("x-requested-with") == "XMLHttpRequest":
-            # Devuelve JSON indicando redirección
+
             return JsonResponse({"redirect": "/login/"}, status=401)
-        # Redirección normal si no es AJAX
         return redirect("/login/?next=" + self.request.path)
 
     def get(self, request):

@@ -43,20 +43,27 @@ class EventoListView(ListView):
         pass
 
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)  # Herencia por medio de super
+        context = super().get_context_data(**kwargs)
+        from django.utils import timezone as tz
+        hoy = tz.now()
+        total = Evento.objects.count()
+        proximos = Evento.objects.filter(fecha_inicio__gte=hoy).count()
+        pasados = Evento.objects.filter(fecha_fin__lt=hoy).count()
+
         context["titulo"] = "Listado de Eventos"
-        context["subtitulo"] = "Bienvenido al listado de Eventos"
+        context["subtitulo"] = "Calendario de actividades del colegio"
         context["crear_url"] = reverse_lazy("app:crear_evento")
         context["limpiar_url"] = reverse_lazy("app:limpiar_evento")
-        context["table"] = "evento"
-        context["text"] = "Eventos de Hoy"
+        context["total_count"] = total
         context["total_text"] = "Total de Eventos"
-        context["icon_primary"] = "fa-arrow-up"
-        context["icon_secodary"] = "fa-arrow-down"
+        context["text"] = "Próximos eventos"
+        context["low_stock"] = proximos
+        context["icon_primary"] = "fa-calendar-alt"
+        context["icon_secodary"] = "fa-calendar-check"
+        context["pasados"] = pasados
         user = self.request.user
         app_label = self.model._meta.app_label
         model_name = self.model._meta.model_name
-
         context["puede_crear"] = user.has_perm(f"{app_label}.add_{model_name}")
         context["puede_editar"] = user.has_perm(f"{app_label}.change_{model_name}")
         context["puede_eliminar"] = user.has_perm(f"{app_label}.delete_{model_name}")

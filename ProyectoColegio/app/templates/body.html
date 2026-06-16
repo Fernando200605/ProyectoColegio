@@ -55,13 +55,51 @@
     <!-- Qr code -->
 
     <script>
-      const hamburger = document.getElementById('hamburger')
-      const sidebar = document.getElementById('sidebar')
+      const hamburger = document.getElementById('hamburger');
+      const sidebar = document.getElementById('sidebar');
+      const sidebarToggle = document.getElementById('sidebarToggle');
+      const sidebarClose = document.getElementById('sidebarClose');
+      const sidebarOverlay = document.getElementById('sidebarOverlay');
       
-      hamburger.addEventListener('click', () => {
-        sidebar.classList.toggle('open')
-        hamburger.classList.toggle('active')
-      })
+      // Toggle sidebar on hamburger click
+      if (hamburger) {
+        hamburger.addEventListener('click', () => {
+          sidebar.classList.toggle('open');
+          hamburger.classList.toggle('active');
+        });
+      }
+
+      // Toggle sidebar on mobile toggle button click
+      if (sidebarToggle) {
+        sidebarToggle.addEventListener('click', () => {
+          sidebar.classList.add('active');
+          if (sidebarOverlay) sidebarOverlay.classList.add('active');
+        });
+      }
+
+      // Close sidebar when close button is clicked
+      if (sidebarClose) {
+        sidebarClose.addEventListener('click', () => {
+          sidebar.classList.remove('active');
+          if (sidebarOverlay) sidebarOverlay.classList.remove('active');
+        });
+      }
+
+      // Close sidebar when overlay is clicked
+      if (sidebarOverlay) {
+        sidebarOverlay.addEventListener('click', () => {
+          sidebar.classList.remove('active');
+          sidebarOverlay.classList.remove('active');
+        });
+      }
+
+      // Close sidebar on escape key
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && sidebar && sidebar.classList.contains('active')) {
+          sidebar.classList.remove('active');
+          if (sidebarOverlay) sidebarOverlay.classList.remove('active');
+        }
+      });
     </script>
     {% if messages %}
       <script>

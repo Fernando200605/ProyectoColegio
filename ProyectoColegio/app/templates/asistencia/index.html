@@ -1,49 +1,96 @@
 {% extends 'list_generic.html' %}
 
-{% block titulo %}
-{{titulo}}
-{% endblock titulo %}
+{% block titulo %}{{ titulo }}{% endblock %}
+{% block subtitulo %}{{ subtitulo }}{% endblock %}
 
-{% block subtitulo %}
-{{subtitulo}}
-{% endblock subtitulo%}
+{% block extra_cards %}
+<div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-3 mb-md-0">
+  <div class="card card-stats" style="background: linear-gradient(135deg,#fff9e6,#fff3cd);">
+    <div class="card-body">
+      <div class="d-flex justify-content-between">
+        <div>
+          <p class="text-muted mb-0 small">Registros hoy</p>
+          <h3 class="fw-bold mb-0" style="color:#e67e22;">{{ hoy_count|default:"0" }}</h3>
+        </div>
+        <i class="fa-solid fa-calendar-day fa-2x" style="color:#e67e22;"></i>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-3 mb-md-0">
+  <div class="card card-stats" style="background: linear-gradient(135deg,#fde8e8,#fcc);">
+    <div class="card-body">
+      <div class="d-flex justify-content-between">
+        <div>
+          <p class="text-muted mb-0 small">Inasistencias</p>
+          <h3 class="fw-bold text-danger mb-0">{{ inasistencias|default:"0" }}</h3>
+        </div>
+        <i class="fa-solid fa-user-times fa-2x text-danger"></i>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block exportar %}
+  <a href="{% url 'app:reporte_asistencia_pdf' %}" class="btn-pdf btn-sm">
+    <i class="fas fa-file-pdf me-1"></i> <span class="d-none d-sm-inline">Descargar</span> PDF
+  </a>
+  <a href="{% url 'app:Camara' %}" class="btn-pdf btn-sm">
+    <i class="fas fa-camera me-1"></i> <span class="d-none d-sm-inline">Cámara</span> QR
+  </a>
+  <a href="{% url 'app:reporte_asistencia_excel' %}" class="btn-excel btn-sm">
+    <i class="fas fa-file-excel me-1"></i> <span class="d-none d-sm-inline">Descargar</span> Excel
+  </a>
+{% endblock %}
 
 {% block columns %}
-    <th><i class="fas fa-hashtag me-2"></i>ID</th>
-    <th><i class="fas fa-book me-2"></i>Nombre del Estudiante</th>
-    <th><i class="fas fa-clock me-2"></i>Fecha</th>
-    <th><i class="fas fa-clock me-2"></i>Observaciones</th>
-    <th class="text-center"><i class="fas fa-tools me-2"></i>Acciones</th>
-{% endblock columns %}
-    {% block exportar %}
-      <a href="{% url 'app:reporte_asistencia_pdf' %}" class="btn-pdf">
-        <i class="fas fa-file-pdf me-1"></i>
-          Descargar PDF
-      </a>
-      <a href="{% url 'app:Camara' %}" class="btn-pdf">
-        <i class="fas fa-file-camera me-1"></i>
-          Camara
-      </a>
-      <a href="{% url 'app:reporte_asistencia_excel' %}" class="btn-excel">
-        <i class="fas fa-file-excel me-1"></i>
-          Descargar Excel
-      </a>
-    {% endblock %}
+  <th class="d-none d-md-table-cell"><i class="fas fa-hashtag me-2"></i>ID</th>
+  <th><i class="fas fa-user-graduate me-2"></i>Estudiante</th>
+  <th class="d-none d-lg-table-cell"><i class="fas fa-calendar me-2"></i>Fecha</th>
+  <th><i class="fas fa-clock me-2"></i>Hora</th>
+  <th><i class="fas fa-tag me-2"></i>Estado</th>
+  <th class="d-none d-xl-table-cell"><i class="fas fa-comment me-2"></i>Observaciones</th>
+  <th class="text-center"><i class="fas fa-tools me-2"></i><span class="d-none d-md-inline">Acciones</span></th>
+{% endblock %}
+
 {% block rows %}
-    {% for asistencia in object_list %}
-    <tr>
-        <td>{{ asistencia.id }}</td>
-        <td>{{ asistencia.estudianteid}}
-        <td>{{ asistencia.fecha }}</td>
-        <td>{{ asistencia.observaciones }}</td>
-        <td class="text-center">
-            <a href="{% url 'app:editar_asistencia' asistencia.id %}" class="btn btn-sm me-1" style="background-color: #3054f7; color: #ffffff; border-radius: 8px;">
-                            <i class="fa-solid fa-pen-to-square"></i>
-            </a>
-            <a href="{% url 'app:eliminar_asistencia' asistencia.id %}" class="btn btn-sm" style="background-color: #ff4d4d; color: white; border-radius: 8px;">
-                            <i class="fa-solid fa-trash"></i>
-            </a>
-        </td>
-    </tr>
-    {% endfor %}
-{% endblock rows %}
+  {% for asistencia in object_list %}
+  <tr>
+    <td class="d-none d-md-table-cell">{{ asistencia.id }}</td>
+    <td>{{ asistencia.estudianteid }}</td>
+    <td class="d-none d-lg-table-cell">{{ asistencia.fecha }}</td>
+    <td>{{ asistencia.horaentrada|time:"H:i" }}</td>
+    <td>
+      {% if asistencia.estado == "A tiempo" %}
+        <span class="badge" style="background-color:#28a745;">A tiempo</span>
+      {% elif asistencia.estado == "Tarde" %}
+        <span class="badge" style="background-color:#ffc107; color:#000;">Tarde</span>
+      {% elif asistencia.estado == "Inasistencia" %}
+        <span class="badge" style="background-color:#dc3545;">Inasistencia</span>
+      {% else %}
+        <span class="badge bg-secondary">{{ asistencia.estado }}</span>
+      {% endif %}
+    </td>
+    <td class="d-none d-xl-table-cell">
+      {% if asistencia.observaciones %}
+        {{ asistencia.observaciones|truncatechars:40 }}
+      {% else %}
+        <span class="text-muted">—</span>
+      {% endif %}
+    </td>
+    <td class="text-center">
+      <div class="d-flex justify-content-center gap-1 flex-nowrap">
+        <a href="{% url 'app:editar_asistencia' asistencia.id %}" class="btn btn-sm"
+           style="background-color:#3054f7; color:#fff; border-radius:8px;" title="Editar">
+          <i class="fa-solid fa-pen-to-square"></i>
+        </a>
+        <a href="{% url 'app:eliminar_asistencia' asistencia.id %}" class="btn btn-sm"
+           style="background-color:#ff4d4d; color:white; border-radius:8px;" title="Eliminar">
+          <i class="fa-solid fa-trash"></i>
+        </a>
+      </div>
+    </td>
+  </tr>
+  {% endfor %}
+{% endblock %}

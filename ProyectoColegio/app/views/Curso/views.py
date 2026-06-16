@@ -48,9 +48,9 @@ class CursoListView(PermissionRequiredMixin, ListView):
         user = self.request.user
         rol = user.get_rol()
         if rol == "Administrador":
-            return Curso.objects.all()
+            return Curso.objects.select_related("docenteid__usuario").all()
         else:
-            return Curso.objects.filter(docenteid=user.id)
+            return Curso.objects.filter(docenteid__usuario=user)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -58,7 +58,7 @@ class CursoListView(PermissionRequiredMixin, ListView):
         rol = user.get_rol()
 
         if rol != "Administrador":
-            curso = Curso.objects.filter(docenteid=user.id).first()
+            curso = Curso.objects.filter(docenteid__usuario=user).first()
             context['curso'] = curso
             context['estudiantes'] = curso.estudiante_set.all() if curso else []
             context['titulo'] = 'Listado de Estudiantes'
@@ -66,12 +66,22 @@ class CursoListView(PermissionRequiredMixin, ListView):
             context['text'] = "Estudiantes inscritos en tu curso"
             context['total_text'] = "Total de Estudiantes"
             context['total_count'] = context['estudiantes'].count()
+            context['low_stock'] = context['estudiantes'].filter(estadoMatricula="No Matriculado").count()
+            context['icon_primary'] = "fa-user-graduate"
+            context['icon_secodary'] = "fa-user-times"
         else:
+            total_cursos = Curso.objects.count()
+            total_estudiantes = Estudiante.objects.count()
             context['titulo'] = 'Listado de Cursos'
-            context['subtitulo'] = 'Bienvenido al listado de cursos'
+            context['subtitulo'] = 'Gestión de cursos del colegio'
             context['crear_url'] = reverse_lazy('app:crear_curso')
-            context['text'] = "Cursos con estado inactivo"
+            context['limpiar_url'] = reverse_lazy('app:limpiar_curso')
+            context['text'] = "Total de Estudiantes"
             context['total_text'] = "Total de Cursos"
+            context['total_count'] = total_cursos
+            context['low_stock'] = total_estudiantes
+            context['icon_primary'] = "fa-graduation-cap"
+            context['icon_secodary'] = "fa-users"
 
         # 🔹 PERMISOS DINÁMICOS
         app_label = self.model._meta.app_label

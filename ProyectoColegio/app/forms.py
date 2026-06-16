@@ -51,6 +51,7 @@ class CursoForm(forms.ModelForm):
             "codigo": "Código",
             "capacidad": "Capacidad",
             "docenteid": "Docente",
+            "fechafin": "Fecha de Fin",
         }
 
         widgets = {
@@ -58,6 +59,10 @@ class CursoForm(forms.ModelForm):
             "codigo": forms.NumberInput(attrs={"class": "form-control"}),
             "capacidad": forms.NumberInput(attrs={"class": "form-control"}),
             "docenteid": forms.Select(attrs={"class": "form-control"}),
+            "fechafin": forms.DateTimeInput(
+                attrs={"class": "form-control", "type": "datetime-local"},
+                format="%Y-%m-%dT%H:%M",
+            ),
         }
 
     def clean_nom(self):
@@ -88,7 +93,7 @@ class AsistenciaForm(forms.ModelForm):
             "observaciones": forms.TextInput(attrs={"class": "form-control"}),
             "fecha": forms.DateInput(attrs={"class": "form-control", "type": "date"}),
             "estado": forms.HiddenInput(
-                attrs={"class": "form-control", "value": "Pendiente"}
+                attrs={"class": "form-control"}
             ),
         }
 
@@ -372,6 +377,38 @@ class AcudienteForm(forms.ModelForm):
 
     def clean_direccion(self):
         return self.cleaned_data.get("direccion", "")
+
+
+class AcudienteReadOnlyForm(forms.Form):
+    """
+    Formulario de solo lectura para mostrar los datos del acudiente
+    en la edición del estudiante. Los campos están deshabilitados
+    para que no puedan modificarse desde aquí.
+    """
+    nombre_acudiente = forms.CharField(
+        required=False,
+        widget=forms.TextInput(
+            attrs={"class": "form-control", "disabled": True}
+        ),
+    )
+    email_acudiente = forms.EmailField(
+        required=False,
+        widget=forms.EmailInput(
+            attrs={"class": "form-control", "disabled": True}
+        ),
+    )
+    telefono = forms.CharField(
+        required=False,
+        widget=forms.TextInput(
+            attrs={"class": "form-control", "disabled": True}
+        ),
+    )
+    direccion = forms.CharField(
+        required=False,
+        widget=forms.Textarea(
+            attrs={"class": "form-control", "rows": 2, "disabled": True}
+        ),
+    )
 
 
 class TipoElementoForm(forms.ModelForm):

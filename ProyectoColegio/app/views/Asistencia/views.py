@@ -3,6 +3,8 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView, D
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
+from django.utils import timezone
+from datetime import time
 from app.models import *
 from app.forms import *
 from django.urls import reverse_lazy
@@ -40,13 +42,13 @@ class AsistenciaQR(View):
             if hora_actual > time(7,15):
                 estado = "Tarde"
             else:
-                estado = "Temprano"
+                estado = "A tiempo"
             Asistencia.objects.create(
-                estado= "A tiempo",
+                estado=estado,
                 estudianteid=estudiante,
                 fecha=timezone.localdate(),
                 horaentrada=timezone.now(),
-                observaciones=estado,
+                observaciones="",
                 horasalida=time(13,00)
 			)
             print("Retornado verdad")
@@ -89,21 +91,29 @@ class AsistenciaListView(ListView):
         pass
 
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)  # Herencia por medio de super
+        context = super().get_context_data(**kwargs)
+        hoy = timezone.localdate()
+        total = Asistencia.objects.count()
+        tardanzas = Asistencia.objects.filter(estado="Tarde").count()
+        hoy_count = Asistencia.objects.filter(fecha=hoy).count()
+        inasistencias = Asistencia.objects.filter(estado="Inasistencia").count()
+
         context['titulo'] = 'Listado de Asistencias'
         context['subtitulo'] = 'Bienvenido al listado de asistencias'
         context['crear_url'] = reverse_lazy('app:crear_asistencia')
         context['limpiar_url'] = reverse_lazy('app:limpiar_asistencia')
-        context['table'] = "Asistencias"
-        context['text'] = "Asistencias Hoy"
-        context['total_text'] = "Total de Asistencias"  
-        context['table'] = "Asistencias"  
-        context['icon_primary'] = "fa-arrow-up"
-        context['icon_secodary'] = "fa-arrow-down"
+        context['total_count'] = total
+        context['total_text'] = "Total de Asistencias"
+        context['text'] = "Tardanzas registradas"
+        context['low_stock'] = tardanzas
+        context['icon_primary'] = "fa-clipboard-check"
+        context['icon_secodary'] = "fa-clock"
+        # Tarjetas extra
+        context['hoy_count'] = hoy_count
+        context['inasistencias'] = inasistencias
         user = self.request.user
         app_label = self.model._meta.app_label
         model_name = self.model._meta.model_name
-
         context['puede_crear'] = user.has_perm(f'{app_label}.add_{model_name}')
         context['puede_editar'] = user.has_perm(f'{app_label}.change_{model_name}')
         context['puede_eliminar'] = user.has_perm(f'{app_label}.delete_{model_name}')

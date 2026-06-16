@@ -41,20 +41,29 @@ class MovimientoListView(ListView):
         pass
 
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)  # Herencia por medio de super
+        context = super().get_context_data(**kwargs)
+        from django.utils import timezone as tz
+        from django.db.models import F
+        total = Movimiento.objects.count()
+        entradas = Movimiento.objects.filter(tipo="Entrada").count()
+        salidas = Movimiento.objects.filter(tipo="Salida").count()
+        hoy = Movimiento.objects.filter(fecha__date=tz.localdate()).count()
+
         context['titulo'] = 'Listado de Movimientos'
-        context['subtitulo'] = 'Bienvenido al listado de Movimientos'
+        context['subtitulo'] = 'Registro de entradas y salidas de inventario'
         context['crear_url'] = reverse_lazy('app:crear_movimiento')
         context['limpiar_url'] = reverse_lazy('app:limpiar_movimiento')
-        context['table'] = "movimiento"  
-        context['text'] = "Movimientos de Hoy"
+        context['total_count'] = total
         context['total_text'] = "Total de Movimientos"
-        context['icon_primary'] = "fa-arrow-up"
+        context['text'] = "Salidas registradas"
+        context['low_stock'] = salidas
+        context['icon_primary'] = "fa-exchange-alt"
         context['icon_secodary'] = "fa-arrow-down"
+        context['entradas'] = entradas
+        context['hoy_count'] = hoy
         user = self.request.user
         app_label = self.model._meta.app_label
         model_name = self.model._meta.model_name
-
         context['puede_crear'] = user.has_perm(f'{app_label}.add_{model_name}')
         context['puede_editar'] = user.has_perm(f'{app_label}.change_{model_name}')
         context['puede_eliminar'] = user.has_perm(f'{app_label}.delete_{model_name}')

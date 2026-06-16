@@ -165,48 +165,76 @@
     <hr class="my-3">
 <h6 class="fw-bold mb-3" style="color:#1C2E4A;">
   <i class="fas fa-user-friends me-2"></i>Datos del Acudiente
+  {% if acudiente_readonly %}
+    <span class="badge ms-2" style="background-color:#6c757d; font-size:0.75rem;">Solo lectura</span>
+  {% endif %}
 </h6>
 <div class="row">
 
   <div class="col-md-6 mb-3">
     <label class="form-label fw-bold">Nombre</label>
-    {{ acudiente_form.nombre_acudiente|add_class:'form-control form-control-custom' }}
-    {% if acudiente_form.nombre_acudiente.errors %}
-      {% for error in acudiente_form.nombre_acudiente.errors %}
-        <div class="text-danger mt-1 small"><i class="fas fa-exclamation-circle me-1"></i> {{ error }}</div>
-      {% endfor %}
+    {% if acudiente_readonly %}
+      {{ acudiente_form.nombre_acudiente }}
+    {% else %}
+      {{ acudiente_form.nombre_acudiente|add_class:'form-control form-control-custom' }}
+      {% if acudiente_form.nombre_acudiente.errors %}
+        {% for error in acudiente_form.nombre_acudiente.errors %}
+          <div class="text-danger mt-1 small"><i class="fas fa-exclamation-circle me-1"></i> {{ error }}</div>
+        {% endfor %}
+      {% endif %}
     {% endif %}
   </div>
 
   <div class="col-md-6 mb-3">
     <label class="form-label fw-bold">Email</label>
-    {{ acudiente_form.email_acudiente|add_class:'form-control form-control-custom' }}
-    {% if acudiente_form.email_acudiente.errors %}
-      {% for error in acudiente_form.email_acudiente.errors %}
-        <div class="text-danger mt-1 small"><i class="fas fa-exclamation-circle me-1"></i> {{ error }}</div>
-      {% endfor %}
+    {% if acudiente_readonly %}
+      {{ acudiente_form.email_acudiente }}
+    {% else %}
+      {{ acudiente_form.email_acudiente|add_class:'form-control form-control-custom' }}
+      {% if acudiente_form.email_acudiente.errors %}
+        {% for error in acudiente_form.email_acudiente.errors %}
+          <div class="text-danger mt-1 small"><i class="fas fa-exclamation-circle me-1"></i> {{ error }}</div>
+        {% endfor %}
+      {% endif %}
     {% endif %}
   </div>
 
   <div class="col-md-6 mb-3">
     <label class="form-label fw-bold">Teléfono</label>
-    {{ acudiente_form.telefono|add_class:'form-control' }}
-    {% if acudiente_form.telefono.errors %}
-      {% for error in acudiente_form.telefono.errors %}
-        <div class="text-danger mt-1 small"><i class="fas fa-exclamation-circle me-1"></i> {{ error }}</div>
-      {% endfor %}
+    {% if acudiente_readonly %}
+      {{ acudiente_form.telefono }}
+    {% else %}
+      {{ acudiente_form.telefono|add_class:'form-control' }}
+      {% if acudiente_form.telefono.errors %}
+        {% for error in acudiente_form.telefono.errors %}
+          <div class="text-danger mt-1 small"><i class="fas fa-exclamation-circle me-1"></i> {{ error }}</div>
+        {% endfor %}
+      {% endif %}
     {% endif %}
   </div>
 
   <div class="col-md-6 mb-3">
     <label class="form-label fw-bold">Dirección</label>
-    {{ acudiente_form.direccion|add_class:'form-control' }}
-    {% if acudiente_form.direccion.errors %}
-      {% for error in acudiente_form.direccion.errors %}
-        <div class="text-danger mt-1 small"><i class="fas fa-exclamation-circle me-1"></i> {{ error }}</div>
-      {% endfor %}
+    {% if acudiente_readonly %}
+      {{ acudiente_form.direccion }}
+    {% else %}
+      {{ acudiente_form.direccion|add_class:'form-control' }}
+      {% if acudiente_form.direccion.errors %}
+        {% for error in acudiente_form.direccion.errors %}
+          <div class="text-danger mt-1 small"><i class="fas fa-exclamation-circle me-1"></i> {{ error }}</div>
+        {% endfor %}
+      {% endif %}
     {% endif %}
   </div>
+
+  {% if acudiente_readonly %}
+  <div class="col-12">
+    <div class="alert alert-info py-2 px-3 small mb-0" style="border-radius: 8px;">
+      <i class="fas fa-info-circle me-1"></i>
+      Los datos del acudiente se gestionan desde el módulo <strong>Relaciones Estudiante-Acudiente</strong>.
+    </div>
+  </div>
+  {% endif %}
 
 </div>
   </div>

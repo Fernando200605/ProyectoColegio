@@ -82,7 +82,7 @@ def crear_admin_inicial(sender, **kwargs):
         cargo="Administrador General"
     )
 
-    print("✔ Administrador creado correctamente")
+    print("[OK] Administrador creado correctamente")
 
 @receiver(post_save, sender=Usuario)
 def notificar_usuario(sender, instance, created, **kwargs):
@@ -108,8 +108,8 @@ def notificar_usuario(sender, instance, created, **kwargs):
             titulo=titulo,
             mensaje=mensaje,
             fecha_envio=now().date(),
-            estado='Activo',
-            tipo="Sistema",
+            estado='no_leida',
+            tipo="aviso",
             receptor_id=admin.id
         )
 
@@ -172,8 +172,8 @@ def notificar_curso(sender, instance, created, **kwargs):
             titulo=titulo,
             mensaje=mensaje,
             fecha_envio=now().date(),
-            estado='Activo',
-            tipo="Actualización",
+            estado='no_leida',
+            tipo="actualizacion",
             receptor=admin
         )
 

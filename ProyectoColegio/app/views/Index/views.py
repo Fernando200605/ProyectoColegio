@@ -4,13 +4,13 @@ from app.models import Usuario,Asistencia,Elemento,Notificacion
 from django.urls import reverse_lazy
 from app.mixins import RolMixin
 from django.db.models.functions import TruncDate
-from django.db.models import Count ,Sum
+from django.db.models import Count ,Sum, F
 from django.utils.timezone import now
 from datetime import timedelta
 from django.views import View
 from django.http import JsonResponse
 import json
-from app.models import Curso,Estudiante,Movimiento
+from app.models import Curso,Estudiante,Movimiento,docente,Estudianteacudiente
 from django.shortcuts import render
 
 class DashboardView(LoginRequiredMixin,RolMixin, TemplateView):
@@ -30,7 +30,7 @@ class DashboardView(LoginRequiredMixin,RolMixin, TemplateView):
         inicio = hoy - timedelta(days=6)
 
         if rol == 'Docente':
-            cursos = Curso.objects.filter(docenteid=user.id)
+            cursos = Curso.objects.filter(docenteid__usuario=user)
 
             estudiantes_ids = Estudiante.objects.filter(
                 cursoId__in=cursos
@@ -47,10 +47,20 @@ class DashboardView(LoginRequiredMixin,RolMixin, TemplateView):
             datos_inventario = (
                 Movimiento.objects
                 .filter(cursoId__in=cursos)
-                .values('elementoId__categoriaId__nombre') 
+                .values('elementoId__categoriaId__nombre')
                 .annotate(total=Sum('elementoId__stockActual'))
                 .order_by('elementoId__categoriaId__nombre')
             )
+
+            # Tarjetas del docente
+            context['stat_estudiantes'] = Estudiante.objects.filter(cursoId__in=cursos).count()
+            context['stat_asistencias_hoy'] = Asistencia.objects.filter(
+                fecha=hoy, estudianteid__in=estudiantes_ids
+            ).count()
+            context['stat_tardanzas_hoy'] = Asistencia.objects.filter(
+                fecha=hoy, estado="Tarde", estudianteid__in=estudiantes_ids
+            ).count()
+            context['stat_cursos'] = cursos.count()
 
         else:
             datos = (
@@ -68,10 +78,20 @@ class DashboardView(LoginRequiredMixin,RolMixin, TemplateView):
                 .order_by('categoriaId__nombre')
             )
 
-        # 🔹 ASISTENCIAS
-        labels = []
-        data = []
+            # Tarjetas del administrador
+            context['stat_usuarios'] = Usuario.objects.count()
+            context['stat_estudiantes'] = Estudiante.objects.count()
+            context['stat_cursos'] = Curso.objects.count()
+            context['stat_stock_bajo'] = Elemento.objects.filter(
+                stockActual__lte=F('stockMinimo')
+            ).count()
+            context['stat_asistencias_hoy'] = Asistencia.objects.filter(fecha=hoy).count()
+            context['stat_notificaciones'] = Notificacion.objects.filter(
+                estado='no_leida', receptor=user
+            ).count()
 
+        # Gráficas
+        labels, data = [], []
         for item in datos:
             if item['fecha']:
                 labels.append(item['fecha'].strftime('%d %b'))
@@ -80,17 +100,12 @@ class DashboardView(LoginRequiredMixin,RolMixin, TemplateView):
         context['labels'] = json.dumps(labels)
         context['data'] = json.dumps(data)
 
-        # 🔹 INVENTARIO (SIN IF RARO)
-        labels_elemento = []
-        datos_elemento = []
-
+        labels_elemento, datos_elemento = [], []
         for item in datos_inventario:
-            # 🔹 soporta ambos casos sin romperse
             nombre_categoria = (
                 item.get('categoriaId__nombre') or
                 item.get('elementoId__categoriaId__nombre')
             )
-
             labels_elemento.append(nombre_categoria)
             datos_elemento.append(item['total'])
 
@@ -123,7 +138,7 @@ class MarcarComoleidasNotificaciones(View):
                 pk = pk,
                 receptor_id = request.user.id
             )
-            notificacion.estado = 'Inactiva'
+            notificacion.estado = 'leida'
             notificacion.save()
             return JsonResponse({
                 "success": True,

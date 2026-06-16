@@ -300,173 +300,121 @@ function abrirPerfil() {
 }
 
 async function abrirNotificacion() {
+    const modalElement = document.getElementById('modalGeneral');
+    const contenedor = document.getElementById('contenedorModal');
 
-    const modalElement =
-        document.getElementById('modalGeneral');
-
-    const contenedor =
-        document.getElementById('contenedorModal');
-
-    // Loader
+    // Loader adaptado a tu paleta (Azul oscuro institucional)
     contenedor.innerHTML = `
-
-        <div class="text-center p-4">
-
-            <div class="spinner-border text-primary" role="status">
-                <span class="visually-hidden">
-                    Cargando...
-                </span>
+        <div class="text-center p-5">
+            <div class="spinner-border" style="color: #1d3557;" role="status">
+                <span class="visually-hidden">Cargando...</span>
             </div>
-
-            <p class="mt-2 mb-0">
-                Cargando notificaciones...
-            </p>
-
+            <p class="mt-3 mb-0 text-secondary fw-medium">Cargando notificaciones...</p>
         </div>
     `;
 
     try {
-
-        const response = await fetch(
-            "/ejemplo/mis_notificaciones/",
-            {
-                headers: {
-                    "X-Requested-With": "XMLHttpRequest"
-                }
-            }
-        );
+        const response = await fetch("/ejemplo/mis_notificaciones/", {
+            headers: { "X-Requested-With": "XMLHttpRequest" }
+        });
 
         if (!response.ok) {
-
-            throw new Error(
-                `Error HTTP: ${response.status}`
-            );
+            throw new Error(`Error HTTP: ${response.status}`);
         }
 
         const html = await response.text();
-
         contenedor.innerHTML = html;
 
-        // Cerrar modal anterior
+        // Cerrar modal anterior si existe
         if (miModalInstancia) {
-
             miModalInstancia.hide();
             miModalInstancia.dispose?.();
         }
 
-        // Crear modal nuevo
-        miModalInstancia =
-            new bootstrap.Modal(modalElement);
-
+        // Crear e inicializar modal nuevo
+        miModalInstancia = new bootstrap.Modal(modalElement);
         miModalInstancia.show();
 
-        // =========================
-        // MARCAR NOTIFICACIÓN LEÍDA (CLICK)
-        // =========================
-
-        const botones =
-            contenedor.querySelectorAll(
-                ".btn-marcar-leida"
-            );
+        // ===================================
+        // ACCIÓN: MARCAR COMO LEÍDA
+        // ===================================
+        const botones = contenedor.querySelectorAll(".btn-marcar-leida");
 
         botones.forEach(boton => {
-
             boton.addEventListener("click", async function () {
-				console.log("aqui en el boton")
-                const item =
-                    this.closest("[data-notificacion-id]");
-
-                const id =
-                    item.dataset.notificacionId;
+                const item = this.closest("[data-notificacion-id]");
+                const id = item.dataset.notificacionId;
 
                 try {
-
-                    const response = await fetch(
-
-                        `/ejemplo/mis_notificaciones/${id}/leer/`,
-
-                        {
-                            method: "POST",
-
-                            headers: {
-
-                                "X-Requested-With":
-                                    "XMLHttpRequest",
-
-                                "X-CSRFToken":
-                                    obtenerCSRFToken()
-                            }
+                    const response = await fetch(`/ejemplo/mis_notificaciones/${id}/leer/`, {
+                        method: "POST",
+                        headers: {
+                            "X-Requested-With": "XMLHttpRequest",
+                            "X-CSRFToken": obtenerCSRFToken()
                         }
-                    );
+                    });
 
-                    const data =
-                        await response.json();
+                    const data = await response.json();
 
                     if (data.success) {
+                        // 1. Actualizar el contenedor padre (Cambiar fondo a blanco y borde a gris)
+                        item.style.setProperty("border-left", "5px solid #6c757d", "important");
+                        item.style.backgroundColor = "#ffffff";
 
-                        // Cambiar estilo visual
-                        item.classList.remove("no-leida");
-                        item.classList.add("leida");
+                        // 2. Cambiar dinámicamente el Icono del sobre (De cerrado-rojo a abierto-gris)
+                        const iconoContenedor = item.querySelector(".fa-envelope");
+                        if (iconoContenedor) {
+                            iconoContenedor.classList.remove("fa-envelope", "text-danger");
+                            iconoContenedor.classList.add("fa-envelope-open", "text-muted");
+                            iconoContenedor.parentElement.style.backgroundColor = "#e9ecef";
+                        }
 
-                        // Desactivar botón
-                        this.textContent = "Leída";
-                        this.disabled = true;
+                        // 3. Cambiar el Badge de estado de "Nuevo" a "Leído"
+                        const badge = item.querySelector(".badge");
+                        if (badge) {
+                            badge.textContent = "Leído";
+                            badge.style.backgroundColor = "#6c757d";
+                        }
 
-                        this.classList.remove("btn-primary");
-                        this.classList.add("btn-secondary");
+                        // 4. Reemplazar el botón dinámicamente para mantener la simetría estática
+                        const contenedorBoton = this.parentElement;
+                        contenedorBoton.innerHTML = `
+                            <button class="btn btn-sm px-3 rounded-pill btn-outline-secondary border-0" 
+                                    style="font-size: 0.8rem; white-space: nowrap;" disabled>
+                                <i class="fa-solid fa-check-double me-1"></i> Ya revisado
+                            </button>
+                        `;
                     }
 
                 } catch (err) {
-
-                    console.error(
-                        "Error marcando leída:",
-                        err
-                    );
+                    console.error("Error marcando leída:", err);
                 }
             });
         });
 
-        // =========================
-        // BOTONES CERRAR MODAL
-        // =========================
-
-        const btnCerrar =
-            contenedor.querySelectorAll(
-                '[data-bs-dismiss="modal"]'
-            );
-
+        // ===================================
+        // CONTROL: BOTONES CERRAR MODAL
+        // ===================================
+        // Selector corregido en una sola cadena de texto
+        const btnCerrar = contenedor.querySelectorAll('[data-bs-dismiss="modal"], #btnCerrarNoti2');
+        
         btnCerrar.forEach(boton => {
-
-            boton.onclick = () =>
-                miModalInstancia.hide();
+            boton.onclick = () => miModalInstancia.hide();
         });
 
-        // =========================
+        // ===================================
         // LIMPIEZA AL CERRAR
-        // =========================
-
-        modalElement.addEventListener(
-            "hidden.bs.modal",
-            () => {
-
-                contenedor.innerHTML = "";
-            },
-            { once: true }
-        );
+        // ===================================
+        modalElement.addEventListener("hidden.bs.modal", () => {
+            contenedor.innerHTML = "";
+        }, { once: true });
 
     } catch (error) {
-
-        console.error(
-            "Error al cargar notificaciones:",
-            error
-        );
-
+        console.error("Error al cargar notificaciones:", error);
         contenedor.innerHTML = `
-
-            <div class="alert alert-danger m-3">
-
-                No se pudieron cargar las notificaciones.
-
+            <div class="alert alert-danger m-3 border-0 rounded-3 shadow-sm text-center">
+                <i class="fa-solid fa-triangle-exclamation me-2"></i>
+                No se pudieron cargar las notificaciones en este momento.
             </div>
         `;
     }

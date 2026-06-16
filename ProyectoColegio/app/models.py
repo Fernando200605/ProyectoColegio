@@ -1,5 +1,6 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.utils import timezone
 import qrcode
 from io import BytesIO
 from django.core.files import File
@@ -139,7 +140,7 @@ class Curso(models.Model):
     codigo = models.CharField(max_length=50, unique=True)
     capacidad = models.IntegerField()
     fechainicio = models.DateTimeField(auto_now_add=True, editable=False)
-    fechafin = models.DateTimeField(auto_now_add=True, editable=False)
+    fechafin = models.DateTimeField(null=True, blank=True)
     docenteid = models.ForeignKey(docente, on_delete=models.CASCADE)
 
     class Meta:
@@ -154,10 +155,10 @@ class Curso(models.Model):
 class Estudiante(models.Model):
     usuario = models.OneToOneField(Usuario, on_delete=models.CASCADE, primary_key=True)
     fechaNacimiento = models.DateField(verbose_name="Fecha de nacimiento")
-    estadoMatricula = models.TextField(
-        max_length=20, null=True, blank=True, choices=Estado_Matricula
+    estadoMatricula = models.CharField(
+        max_length=20, default="Matriculado", choices=Estado_Matricula
     )
-    fechaIngreso = models.DateField(verbose_name="Fecha de Ingreso")
+    fechaIngreso = models.DateField(verbose_name="Fecha de Ingreso", default=timezone.now)
     cursoId = models.ForeignKey(Curso, on_delete=models.CASCADE)
     codigo = models.CharField(max_length=20, unique=True, blank=True)
     qr = models.ImageField(upload_to="usuarios/", blank=True)
@@ -180,11 +181,11 @@ class Estudiante(models.Model):
         self.full_clean()
         if not self.codigo:
             self.codigo = f"EST-{self.usuario.id}"
-        qr_img = qrcode.make(self.codigo)
-        buffer = BytesIO()
-        qr_img.save(buffer, format="PNG")
-        self.qr.save(f"qr_{self.usuario.id}.png", File(buffer), save=False)
-
+        if not self.qr:
+            qr_img = qrcode.make(self.codigo)
+            buffer = BytesIO()
+            qr_img.save(buffer, format="PNG")
+            self.qr.save(f"qr_{self.usuario.id}.png", File(buffer), save=False)
         super().save(*args, **kwargs)
 
     def __str__(self):
@@ -206,9 +207,9 @@ class Asistencia(models.Model):
     estudianteid = models.ForeignKey(Estudiante, on_delete=models.CASCADE)
     fecha = models.DateField(auto_now=True)
     horaentrada = models.TimeField()
-    horasalida = models.TimeField()
+    horasalida = models.TimeField(null=True, blank=True)
     estado = models.CharField(max_length=20, choices=choise)
-    observaciones = models.TextField()
+    observaciones = models.TextField(blank=True, default="")
 
     class Meta:
         verbose_name = "asistencia"
@@ -226,7 +227,7 @@ class Acudiente(models.Model):
     )
 
     def __str__(self):
-        return self.nombre  # ✅ ahora muestra su propio nombre
+        return f"{self.usuario.nombre} - Acudiente"
 
     class Meta:
         verbose_name = "Acudiente"
@@ -239,7 +240,7 @@ class Estudianteacudiente(models.Model):
     acudienteId = models.ForeignKey(Acudiente, on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.estudianteId.usuario.nombre, self.acudienteId.nombre
+        return f"{self.estudianteId.usuario.nombre} - Acudiente: {self.acudienteId.usuario.nombre}"
 
     class Meta:
         verbose_name = "Estudianteacudiente"
@@ -319,9 +320,8 @@ class Elemento(models.Model):
 
 class Movimiento(models.Model):
     choise = [
-        ("Absoluto", "Absoluto"),
-        ("Parcial", "Parcial"),
-        ("Indefinido", "Indefinido"),
+        ("Entrada", "Entrada"),
+        ("Salida", "Salida"),
     ]
     tipo = models.CharField(max_length=50, choices=choise)
     fecha = models.DateTimeField(auto_now=True)
@@ -330,6 +330,17 @@ class Movimiento(models.Model):
     usuarioId = models.ForeignKey(Usuario, on_delete=models.CASCADE)
     cursoId = models.ForeignKey(Curso, on_delete=models.CASCADE)
     motivo = models.TextField()
+
+    def save(self, *args, **kwargs):
+        es_nuevo = self.pk is None
+        super().save(*args, **kwargs)
+        if es_nuevo:
+            elemento = self.elementoId
+            if self.tipo == "Entrada":
+                elemento.stockActual += self.cantidad
+            elif self.tipo == "Salida":
+                elemento.stockActual -= self.cantidad
+            elemento.save(update_fields=["stockActual"])
 
     class Meta:
         verbose_name = "Movimiento"
@@ -341,20 +352,20 @@ class Movimiento(models.Model):
 
 
 class Notificacion(models.Model):
-    choiseE = [
-        ("Activo", "Activo"),
-        ("Inactivo", "Inactivo"),
+    ESTADO_CHOICES = [
+        ("no_leida", "No Leída"),
+        ("leida", "Leída"),
     ]
-    choiseT = [
-        ("Aviso", "Aviso"),
-        ("Actualización", "Actualización"),
-        ("Otro", "Otro"),
+    TIPO_CHOICES = [
+        ("aviso", "Aviso"),
+        ("actualizacion", "Actualización"),
+        ("urgente", "Urgente"),
     ]
     titulo = models.CharField(max_length=200)
     mensaje = models.TextField()
     fecha_envio = models.DateTimeField(auto_now_add=True)
-    estado = models.CharField(max_length=20, choices=choiseE)
-    tipo = models.CharField(max_length=50, choices=choiseT)
+    estado = models.CharField(max_length=20, choices=ESTADO_CHOICES, default="no_leida")
+    tipo = models.CharField(max_length=50, choices=TIPO_CHOICES, default="aviso")
     receptor = models.ForeignKey(Usuario, on_delete=models.CASCADE)
     evento = models.ForeignKey(Evento, on_delete=models.CASCADE, null=True, blank=True)
 

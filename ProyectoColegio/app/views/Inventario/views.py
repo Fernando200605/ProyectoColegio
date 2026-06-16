@@ -58,15 +58,16 @@ class InventarioListView(LoginRequiredMixin,ListView):
         context['titulo'] = 'Inventario General'
         context['subtitulo'] = 'Gestión de elementos del colegio'
         context['crear_url'] = reverse_lazy('app:crear_elemento')
-        context['icon_primary'] = "fa-arrow-up"
-        context['icon_secodary'] = "fa-arrow-down"
-        # Contadores útiles
-        context['total_elementos'] = Elemento.objects.count()
+        context['limpiar_url'] = reverse_lazy('app:limpiar_inventario')
+        context['icon_primary'] = "fa-boxes"
+        context['icon_secodary'] = "fa-exclamation-triangle"
+        context['total_count'] = Elemento.objects.count()
         context['stock_bajo'] = Elemento.objects.filter(
             stockActual__lte=F("stockMinimo")
         ).count()
-        context['text'] = "Elementos con stock bajo"
+        context['text'] = "Con stock bajo"
         context['total_text'] = "Total de Elementos"
+        context['low_stock'] = context['stock_bajo']
         user = self.request.user
         app_label = self.model._meta.app_label
         model_name = self.model._meta.model_name

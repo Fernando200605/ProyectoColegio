@@ -1,6 +1,19 @@
 {% load static %}
+
+<!-- Botón toggle para móviles -->
+<button class="sidebar-toggle d-md-none" id="sidebarToggle" aria-label="Abrir menú">
+  <i class="fas fa-bars"></i>
+</button>
+
+<!-- Overlay para cerrar sidebar en móvil -->
+<div class="sidebar-overlay d-md-none" id="sidebarOverlay"></div>
+
 <!-- Sidebar -->
 <div id="sidebar" class="sidebar">
+  <button class="sidebar-close d-md-none" id="sidebarClose" aria-label="Cerrar menú">
+    <i class="fas fa-times"></i>
+  </button>
+  
   <div class="profile">
     {% if request.user.img_usuario %}
       <img src="{{ request.user.img_usuario.url }}" alt="{{ request.user.nombre }}" />
@@ -58,6 +71,15 @@
     <li>
       <a href="{% url 'app:index_usuario' %}">
         <i class="fa-solid fa-user"></i> Usuarios
+      </a>
+    </li>
+    {% endif %}
+
+    <!-- RELACIONES ESTUDIANTE-ACUDIENTE (solo admin) -->
+    {% if request.user.get_rol == "Administrador" %}
+    <li>
+      <a href="{% url 'app:index_relacion' %}">
+        <i class="fa-solid fa-user-group"></i> Estudiante — Acudiente
       </a>
     </li>
     {% endif %}
