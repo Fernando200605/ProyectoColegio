@@ -21,7 +21,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-#-htnytw7g*va6-7(w+!b=0d8lb6qk46&-y_hjy2if4p5a$m=8'
+SECRET_KEY = os.getenv('SECRET_KEY')
 load_dotenv(BASE_DIR / '.env')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -86,7 +86,8 @@ DATABASES = {
         'NAME': 'colegio_db',
         'USER': 'root',
         'PASSWORD': 'mamitas39',
-        'HOST': 'localhost',
+        'HOST': '127.0.0.1',  # <--- Cambia 'db' por '127.0.0.1'
+        'PORT': '3306',
     }
 }
 
