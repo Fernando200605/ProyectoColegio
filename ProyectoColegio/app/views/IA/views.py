@@ -33,7 +33,6 @@ def normalizar_ruta(r):
     r = r.replace("^", "").replace("$", "")
     return r
 
-
 @csrf_exempt
 def preguntar_ia_local(request):
     if request.method == "POST":
@@ -41,30 +40,41 @@ def preguntar_ia_local(request):
         mensaje = data.get("mensaje", "")
 
         rutas_validas = obtener_rutas()
-        # ✅ Normalizar todas las rutas obtenidas
         rutas_normalizadas = [normalizar_ruta(r) for r in rutas_validas]
         print("Rutas normalizadas:", rutas_normalizadas)
 
+        # Mejoramos el prompt para guiar mejor a Qwen
         prompt_completo = f"""
-        Estas son las rutas válidas de la app: {', '.join(rutas_normalizadas)}.
-        Cuando menciones una ruta, escríbela SIEMPRE entre comillas invertidas (backticks), exactamente como aparece en la lista.
-        Responde al usuario usando solo estas rutas válidas.
-        Usuario pregunta: {mensaje}
-        """
+Estas son las rutas válidas de la app: {', '.join(rutas_normalizadas)}.
+Cuando menciones una ruta, escríbela SIEMPRE entre comillas invertidas (backticks), exactamente como aparece en la lista.
+Responde al usuario usando solo estas rutas válidas de forma concisa , en dado caso de no existir decir que no se encontro
 
-        respuesta = requests.post(
-            "http://localhost:11434/api/generate",
-            json={
-                "model": "deepseek-coder:6.7b",
-                "prompt": prompt_completo,
-                "stream": False,
-                "options": {
-                    "num_predict": 50,  # Máximo número de tokens (limita longitud de respuesta)
-                    "temperature": 0.3,  # Menor valor = respuestas más precisas
-                    "top_k": 20,  # Reduce aleatoriedad → mejora coherencia y velocidad
-                },
-            },
-        )
+Usuario pregunta: {mensaje}
+"""
+
+        try:
+            # NOTA: Cambiamos /api/generate por /api/chat que es más eficiente para diálogos,
+            # o mantenemos /api/generate pero corrigiendo las opciones.
+            respuesta = requests.post(
+    "http://localhost:11434/api/generate",
+    json={
+        "model": "qwen3:8b",  # Ya confirmamos que este es el nombre real
+        "prompt": prompt_completo,
+        "stream": False,
+        "options": {
+            "num_predict": 150,  # Lo bajamos un poco de 250 a 150 para que responda más rápido
+            "temperature": 0.3,
+            "top_k": 100,
+        },
+    },
+    timeout=200, 
+)
+            respuesta.raise_for_status()  # Lanza error si Ollama responde un 400 o 500
+        except requests.exceptions.RequestException as e:
+            print(f"Error al conectar con Ollama: {e}")
+            return JsonResponse(
+                {"respuesta": "Error de comunicación con la IA local."}, status=500
+            )
 
         resultado = respuesta.json()
         ia_texto = resultado.get("response", "")
@@ -76,10 +86,7 @@ def preguntar_ia_local(request):
         ia_texto_con_links = ia_texto
 
         for ruta in set(rutas_detectadas):
-            # ✅ Normalizar la ruta detectada igual que las válidas
             ruta_limpia = normalizar_ruta(ruta)
-
-            # ✅ Buscar match con o sin trailing slash
             ruta_match = None
             if ruta_limpia in rutas_normalizadas:
                 ruta_match = ruta_limpia
@@ -90,7 +97,11 @@ def preguntar_ia_local(request):
 
             if ruta_match:
                 url_completa = f"{LOCAL_HOST}{ruta_match}"
-                link_html = f'<a href="{url_completa}" target="_blank">{ruta_match}</a>'
-                ia_texto_con_links = ia_texto_con_links.replace(f"`{ruta}`", link_html)
+                link_html = (
+                    f'<a href="{url_completa}" target="_blank">{ruta_match}</a>'
+                )
+                ia_texto_con_links = ia_texto_con_links.replace(
+                    f"`{ruta}`", link_html
+                )
 
         return JsonResponse({"respuesta": ia_texto_con_links})
