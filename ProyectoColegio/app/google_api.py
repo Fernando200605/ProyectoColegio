@@ -1,17 +1,14 @@
 import os
-import json
 
-from googleapiclient.discovery import build
+from django.conf import settings
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
-from googleapiclient.errors import HttpError
-from django.conf import settings
+from googleapiclient.discovery import build
 
 SCOPES = [
     "https://www.googleapis.com/auth/calendar"
 ]
-
 
 TOKEN_PATH = os.path.join(
     settings.BASE_DIR,
@@ -28,45 +25,69 @@ def obtener_servicio():
 
     creds = None
 
-    # Leer token guardado
+    # Cargar token existente
     if os.path.exists(TOKEN_PATH):
 
-        creds = Credentials.from_authorized_user_file(
-            TOKEN_PATH,
-            SCOPES
-        )
-
-    # Si no existe o expiró
-    if not creds or not creds.valid:
-
-        # Refrescar automáticamente
-        if (
-            creds
-            and creds.expired
-            and creds.refresh_token
-        ):
-
-            creds.refresh(Request())
-
-        else:
-            # Solo la primera vez
-            flow = InstalledAppFlow.from_client_secrets_file(
-                CREDENTIALS_PATH,
+        try:
+            creds = Credentials.from_authorized_user_file(
+                TOKEN_PATH,
                 SCOPES
             )
 
-            creds = flow.run_local_server(
-                port=8080,
-                prompt="consent",
-                access_type="offline"
+            print("\n=== ESTADO DEL TOKEN ===")
+            print("Valid:", creds.valid)
+            print("Expired:", creds.expired)
+            print("Refresh token:", bool(creds.refresh_token))
+            print("========================\n")
+
+        except Exception as e:
+            print(f"Error leyendo token.json: {e}")
+            creds = None
+
+    # Si hay credenciales expiradas intentar renovar
+    if creds and creds.expired and creds.refresh_token:
+
+        print("Intentando renovar token...")
+
+        try:
+
+            creds.refresh(Request())
+
+            with open(TOKEN_PATH, "w") as token:
+                token.write(creds.to_json())
+
+            print("✅ Token renovado correctamente")
+
+        except Exception as e:
+
+            print(f"❌ Error renovando token: {e}")
+
+            # No abrir navegador automáticamente
+            raise Exception(
+                f"No fue posible renovar el token: {e}"
             )
 
-        # Guardar token actualizado
+    # Si no existen credenciales válidas
+    elif not creds:
+
+        print("No existe token válido.")
+        print("Iniciando autenticación OAuth...")
+
+        flow = InstalledAppFlow.from_client_secrets_file(
+            CREDENTIALS_PATH,
+            SCOPES
+        )
+
+        creds = flow.run_local_server(
+            port=8080,
+            prompt="consent",
+            access_type="offline"
+        )
+
         with open(TOKEN_PATH, "w") as token:
+            token.write(creds.to_json())
 
-            token.write(
-                creds.to_json()
-            )
+        print("✅ Token generado correctamente")
 
     service = build(
         "calendar",
@@ -75,7 +96,6 @@ def obtener_servicio():
     )
 
     return service
-
 
 def crear_evento(
     titulo,

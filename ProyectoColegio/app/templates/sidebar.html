@@ -1,60 +1,71 @@
 {% load static %}
 
-<!-- Botón toggle para móviles -->
 <button class="sidebar-toggle d-md-none" id="sidebarToggle" aria-label="Abrir menú">
   <i class="fas fa-bars"></i>
 </button>
 
-<!-- Overlay para cerrar sidebar en móvil -->
 <div class="sidebar-overlay d-md-none" id="sidebarOverlay"></div>
 
-<!-- Sidebar -->
 <div id="sidebar" class="sidebar">
   <button class="sidebar-close d-md-none" id="sidebarClose" aria-label="Cerrar menú">
     <i class="fas fa-times"></i>
   </button>
   
-  <div class="profile">
-    {% if request.user.img_usuario %}
-      <img src="{{ request.user.img_usuario.url }}" alt="{{ request.user.nombre }}" />
-    {% endif %}
-    
-    <a onclick="abrirPerfil()" class="edit-profile">
-      <i class="fa-solid fa-pencil"></i>
-    </a>
-
-    <p class="name">{{ request.user.nombre }}</p>
-    <p class="badge rounded-pill badge-primary rol">{{ request.user.get_rol }}</p>
-
-    <a onclick="abrirNotificacion()">Mis Notificaciones</a>
-
-    {% if request.user.get_rol == "Administrador" %}
-    <div class="dropdown">
-      <button class="btn btn-secondary dropdown-toggle" type="button" data-toggle="dropdown">
-        Backup
-      </button>
-      <div class="dropdown-menu">
-        <a class="dropdown-item" href="{% url 'app:backup' %}">Ir a panel</a>
-        <form method="POST" action="{% url 'app:backup' %}">
-          {% csrf_token %}
-          <input type="hidden" name="accion" value="backup_completo" />
-          <button type="submit" class="dropdown-item">Realizar Respaldo</button>
-        </form>
-      </div>
+  <div class="profile-card">
+    <div class="avatar-container">
+      {% if request.user.img_usuario %}
+        <img src="{{ request.user.img_usuario.url }}" alt="{{ request.user.nombre }}" class="profile-avatar" />
+      {% else %}
+        <div class="profile-avatar-placeholder">
+          <i class="fa-solid fa-user"></i>
+        </div>
+      {% endif %}
+      
+      <a onclick="abrirPerfil()" class="edit-profile-badge" title="Editar Perfil">
+        <i class="fa-solid fa-pen-to-square"></i>
+      </a>
     </div>
-    {% endif %}
+
+    <div class="profile-info">
+      <h4 class="name">{{ request.user.nombre }}</h4>
+      <span class="badge-role">{{ request.user.get_rol }}</span>
+    </div>
+
+    <div class="profile-actions">
+      <button onclick="abrirNotificacion()" class="btn-profile-notif">
+        <i class="fa-solid fa-bell"></i> Mis Notificaciones
+      </button>
+
+      {% if request.user.get_rol == "Administrador" %}
+      <div class="dropdown w-100 mt-2">
+        <button class="btn btn-backup-custom dropdown-toggle btn-sm w-100" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <i class="fa-solid fa-database me-1"></i> Respaldos
+        </button>
+        <div class="dropdown-menu shadow border-0">
+          <a class="dropdown-item" href="{% url 'app:backup' %}">
+            <i class="fa-solid fa-sliders me-2 text-muted"></i> Ir a panel
+          </a>
+          <div class="dropdown-divider"></div>
+          <form method="POST" action="{% url 'app:backup' %}">
+            {% csrf_token %}
+            <input type="hidden" name="accion" value="backup_completo" />
+            <button type="submit" class="dropdown-item text-primary">
+              <i class="fa-solid fa-cloud-arrow-up me-2"></i> Realizar Respaldo
+            </button>
+          </form>
+        </div>
+      </div>
+      {% endif %}
+    </div>
   </div>
 
   <ul>
-
-    <!-- INICIO (todos) -->
     <li>
       <a href="{% url 'app:dashboard' %}">
         <i class="fa-solid fa-house"></i> Inicio
       </a>
     </li>
 
-    <!-- CURSOS -->
     <li>
       <a href="{% url 'app:index_curso' %}">
         <i class="fa-solid fa-graduation-cap"></i> 
@@ -66,7 +77,6 @@
       </a>
     </li>
 
-    <!-- USUARIOS (solo admin) -->
     {% if request.user.get_rol == "Administrador" %}
     <li>
       <a href="{% url 'app:index_usuario' %}">
@@ -75,7 +85,6 @@
     </li>
     {% endif %}
 
-    <!-- RELACIONES ESTUDIANTE-ACUDIENTE (solo admin) -->
     {% if request.user.get_rol == "Administrador" %}
     <li>
       <a href="{% url 'app:index_relacion' %}">
@@ -84,7 +93,6 @@
     </li>
     {% endif %}
 
-    <!-- ASISTENCIA -->
     {% if request.user.get_rol == "Administrador" or request.user.get_rol == "Docente" %}
     <li>
       <a href="{% url 'app:index_asistencia' %}">
@@ -93,7 +101,6 @@
     </li>
     {% endif %}
 
-    <!-- INVENTARIO -->
     {% if request.user.get_rol == "Administrador" or request.user.get_rol == "Docente" %}
     <li>
       <a href="{% url 'app:index_inventario' %}">
@@ -102,7 +109,6 @@
     </li>
     {% endif %}
 
-    <!-- MOVIMIENTOS (solo admin) -->
     {% if request.user.get_rol == "Administrador" %}
     <li>
       <a href="{% url 'app:index_movimiento' %}">
@@ -111,8 +117,7 @@
     </li>
     {% endif %}
 
-    <!-- EVENTOS -->
-     {% if request.user.get_rol == "Administrador" %}
+    {% if request.user.get_rol == "Administrador" %}
     <li>
       <a href="{% url 'app:index_evento' %}">
         <i class="fa-regular fa-calendar"></i> Eventos
@@ -120,14 +125,12 @@
     </li>
     {% endif %}
 
-    <!-- NOTIFICACIONES -->
     <li>
       <a href="{% url 'app:index_notificacion' %}">
         <i class="fa-regular fa-file"></i> Notificaciones
       </a>
     </li>
 
-    <!-- LOGOUT -->
     <li>
       <form action="{% url 'login:logout' %}" method="post">
         {% csrf_token %}
@@ -137,12 +140,10 @@
       </form>
     </li>
 
-    <!-- AYUDA -->
     <li>
       <a href="#">
         <i class="fa-solid fa-question"></i> Ayuda
       </a>
     </li>
-
   </ul>
 </div>

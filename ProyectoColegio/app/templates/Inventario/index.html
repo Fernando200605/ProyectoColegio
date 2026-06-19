@@ -4,13 +4,13 @@
 {% block subtitulo %}{{ subtitulo }}{% endblock %}
 
 {% block exportar %}
-  <a href="{% url 'app:reporte_inventario_pdf' %}" class="btn-pdf btn-sm">
+  <a href="{% url 'app:reporte_inventario_pdf' %}" class="btn-pdf ">
     <i class="fas fa-file-pdf me-1"></i> <span class="d-none d-sm-inline">Exportar a</span> PDF
   </a>
-  <a href="{% url 'app:reporte_inventario_excel' %}" class="btn-excel btn-sm">
+  <a href="{% url 'app:reporte_inventario_excel' %}" class="btn-excel">
     <i class="fas fa-file-excel me-1"></i> <span class="d-none d-sm-inline">Exportar a</span> Excel
   </a>
-  <a href="?bajo_stock=1" class="btn btn-outline-warning btn-sm ms-1" style="border-radius:8px;">
+  <a href="?bajo_stock=1" class="btn btn-outline-warning" style="border-radius:8px;">
     <i class="fas fa-exclamation-triangle me-1"></i> <span class="d-none d-sm-inline">Solo</span> Stock bajo
   </a>
   {% if request.GET.bajo_stock %}

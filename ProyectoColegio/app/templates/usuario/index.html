@@ -44,28 +44,60 @@
 {% endblock %}
 
 {% block exportar %}
-  <a href="#" class="btn-pdf btn-sm" id="ExportarPdf">
-    <i class="fas fa-file-pdf me-1"></i> <span class="d-none d-sm-inline">Descargar</span> PDF
-  </a>
-  <a href="#" class="btn-excel btn-sm" id="ExportarExcel">
-    <i class="fas fa-file-excel me-1"></i> <span class="d-none d-sm-inline">Descargar</span> Excel
-  </a>
-  <div class="filtros mt-2 mt-md-0" style="z-index:1000;">
-    <input type="text" id="buscar" name="buscar" placeholder="Buscar usuario" class="form-control form-control-sm">
-    <select id="rol" name="rol" class="form-select form-select-sm">
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+
+  <!-- BOTONES EXPORTAR -->
+  <div class="d-flex gap-2 flex-wrap">
+
+    <a href="#" class="btn-pdf " id="ExportarPdf">
+      <i class="fas fa-file-pdf me-1"></i> Descargar PDF
+    </a>
+
+    <a href="#" class="btn-excel " id="ExportarExcel">
+      <i class="fas fa-file-excel me-1"></i> Descargar Excel
+    </a>
+
+  </div>
+
+  <!-- FILTROS -->
+  <div class="d-flex flex-wrap gap-2 align-items-center mt-2 mt-md-0">
+
+    <input type="text"
+           id="buscar"
+           name="buscar"
+           placeholder="Buscar usuario"
+           class="form-control form-control-sm"
+           style="min-width: 180px;">
+
+    <select id="rol"
+            name="rol"
+            class="form-select form-select-sm"
+            style="min-width: 160px;">
+
       <option value="">Todos los roles</option>
       <option value="Administrador">Administrador</option>
       <option value="Docente">Docente</option>
       <option value="Estudiante">Estudiante</option>
       <option value="Acudiente">Acudiente</option>
     </select>
-    <select id="estado" name="estado" class="form-select form-select-sm">
+
+    <select id="estado"
+            name="estado"
+            class="form-select form-select-sm"
+            style="min-width: 140px;">
+
       <option value="">Todos</option>
       <option value="1">Activo</option>
       <option value="0">Inactivo</option>
     </select>
-    <button type="button" id="filtrar" class="btn btn-sm btn-primary">Filtrar</button>
+
+    <button type="button" id="filtrar" class="btn btn-sm btn-primary">
+      Filtrar
+    </button>
+
   </div>
+
+</div>
 {% endblock %}
 
 {% block columns %}

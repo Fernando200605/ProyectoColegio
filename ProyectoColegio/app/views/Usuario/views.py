@@ -491,15 +491,27 @@ class GestionPermisosUsuarioView(View):
 
     def get(self, request, user_id):
         usuario = get_object_or_404(User, id=user_id)
+        
+        # 1. Traemos los grupos con sus permisos optimizados
         grupos = Group.objects.prefetch_related("permissions").all()
-        permisos = Permission.objects.select_related("content_type").all()
+        
+        # 2. Construimos el mapa de permisos POR FUERA del bucle de permisos individuales
+        grupos_permisos_map = {
+            grupo.id: list(grupo.permissions.values_list("id", flat=True))
+            for grupo in grupos
+        }
+        
+        # 3. Traemos permisos optimizando el ContentType para evitar queries N+1
+        permisos = Permission.objects.select_related("content_type").order_by("content_type__model", "name")
+        
         permisos_por_modelo = defaultdict(list)
         for p in permisos:
             permisos_por_modelo[p.content_type.model].append(p)
-            grupos_permisos_map = {
-                grupo.id: list(grupo.permissions.values_list("id", flat=True))
-                for grupo in grupos
-            }
+        
+        # 4. Optimizamos las búsquedas de los actuales convirtiendo a listas de inmediato
+        grupos_actuales = list(usuario.groups.values_list("id", flat=True))
+        permisos_actuales = list(usuario.user_permissions.values_list("id", flat=True))
+
         return render(
             request,
             self.template_name,
@@ -507,34 +519,29 @@ class GestionPermisosUsuarioView(View):
                 "usuario": usuario,
                 "grupos": grupos,
                 "permisos_por_modelo": dict(permisos_por_modelo),
-                "grupos_actuales": set(usuario.groups.values_list("id", flat=True)),
-                "permisos_actuales": set(
-                    usuario.user_permissions.values_list("id", flat=True)
-                ),
-                "grupos_permisos_map": grupos_permisos_map,  # ✅ NUEVO
+                "grupos_actuales": grupos_actuales,
+                "permisos_actuales": permisos_actuales,
+                "grupos_permisos_map": grupos_permisos_map,
             },
         )
 
     def post(self, request, user_id):
         usuario = get_object_or_404(User, id=user_id)
-
-        # ✅ NUEVO: ACTUALIZAR GRUPOS
-        grupos_post = request.POST.getlist("grupos")  # name="grupos" en el HTML
-        grupos_ids = [int(g) for g in grupos_post if g]
+        
+        # Validamos y convertimos a enteros de forma segura en una sola línea
+        grupos_ids = [int(g) for g in request.POST.getlist("grupos") if g.isdigit()]
+        permisos_ids = [int(p) for p in request.POST.getlist("permisos") if p.isdigit()]
+        
+        # Asignación masiva en base de datos
         usuario.groups.set(grupos_ids)
-
-        # ACTUALIZAR PERMISOS INDIVIDUALES (tu código original, sin cambios)
-        permisos_post = request.POST.getlist("permisos")  # name="permisos" en el HTML
-        permisos_ids = [int(p) for p in permisos_post if p]
         usuario.user_permissions.set(permisos_ids)
 
-        # ✅ NUEVO: Limpiar caché de permisos de la instancia
+        # Limpieza manual del caché de permisos internos de Django
         for attr in ("_perm_cache", "_user_perm_cache", "_group_perm_cache"):
             if hasattr(usuario, attr):
                 delattr(usuario, attr)
 
-        print(
-            f"Grupos: {usuario.groups.all()} | Permisos: {usuario.user_permissions.all()}"
-        )
+        # Añadimos un feedback visual para el usuario (¡Muy recomendado!)
+        messages.success(request, f"Permisos actualizados correctamente para {usuario.username}.")
 
         return redirect("app:index_usuario")

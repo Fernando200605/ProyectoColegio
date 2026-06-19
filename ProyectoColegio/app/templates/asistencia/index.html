@@ -33,13 +33,13 @@
 {% endblock %}
 
 {% block exportar %}
-  <a href="{% url 'app:reporte_asistencia_pdf' %}" class="btn-pdf btn-sm">
+  <a href="{% url 'app:reporte_asistencia_pdf' %}" class="btn-pdf ">
     <i class="fas fa-file-pdf me-1"></i> <span class="d-none d-sm-inline">Descargar</span> PDF
   </a>
-  <a href="{% url 'app:Camara' %}" class="btn-pdf btn-sm">
+  <a href="{% url 'app:Camara' %}" class="btn-pdf ">
     <i class="fas fa-camera me-1"></i> <span class="d-none d-sm-inline">Cámara</span> QR
   </a>
-  <a href="{% url 'app:reporte_asistencia_excel' %}" class="btn-excel btn-sm">
+  <a href="{% url 'app:reporte_asistencia_excel' %}" class="btn-excel ">
     <i class="fas fa-file-excel me-1"></i> <span class="d-none d-sm-inline">Descargar</span> Excel
   </a>
 {% endblock %}

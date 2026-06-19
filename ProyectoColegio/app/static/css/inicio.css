@@ -1228,340 +1228,141 @@ body.is-large-text .guia-item p {
 	box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 	text-align: left;
 }
-
-/* ===== BOTON PDF PROFESIONAL ===== */
-.btn-pdf {
-	display: inline-flex !important;
-	align-items: center !important;
-	gap: 8px !important;
-
-	padding: 10px 18px !important;
-	background: white;
-	color: #ee3535 !important;
-	font-weight: 600 !important;
-	font-size: 14px !important;
-	text-decoration: none !important;
-
-	border-radius: 8px !important;
-	border: 2px solid red !important;
-
-	box-shadow: 0 4px 10px rgba(198, 40, 40, 0.3) !important;
-	transition: all 0.3s ease-in-out !important;
-	cursor: pointer !important;
-	z-index: 1000 !important;
-}
-
-/* Hover */
-.btn-pdf:hover {
-	background: linear-gradient(135deg, #b71c1c, #c62828) !important;
-	transform: translateY(-2px) !important;
-	box-shadow: 0 6px 14px rgba(198, 40, 40, 0.4) !important;
-	color: white !important;
-}
-
-/* Click */
-.btn-pdf:active {
-	transform: translateY(0) !important;
-	box-shadow: 0 3px 8px rgba(198, 40, 40, 0.3) !important;
-}
-
-/* Opcional: Icono PDF antes del texto */
-.btn-pdf::before {
-	font-size: 16px !important;
-}
-
-.btn-excel {
-	display: inline-flex !important;
-	align-items: center !important;
-	gap: 8px !important;
-
-	padding: 10px 18px !important;
-	background: white !important;
-	color: #0de906 !important;
-	font-weight: 600 !important;
-	font-size: 14px !important;
-	text-decoration: none !important;
-
-	border-radius: 8px !important;
-	border: 2px solid #0de906 !important;
-
-	box-shadow: 0 4px 10px rgba(27, 94, 32, 0.3) !important;
-	transition: all 0.3s ease-in-out !important;
-	cursor: pointer !important;
-	z-index: 1000 !important;
-}
-
-/* Hover */
-.btn-excel:hover {
-	background: linear-gradient(135deg, #23b82f, #32d43d) !important;
-	transform: translateY(-2px) !important;
-	box-shadow: 0 6px 14px rgba(27, 94, 32, 0.4) !important;
-	color: white !important;
-}
-
-/* Click */
-.btn-excel:active {
-	transform: translateY(0) !important;
-	box-shadow: 0 3px 8px rgba(27, 94, 32, 0.3) !important;
-}
-
-/* Opcional: Icono antes del texto */
-.btn-excel::before {
-	font-size: 16px !important;
-}
-
+/* ==============================
+   CONTENEDOR EXPORTAR (RESPONSIVE)
+============================== */
 .contenedor-exportar {
-	display: flex !important;
-	justify-content: flex-end !important;
-	align-items: center !important;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    flex-wrap: wrap;
 
-	padding: 12px 18px !important;
-	gap: 14px !important;
+    gap: 14px;
+    padding: 12px 18px;
+    margin-bottom: 20px;
 
-	margin-bottom: 20px !important;
-
-	background: #f8f9fa;
-	/* fondo suave */
-	border-radius: 10px;
-	/* esquinas redondeadas */
+    background: #f8f9fa;
+    border-radius: 10px;
 }
 
-.filtros {
-	display: flex !important;
-	gap: 10px !important;
-	align-items: center !important;
-	flex-wrap: wrap !important;
-	background: #f8f9fa !important;
-	padding: 12px !important;
-	border-radius: 8px !important;
-	border: 1px solid #dee2e6 !important;
+@media (max-width: 576px) {
+    .contenedor-exportar {
+        justify-content: center;
+        flex-direction: column;
+        align-items: stretch;
+    }
 }
 
-/* Inputs */
-.filtros input,
-.filtros select {
-	padding: 7px 10px !important;
-	border-radius: 6px !important;
-	border: 1px solid #ced4da !important;
-	font-size: 14px !important;
-	outline: none !important;
-	min-width: 160px !important;
-}
-
-/* focus */
-.filtros input:focus,
-.filtros select:focus {
-	border-color: #0d6efd !important;
-	box-shadow: 0 0 0 2px rgba(13, 110, 253, .15) !important;
-}
-
-/* BOTON FILTRAR */
-#filtrar {
-	background: #0d6efd !important;
-	color: white !important;
-	border: none !important;
-	padding: 8px 16px !important;
-	border-radius: 6px !important;
-	cursor: pointer !important;
-	transition: 0.2s !important;
-}
-
-#filtrar:hover {
-	background: #0b5ed7 !important;
-}
-
+/* ==============================
+   BOTÓN PDF
+============================== */
 .btn-pdf {
-	display: inline-flex !important;
-	align-items: center !important;
-	gap: 8px !important;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
 
-	padding: 10px 18px !important;
-	background: white;
-	color: #ee3535 !important;
-	font-weight: 600 !important;
-	font-size: 14px !important;
-	text-decoration: none !important;
+    padding: 10px 18px;
+    background: white;
+    color: #ee3535;
+    font-weight: 600;
+    font-size: 14px;
+    text-decoration: none;
 
-	border-radius: 8px !important;
-	border: 2px solid red !important;
+    border-radius: 10px;
+    border: 2px solid red;
 
-	box-shadow: 0 4px 10px rgba(198, 40, 40, 0.3) !important;
-	transition: all 0.3s ease-in-out !important;
-	cursor: pointer !important;
-	z-index: 1000 !important;
+    box-shadow: 0 4px 10px rgba(198, 40, 40, 0.3);
+    transition: all 0.3s ease;
+    cursor: pointer;
 }
 
-/* Hover */
 .btn-pdf:hover {
-	background: linear-gradient(135deg, #b71c1c, #c62828) !important;
-	transform: translateY(-2px) !important;
-	box-shadow: 0 6px 14px rgba(198, 40, 40, 0.4) !important;
-	color: white !important;
+    background: linear-gradient(135deg, #b71c1c, #c62828);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 14px rgba(198, 40, 40, 0.4);
+    color: white;
 }
 
-/* Click */
 .btn-pdf:active {
-	transform: translateY(0) !important;
-	box-shadow: 0 3px 8px rgba(198, 40, 40, 0.3) !important;
+    transform: translateY(0);
+    box-shadow: 0 3px 8px rgba(198, 40, 40, 0.3);
 }
 
-/* Opcional: Icono PDF antes del texto */
-.btn-pdf::before {
-	font-size: 16px !important;
-}
-
+/* ==============================
+   BOTÓN EXCEL
+============================== */
 .btn-excel {
-	display: inline-flex !important;
-	align-items: center !important;
-	gap: 8px !important;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
 
-	padding: 10px 18px !important;
-	background: white !important;
-	color: #0de906 !important;
-	font-weight: 600 !important;
-	font-size: 14px !important;
-	text-decoration: none !important;
+    padding: 10px 18px;
+    background: white;
+    color: #0de906;
+    font-weight: 600;
+    font-size: 14px;
+    text-decoration: none;
 
-	border-radius: 8px !important;
-	border: 2px solid #0de906 !important;
+    border-radius: 10px;
+    border: 2px solid #0de906;
 
-	box-shadow: 0 4px 10px rgba(27, 94, 32, 0.3) !important;
-	transition: all 0.3s ease-in-out !important;
-	cursor: pointer !important;
-	z-index: 1000 !important;
+    box-shadow: 0 4px 10px rgba(27, 94, 32, 0.3);
+    transition: all 0.3s ease;
+    cursor: pointer;
 }
 
-/* Hover */
 .btn-excel:hover {
-	background: linear-gradient(135deg, #23b82f, #32d43d) !important;
-	transform: translateY(-2px) !important;
-	box-shadow: 0 6px 14px rgba(27, 94, 32, 0.4) !important;
-	color: white !important;
+    background: linear-gradient(135deg, #23b82f, #32d43d);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 14px rgba(27, 94, 32, 0.4);
+    color: white;
 }
 
-/* Click */
 .btn-excel:active {
-	transform: translateY(0) !important;
-	box-shadow: 0 3px 8px rgba(27, 94, 32, 0.3) !important;
+    transform: translateY(0);
+    box-shadow: 0 3px 8px rgba(27, 94, 32, 0.3);
 }
 
-/* Opcional: Icono antes del texto */
-.btn-excel::before {
-	font-size: 16px !important;
+/* ==============================
+   BOTÓN SELECTOR (DROPDOWN)
+============================== */
+#botonSelector {
+    background-color: #1e2a40;
+    color: white;
+
+    border: none;
+    border-radius: 8px;
+
+    padding: 10px 18px;
+    font-weight: 600;
+
+    transition: all 0.3s ease;
 }
 
-.contenedor-exportar {
-	display: flex !important;
-	justify-content: flex-end !important;
-	align-items: center !important;
-
-	padding: 12px 18px !important;
-	gap: 14px !important;
-
-	margin-bottom: 20px !important;
-
-	background: #f8f9fa;
-	/* fondo suave */
-	border-radius: 10px;
-	/* esquinas redondeadas */
+#botonSelector:hover {
+    background-color: #7195ee;
+    transform: translateY(-2px);
 }
 
-
-/*Botones de exportar */
-.btn-pdf {
-	display: inline-flex !important;
-	align-items: center !important;
-	gap: 8px !important;
-
-	padding: 10px 18px !important;
-	background: white;
-	color: #ee3535 !important;
-	font-weight: 600 !important;
-	font-size: 14px !important;
-	text-decoration: none !important;
-
-	border-radius: 8px !important;
-	border: 2px solid red !important;
-
-	box-shadow: 0 4px 10px rgba(198, 40, 40, 0.3) !important;
-	transition: all 0.3s ease-in-out !important;
-	cursor: pointer !important;
-	z-index: 1000 !important;
+/* ==============================
+   DROPDOWN ITEMS
+============================== */
+.dropdown-item {
+    font-size: 0.9rem;
+    color: #333;
+    padding: 8px 15px;
 }
 
-/* Hover */
-.btn-pdf:hover {
-	background: linear-gradient(135deg, #b71c1c, #c62828) !important;
-	transform: translateY(-2px) !important;
-	box-shadow: 0 6px 14px rgba(198, 40, 40, 0.4) !important;
-	color: white !important;
+.dropdown-item:hover {
+    background-color: #ffc4c4;
+    color: white;
 }
 
-/* Click */
-.btn-pdf:active {
-	transform: translateY(0) !important;
-	box-shadow: 0 3px 8px rgba(198, 40, 40, 0.3) !important;
-}
-
-/* Opcional: Icono PDF antes del texto */
-.btn-pdf::before {
-	font-size: 16px !important;
-}
-
-.btn-excel {
-	display: inline-flex !important;
-	align-items: center !important;
-	gap: 8px !important;
-
-	padding: 10px 18px !important;
-	background: white !important;
-	color: #0de906 !important;
-	font-weight: 600 !important;
-	font-size: 14px !important;
-	text-decoration: none !important;
-
-	border-radius: 8px !important;
-	border: 2px solid #0de906 !important;
-
-	box-shadow: 0 4px 10px rgba(27, 94, 32, 0.3) !important;
-	transition: all 0.3s ease-in-out !important;
-	cursor: pointer !important;
-	z-index: 1000 !important;
-}
-
-/* Hover */
-.btn-excel:hover {
-	background: linear-gradient(135deg, #23b82f, #32d43d) !important;
-	transform: translateY(-2px) !important;
-	box-shadow: 0 6px 14px rgba(27, 94, 32, 0.4) !important;
-	color: white !important;
-}
-
-/* Click */
-.btn-excel:active {
-	transform: translateY(0) !important;
-	box-shadow: 0 3px 8px rgba(27, 94, 32, 0.3) !important;
-}
-
-/* Opcional: Icono antes del texto */
-.btn-excel::before {
-	font-size: 16px !important;
-}
-
-.contenedor-exportar {
-	display: flex !important;
-	justify-content: flex-end !important;
-	align-items: center !important;
-
-	padding: 12px 18px !important;
-	gap: 14px !important;
-
-	margin-bottom: 20px !important;
-
-	background: #f8f9fa;
-	/* fondo suave */
-	border-radius: 10px;
-	/* esquinas redondeadas */
+.dropdown-header {
+    font-weight: bold;
+    color: #666;
+    text-transform: uppercase;
+    font-size: 0.75rem;
 }
 
 /* El botón principal */
@@ -1840,4 +1641,199 @@ button {
 .fc-daygrid-event {
     margin-left: 2px !important;
     margin-right: 2px !important;
+}
+
+
+@media (max-width: 767.98px) {
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: -280px; /* Esconde el menú a la izquierda por defecto */
+        width: 250px;  /* Ajusta según el ancho real de tu sidebar */
+        height: 100vh;
+        z-index: 1050;
+        transition: left 0.3s ease; /* Desplazamiento suave */
+        overflow-y: auto;
+    }
+
+    /* Clase que se activa con JS para mostrar el menú */
+    .sidebar.active {
+        left: 0;
+    }
+
+    /* Estilos del Overlay (Fondo oscuro) */
+    .sidebar-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 100;
+        display: none; /* Escondido por defecto */
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    /* Mostrar overlay de forma activa */
+    .sidebar-overlay.active {
+        display: block;
+        opacity: 1;
+    }
+
+    /* Botón flotante para abrir el menú en móviles */
+    .sidebar-toggle {
+        position: fixed;
+        top: 15px;
+        left: 15px;
+        z-index: 1030;
+        background: #1C2E4A; /* Cámbialo por tu color corporativo */
+        color: #fff;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 5px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+    
+    /* Botón interno para cerrar menú */
+    .sidebar-close {
+        background: transparent;
+        border: none;
+        color: inherit;
+        font-size: 1.5rem;
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        cursor: pointer;
+    }
+}
+
+/* --- COMPORTAMIENTO ESCRITORIO (Pantallas grandes) --- */
+@media (min-width: 768px) {
+    /* Ocultar botones e interfaces móviles inservibles en desktop */
+    .sidebar-toggle, .sidebar-overlay, .sidebar-close {
+        display: none !important;
+    }
+}
+.profile-card {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    padding: 1rem 0.5rem;
+}
+
+/* Contenedor del Avatar Circular */
+.avatar-container {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    margin: 0 auto 0.75rem auto;
+}
+
+/* Imagen de usuario o marcador por defecto */
+.profile-avatar, .profile-avatar-placeholder {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid #FFF0F2; /* Mismo rosa claro de tus botones */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+    background-color: #FFF0F2;
+    color: #2B2D42; /* Icono oscuro por defecto */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+}
+
+/* Botón flotante azul de edición (Ajustado para que resalte limpio) */
+.edit-profile-badge {
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    background-color: #007bff; /* Tu azul de edición */
+    color: #FFFFFF !important;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+    border: 2px solid #FCD7D9; /* Borde del mismo color del fondo del menú */
+    transition: transform 0.2s ease;
+    z-index: 5;
+}
+
+.edit-profile-badge:hover {
+    transform: scale(1.1);
+    background-color: #0056b3;
+}
+
+/* Nombre del usuario (Cambiado a oscuro para combinar con los botones) */
+.profile-info .name {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #2B2D42; /* Mismo color oscuro de "Inicio", "Cursos", etc. */
+    margin-bottom: 0.25rem;
+}
+
+/* Badge del Rol (Texto oscuro sobre fondo rosa más claro para que sea legible) */
+.badge-role {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    font-size: 0.65rem;
+    font-weight: 700;
+    border-radius: 50px;
+    background-color: #FFF0F2; /* Fondo idéntico al de tus botones principales */
+    color: #2B2D42; /* Letras oscuras legibles */
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 1rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+}
+
+/* Botón de Notificaciones (Estilo idéntico a tus botones principales pero más compacto) */
+.btn-profile-notif {
+    width: 100%;
+    background-color: #FFF0F2; /* Mismo fondo que tus tarjetas de menú */
+    color: #2B2D42; /* Mismo color de texto */
+    border: none;
+    padding: 0.6rem 1rem;
+    border-radius: 14px; /* Bordes redondeados consistentes */
+    font-size: 0.9rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+    transition: transform 0.2s ease, background-color 0.2s ease;
+    cursor: pointer;
+}
+
+.btn-profile-notif i {
+    color: #DEA900; /* Un dorado un poco más oscuro y elegante para la campana */
+}
+
+.btn-profile-notif:hover {
+    background-color: #FFFFFF;
+    transform: translateY(-1px);
+}
+
+/* Dropdown de Backup */
+.btn-backup-custom {
+    background-color: transparent;
+    border: 1px dashed rgba(43, 45, 66, 0.3); /* Línea discontinua en tono oscuro */
+    color: #2B2D42;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+}
+
+.btn-backup-custom:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+    color: #2B2D42;
 }

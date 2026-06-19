@@ -42,59 +42,88 @@ class CursoListView(PermissionRequiredMixin, ListView):
     raise_exception = True
 
     def handle_no_permission(self):
-        raise Http404("No se encontro la paginas")
+        raise Http404("No tienes permisos para ver esta página")
 
     def get_queryset(self):
         user = self.request.user
-        rol = user.get_rol()
+
+        try:
+            rol = user.get_rol()
+        except Exception:
+            rol = None
+
         if rol == "Administrador":
             return Curso.objects.select_related("docenteid__usuario").all()
-        else:
-            return Curso.objects.filter(docenteid__usuario=user)
+
+        return Curso.objects.filter(docenteid__usuario=user)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         user = self.request.user
-        rol = user.get_rol()
+
+        # -----------------------
+        # Manejo de rol seguro
+        # -----------------------
+        try:
+            rol = user.get_rol()
+        except Exception:
+            rol = "Sin rol"
+
+        curso = None
+        estudiantes = []
 
         if rol != "Administrador":
             curso = Curso.objects.filter(docenteid__usuario=user).first()
-            context['curso'] = curso
-            context['estudiantes'] = curso.estudiante_set.all() if curso else []
-            context['titulo'] = 'Listado de Estudiantes'
-            context['subtitulo'] = 'Bienvenido al listado de estudiantes de tu curso'
-            context['text'] = "Estudiantes inscritos en tu curso"
-            context['total_text'] = "Total de Estudiantes"
-            context['total_count'] = context['estudiantes'].count()
-            context['low_stock'] = context['estudiantes'].filter(estadoMatricula="No Matriculado").count()
-            context['icon_primary'] = "fa-user-graduate"
-            context['icon_secodary'] = "fa-user-times"
+
+            if curso:
+                estudiantes = curso.estudiante_set.all()
+            else:
+                estudiantes = []
+
+            context.update({
+                'curso': curso,
+                'estudiantes': estudiantes,
+                'titulo': 'Listado de Estudiantes',
+                'subtitulo': 'Bienvenido al listado de estudiantes de tu curso',
+                'text': "Estudiantes inscritos en tu curso",
+                'total_text': "Total de Estudiantes",
+                'total_count': len(estudiantes),
+                'low_stock': estudiantes.filter(estadoMatricula="No Matriculado").count() if curso else 0,
+                'icon_primary': "fa-user-graduate",
+                'icon_secondary': "fa-user-times",
+            })
+
         else:
             total_cursos = Curso.objects.count()
             total_estudiantes = Estudiante.objects.count()
-            context['titulo'] = 'Listado de Cursos'
-            context['subtitulo'] = 'Gestión de cursos del colegio'
-            context['crear_url'] = reverse_lazy('app:crear_curso')
-            context['limpiar_url'] = reverse_lazy('app:limpiar_curso')
-            context['text'] = "Total de Estudiantes"
-            context['total_text'] = "Total de Cursos"
-            context['total_count'] = total_cursos
-            context['low_stock'] = total_estudiantes
-            context['icon_primary'] = "fa-graduation-cap"
-            context['icon_secodary'] = "fa-users"
 
-        # 🔹 PERMISOS DINÁMICOS
+            context.update({
+                'titulo': 'Listado de Cursos',
+                'subtitulo': 'Gestión de cursos del colegio',
+                'crear_url': reverse_lazy('app:crear_curso'),
+                'limpiar_url': reverse_lazy('app:limpiar_curso'),
+                'text': "Total de Estudiantes",
+                'total_text': "Total de Cursos",
+                'total_count': total_cursos,
+                'low_stock': total_estudiantes,
+                'icon_primary': "fa-graduation-cap",
+                'icon_secondary': "fa-users",
+            })
+
+        # -----------------------
+        # Permisos dinámicos seguros
+        # -----------------------
         app_label = self.model._meta.app_label
         model_name = self.model._meta.model_name
 
-        context['puede_crear'] = user.has_perm(f'{app_label}.add_{model_name}')
-        context['puede_editar'] = user.has_perm(f'{app_label}.change_{model_name}')
-        context['puede_eliminar'] = user.has_perm(f'{app_label}.delete_{model_name}')
+        context.update({
+            'puede_crear': user.has_perm(f'{app_label}.add_{model_name}'),
+            'puede_editar': user.has_perm(f'{app_label}.change_{model_name}'),
+            'puede_eliminar': user.has_perm(f'{app_label}.delete_{model_name}'),
 
-        context['icon_primary'] = "fa-arrow-up"
-        context['icon_secodary'] = "fa-arrow-down"
-        context['rol'] = rol
-        context['modo'] = 'cursos' if rol == "Administrador" else 'estudiantes'
+            'rol': rol,
+            'modo': 'cursos' if rol == "Administrador" else 'estudiantes'
+        })
 
         return context
 
