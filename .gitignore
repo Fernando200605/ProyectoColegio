@@ -22,5 +22,7 @@ __pycache__/
 .idea/
 **/.env
 **/token.json
+**/credentials.json
 **/media/usuarios/*
+**/*.md
 

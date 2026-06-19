@@ -8,13 +8,13 @@
 
     <div class="row mb-4 align-items-center">
         <!-- Tarjeta Total -->
-        <div class="col-md-3">
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-3 mb-md-0">
             <div class="card card-stats card-pastel-blue">
                 <div class="card-body">
                     <div class="d-flex justify-content-between">
                         <div>
-                            <p class="text-muted mb-0">{{ total_text }}</p>
-                            <h3 class="fw-bold">{{total_count}}</h3>
+                            <p class="text-muted mb-0 small">{{ total_text }}</p>
+                            <h3 class="fw-bold mb-0">{{total_count}}</h3>
                         </div>
                         <i class="fa-solid {{icon_primary}} fa-2x"></i>
                     </div>
@@ -22,39 +22,46 @@
             </div>
         </div>
 
-        <!-- Tarjeta Stock Bajo -->
-        <div class="col-md-3">
+        <!-- Tarjeta Secundaria -->
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-3 mb-md-0">
             <div class="card card-stats card-pastel-red">
                 <div class="card-body">
                     <div class="d-flex justify-content-between">
                         <div>
-                            <p class="text-muted mb-0">{{text}}</p>
-                            <h3 class="fw-bold text-danger">{% block low_stock %}0{% endblock %}</h3>
+                            <p class="text-muted mb-0 small">{{text}}</p>
+                            <h3 class="fw-bold text-danger mb-0">{% block low_stock %}{{ low_stock|default:"0" }}{% endblock %}</h3>
                         </div>
                         <i class="fa-solid {{icon_secodary}} fa-2x"></i>
                     </div>
                 </div>
             </div>
         </div>
+
+        <!-- Tarjetas extra opcionales por módulo -->
+        {% block extra_cards %}{% endblock %}
     </div>
 
     <div class="card card-custom mb-4 p-3 shadow-sm">
-        <div class="d-flex justify-content-between align-items-center flex-wrap">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
             <h5 class="card-title mb-0" style="color: #1C2E4A; font-weight: 600;">
                 <i class="fas fa-graduation-cap me-2"></i>{% block subtitulo %}{% endblock subtitulo %}
             </h5>
-            <div class="mt-2 mt-md-0 d-flex gap-2">
+            <div class="d-flex flex-wrap gap-2">
                 {% block options %}
                 {% if puede_crear %}
-                <a href="{{ crear_url }}" class="btn btn-create">
-                    <i class="fas fa-plus-circle me-1"></i> Nuevo Registro
+                <a href="{{ crear_url }}" class="btn btn-create btn-sm">
+                    <i class="fas fa-plus-circle me-1"></i> 
+                    <span class="d-none d-sm-inline">Nuevo Registro</span>
+                    <span class="d-inline d-sm-none">Nuevo</span>
                 </a>
                 {% endif %}
                 {% if puede_eliminar %}
-                <form action="{{ limpiar_url }}" method="post" id="Eliminar_Todo">
+                <form action="{{ limpiar_url }}" method="post" id="Eliminar_Todo" class="d-inline">
                     {% csrf_token %}
-                    <button type="submit" class="btn btn-outline-danger btn-rounded-custom">
-                        <i class="fas fa-trash-alt me-1"></i> Vaciar Lista
+                    <button type="submit" class="btn btn-outline-danger btn-rounded-custom btn-sm">
+                        <i class="fas fa-trash-alt me-1"></i> 
+                        <span class="d-none d-sm-inline">Vaciar Lista</span>
+                        <span class="d-inline d-sm-none">Vaciar</span>
                     </button>
                 </form>
                 {% endif %}
@@ -69,8 +76,8 @@
     </div>
 
     <div class="table-responsive bg-white rounded-4 shadow-sm p-3">
-        <table class="table" id="Tabla">
-            <thead>
+        <table class="table table-hover" id="Tabla">
+            <thead class="table-light">
                 <tr>
                     {% block columns %}{% endblock columns %}
                 </tr>

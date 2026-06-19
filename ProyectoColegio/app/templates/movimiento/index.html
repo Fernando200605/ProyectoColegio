@@ -1,45 +1,89 @@
 {% extends 'list_generic.html' %}
 
-{% block titulo %}
-{{titulo}}
-{% endblock titulo %}
+{% block titulo %}{{ titulo }}{% endblock %}
+{% block subtitulo %}{{ subtitulo }}{% endblock %}
 
-{% block subtitulo %}
-{{subtitulo}}
-{% endblock subtitulo%}
+{% block extra_cards %}
+<div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-3 mb-md-0">
+  <div class="card card-stats" style="background:linear-gradient(135deg,#e8f5e9,#c8e6c9);">
+    <div class="card-body">
+      <div class="d-flex justify-content-between">
+        <div>
+          <p class="text-muted mb-0 small">Entradas</p>
+          <h3 class="fw-bold mb-0" style="color:#2e7d32;">{{ entradas|default:"0" }}</h3>
+        </div>
+        <i class="fa-solid fa-arrow-up fa-2x" style="color:#2e7d32;"></i>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-3 mb-md-0">
+  <div class="card card-stats" style="background:linear-gradient(135deg,#fff9e6,#fff3cd);">
+    <div class="card-body">
+      <div class="d-flex justify-content-between">
+        <div>
+          <p class="text-muted mb-0 small">Registrados hoy</p>
+          <h3 class="fw-bold mb-0" style="color:#e67e22;">{{ hoy_count|default:"0" }}</h3>
+        </div>
+        <i class="fa-solid fa-calendar-day fa-2x" style="color:#e67e22;"></i>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block exportar %}
+  <a href="{% url 'app:reporte_movimiento_pdf' %}" class="btn-pdf btn-sm">
+    <i class="fas fa-file-pdf me-1"></i> <span class="d-none d-sm-inline">Descargar</span> PDF
+  </a>
+  <a href="{% url 'app:reporte_movimiento_excel' %}" class="btn-excel btn-sm">
+    <i class="fas fa-file-excel me-1"></i> <span class="d-none d-sm-inline">Descargar</span> Excel
+  </a>
+{% endblock %}
 
 {% block columns %}
-    <th><i class="fas fa-hashtag me-2"></i>ID</th>
-    <th><i class="fas fa-book me-2"></i>Tipo</th>
-    <th><i class="fas fa-clock me-2"></i>Fecha</th>
-    <th class="text-center"><i class="fas fa-tools me-2"></i>Acciones</th>
-{% endblock columns %}
-{% block exportar %}
-        <a href="{% url 'app:reporte_movimiento_pdf' %}" class="btn-pdf">
-            <i class="fas fa-file-pdf me-1"></i>
-        Descargar PDF
-        </a>
-        <a href="{% url 'app:reporte_movimiento_excel' %}" class="btn-excel">
-            <i class="fas fa-file-excel me-1"></i>
-        Descargar Excel
-        </a>
-{% endblock exportar %}
-
+  <th class="d-none d-md-table-cell"><i class="fas fa-hashtag me-2"></i>ID</th>
+  <th><i class="fas fa-box me-2"></i>Elemento</th>
+  <th><i class="fas fa-exchange-alt me-2"></i>Tipo</th>
+  <th><i class="fas fa-sort-numeric-up me-2"></i>Cant.</th>
+  <th class="d-none d-lg-table-cell"><i class="fas fa-calendar me-2"></i>Fecha</th>
+  <th class="d-none d-xl-table-cell"><i class="fas fa-comment me-2"></i>Motivo</th>
+  <th class="text-center"><i class="fas fa-tools me-2"></i><span class="d-none d-md-inline">Acciones</span></th>
+{% endblock %}
 
 {% block rows %}
-    {% for movimiento in object_list %}
-    <tr>
-        <td>{{ movimiento.id }}</td>
-        <td>{{ movimiento.tipo }}</td>
-        <td>{{ movimiento.fecha }}</td>
-        <td class="text-center">
-            <a href="{% url 'app:editar_movimiento' movimiento.id %}" class="btn btn-sm me-1" style="background-color: #3054f7; color: #ffffff; border-radius: 8px;">
-                            <i class="fa-solid fa-pen-to-square"></i>
-            </a>
-            <a href="{% url 'app:eliminar_movimiento' movimiento.id %}" class="btn btn-sm" style="background-color: #ff4d4d; color: white; border-radius: 8px;">
-                            <i class="fa-solid fa-trash"></i>
-            </a>
-        </td>
-    </tr>
-    {% endfor %}
-{% endblock rows %}
+  {% for movimiento in object_list %}
+  <tr>
+    <td class="d-none d-md-table-cell">{{ movimiento.id }}</td>
+    <td>{{ movimiento.elementoId.nombre }}</td>
+    <td>
+      {% if movimiento.tipo == "Entrada" %}
+        <span class="badge" style="background-color:#28a745;">
+          <i class="fas fa-arrow-up me-1 d-none d-sm-inline"></i>Entrada
+        </span>
+      {% elif movimiento.tipo == "Salida" %}
+        <span class="badge" style="background-color:#dc3545;">
+          <i class="fas fa-arrow-down me-1 d-none d-sm-inline"></i>Salida
+        </span>
+      {% else %}
+        <span class="badge bg-secondary">{{ movimiento.tipo }}</span>
+      {% endif %}
+    </td>
+    <td><strong>{{ movimiento.cantidad }}</strong></td>
+    <td class="d-none d-lg-table-cell">{{ movimiento.fecha|date:"d/m/Y H:i" }}</td>
+    <td class="d-none d-xl-table-cell">{{ movimiento.motivo|truncatechars:40 }}</td>
+    <td class="text-center">
+      <div class="d-flex justify-content-center gap-1 flex-nowrap">
+        <a href="{% url 'app:editar_movimiento' movimiento.id %}" class="btn btn-sm"
+           style="background-color:#3054f7; color:#fff; border-radius:8px;" title="Editar">
+          <i class="fa-solid fa-pen-to-square"></i>
+        </a>
+        <a href="{% url 'app:eliminar_movimiento' movimiento.id %}" class="btn btn-sm"
+           style="background-color:#ff4d4d; color:white; border-radius:8px;" title="Eliminar">
+          <i class="fa-solid fa-trash"></i>
+        </a>
+      </div>
+    </td>
+  </tr>
+  {% endfor %}
+{% endblock %}

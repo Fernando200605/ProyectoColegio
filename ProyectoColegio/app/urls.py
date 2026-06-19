@@ -7,12 +7,16 @@ from app.views.TipoElemento.views import *
 from app.views.UnidadMedida.views import *
 from app.views.Categoria.views import *
 from app.views.Asistencia.views import *
-from app.views.Curso.views import *
 from app.views.Movimiento.views import *
 from app.views.Evento.views import *
 from app.views.Notificacion.views import *
-from app.views.Index.views import DashboardView , NotificacionesView
+from app.views.Index.views import DashboardView , NotificacionesView,MarcarComoleidasNotificaciones
 from app.views.IA.views import preguntar_ia,preguntar_ia_local
+from app.views.EstudianteAcudiente.views import (
+    EstudianteAcudienteListView,
+    EstudianteAcudienteCreateView,
+    EstudianteAcudienteDeleteView,
+)
 
 from app.views.reportes import *
 from app.views.backup import *
@@ -23,6 +27,7 @@ urlpatterns = [
     path('preguntas/',preguntar_ia,name="preguntar"),
     path('preguntas1/',preguntar_ia_local,name="preguntar2" ),
     path('mis_notificaciones/',NotificacionesView.as_view(),name="mis_notificaciones"),
+    path("mis_notificaciones/<int:pk>/leer/", MarcarComoleidasNotificaciones.as_view(), name="notificacion_leida"),
     # path('Curso/',listar_curso,name="listar_curso" ),
     path('curso/', CursoListView.as_view(), name="index_curso"),
     path('curso/crear/', CursoCreateView.as_view(), name="crear_curso"),
@@ -79,12 +84,6 @@ urlpatterns = [
          UnidadMedidaUpdateView.as_view(), name='editar_unidad'),
     path('unidad/eliminar/<int:pk>/',
          UnidadMedidaDeleteView.as_view(), name='eliminar_unidad'),
-    # MARCA
-    path('marca/', marcaListView.as_view(), name='index_marca'),
-    path('marca/crear/', marcaCreateView.as_view(), name='crear_marca'),
-    path('marca/editar/<int:pk>/', marcaUpdateView.as_view(), name='editar_marca'),
-    path('marca/eliminar/<int:pk>/',
-         marcaDeleteView.as_view(), name='eliminar_marca'),
     # CATEGORIA
     path('categoria/', CategoriaListView.as_view(), name='index_categoria'),
     path('categoria/crear/', CategoriaCreateView.as_view(), name='crear_categoria'),
@@ -157,4 +156,7 @@ urlpatterns = [
          name="reporte_inventario_excel"),
     path('backup/', backup, name="backup"),
     path('backup/restaurar', restaurar_datos, name="restaurar_datos"),
+    path('relacion/', EstudianteAcudienteListView.as_view(), name="index_relacion"),
+    path('relacion/crear/', EstudianteAcudienteCreateView.as_view(), name="crear_relacion"),
+    path('relacion/eliminar/<int:pk>/', EstudianteAcudienteDeleteView.as_view(), name="eliminar_relacion"),
 ]

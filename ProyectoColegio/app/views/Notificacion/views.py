@@ -41,20 +41,29 @@ class NotificacionListView(ListView):
         else:
             return Notificacion.objects.filter(receptor=usuario.id)
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)  # Herencia por medio de super
+        context = super().get_context_data(**kwargs)
+        from django.utils import timezone as tz
+        usuario = self.request.user
+        rol = usuario.get_rol()
+        qs = self.get_queryset()
+        total = qs.count()
+        no_leidas = qs.filter(estado="no_leida").count()
+        urgentes = qs.filter(tipo="urgente").count()
+
         context['titulo'] = 'Listado de Notificaciones'
-        context['subtitulo'] = 'Bienvenido al listado de Notificaciones'
+        context['subtitulo'] = 'Centro de notificaciones del sistema'
         context['crear_url'] = reverse_lazy('app:crear_notificacion')
         context['limpiar_url'] = reverse_lazy('app:limpiar_notificacion')
-        context['table'] = "notificacion"  
-        context['text'] = "Notificaciones de Hoy"
+        context['total_count'] = total
         context['total_text'] = "Total de Notificaciones"
-        context['icon_primary'] = "fa-arrow-up"
-        context['icon_secodary'] = "fa-arrow-down"
+        context['text'] = "Sin leer"
+        context['low_stock'] = no_leidas
+        context['icon_primary'] = "fa-bell"
+        context['icon_secodary'] = "fa-envelope"
+        context['urgentes'] = urgentes
         user = self.request.user
         app_label = self.model._meta.app_label
         model_name = self.model._meta.model_name
-
         context['puede_crear'] = user.has_perm(f'{app_label}.add_{model_name}')
         context['puede_editar'] = user.has_perm(f'{app_label}.change_{model_name}')
         context['puede_eliminar'] = user.has_perm(f'{app_label}.delete_{model_name}')

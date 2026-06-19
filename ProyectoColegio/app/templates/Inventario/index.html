@@ -1,55 +1,69 @@
 {% extends 'list_generic.html' %}
 
+{% block titulo %}{{ titulo }}{% endblock %}
+{% block subtitulo %}{{ subtitulo }}{% endblock %}
 
-{% block titulo %}
-{{titulo}}
-{% endblock titulo %}
-
-{% block subtitulo %}
-{{subtitulo}}
-{% endblock subtitulo%}
-
-{%block exportar%}
-<a href="{% url 'app:reporte_inventario_pdf' %}" class="btn-pdf">
-    <i class="fas fa-file-pdf me-1"></i> Exportar a PDF
-</a>
-<a href="{% url 'app:reporte_inventario_excel' %}" class="btn-excel">
-    <i class="fas fa-file-excel me-1"></i> Exportar a Excel
-</a>
-{% endblock exportar %}
-
-
-
+{% block exportar %}
+  <a href="{% url 'app:reporte_inventario_pdf' %}" class="btn-pdf btn-sm">
+    <i class="fas fa-file-pdf me-1"></i> <span class="d-none d-sm-inline">Exportar a</span> PDF
+  </a>
+  <a href="{% url 'app:reporte_inventario_excel' %}" class="btn-excel btn-sm">
+    <i class="fas fa-file-excel me-1"></i> <span class="d-none d-sm-inline">Exportar a</span> Excel
+  </a>
+  <a href="?bajo_stock=1" class="btn btn-outline-warning btn-sm ms-1" style="border-radius:8px;">
+    <i class="fas fa-exclamation-triangle me-1"></i> <span class="d-none d-sm-inline">Solo</span> Stock bajo
+  </a>
+  {% if request.GET.bajo_stock %}
+    <a href="?" class="btn btn-outline-secondary btn-sm" style="border-radius:8px;">
+      <i class="fas fa-times me-1"></i> <span class="d-none d-sm-inline">Quitar filtro</span>
+    </a>
+  {% endif %}
+{% endblock %}
 
 {% block columns %}
-     <tr>
-                    <th><i class="fas fa-hashtag me-2"></i>ID</th>
-                    <th><i class="fas fa-box me-2"></i>Nombre</th>
-                    <th><i class="fas fa-box me-2"></i>Marca</th>
-                    <th><i class="fas fa-warehouse me-2"></i>Categoría</th>
-                    <th><i class="fas fa-chart-line me-2"></i>Stock</th>
-                    <th><i class="fas fa-chart-line me-2"></i>Ubicación</th>
-                    <th class="text-center"><i class="fas fa-tools me-2"></i>Acciones</th>
-                </tr>
-{% endblock columns %}
+  <th class="d-none d-md-table-cell"><i class="fas fa-hashtag me-2"></i>ID</th>
+  <th><i class="fas fa-box me-2"></i>Nombre</th>
+  <th class="d-none d-lg-table-cell"><i class="fas fa-tag me-2"></i>Marca</th>
+  <th class="d-none d-xl-table-cell"><i class="fas fa-warehouse me-2"></i>Categoría</th>
+  <th><i class="fas fa-cubes me-2"></i>Stock</th>
+  <th class="d-none d-lg-table-cell"><i class="fas fa-map-marker-alt me-2"></i>Ubicación</th>
+  <th class="text-center"><i class="fas fa-tools me-2"></i><span class="d-none d-md-inline">Acciones</span></th>
+{% endblock %}
 
 {% block rows %}
-    {% for elemento in object_list %}
-    <tr>
-        <td>{{ elemento.id }}</td>
-        <td>{{ elemento.nombre }}</td>
-        <td>{{ elemento.marcaId }}</td>
-        <td>{{ elemento.categoriaId }}</td>
-        <td>{{ elemento.stockActual }}</td>
-        <td>{{ elemento.ubicacion }}</td>
-        <td class="text-center">
-            <a href="{% url 'app:editar_elemento' elemento.id %}" class="btn btn-sm me-1" style="background-color: #3054f7; color: #ffffff; border-radius: 8px;">
-                            <i class="fa-solid fa-pen-to-square"></i>
-            </a>
-            <a href="{% url 'app:eliminar_elemento' elemento.id %}" class="btn btn-sm" style="background-color: #ff4d4d; color: white; border-radius: 8px;">
-                            <i class="fa-solid fa-trash"></i>
-            </a>
-        </td>
-    </tr>
-    {% endfor %}
-{% endblock rows %}
+  {% for elemento in object_list %}
+  <tr {% if elemento.stockActual <= elemento.stockMinimo %}style="background-color:#fff8e1;"{% endif %}>
+    <td class="d-none d-md-table-cell">{{ elemento.id }}</td>
+    <td>
+      {{ elemento.nombre|truncatechars:30 }}
+      {% if elemento.stockActual <= elemento.stockMinimo %}
+        <span class="badge ms-1" style="background-color:#ff9800; font-size:0.65rem;">Bajo</span>
+      {% endif %}
+    </td>
+    <td class="d-none d-lg-table-cell">{{ elemento.marcaId }}</td>
+    <td class="d-none d-xl-table-cell">{{ elemento.categoriaId }}</td>
+    <td>
+      {% if elemento.stockActual <= elemento.stockMinimo %}
+        <span class="fw-bold text-danger">{{ elemento.stockActual }}</span>
+        <small class="text-muted d-none d-sm-inline"> / {{ elemento.stockMinimo }}</small>
+      {% else %}
+        <span class="text-success fw-bold">{{ elemento.stockActual }}</span>
+        <small class="text-muted d-none d-sm-inline"> / {{ elemento.stockMinimo }}</small>
+      {% endif %}
+    </td>
+    <td class="d-none d-lg-table-cell">{{ elemento.ubicacion }}</td>
+    <td class="text-center">
+      <div class="d-flex justify-content-center gap-1 flex-nowrap">
+        <a href="{% url 'app:editar_elemento' elemento.id %}" class="btn btn-sm"
+           style="background-color:#3054f7; color:#fff; border-radius:8px;" title="Editar">
+          <i class="fa-solid fa-pen-to-square"></i>
+        </a>
+        <a href="{% url 'app:eliminar_elemento' elemento.id %}" class="btn btn-sm"
+           style="background-color:#ff4d4d; color:white; border-radius:8px;" title="Eliminar">
+          <i class="fa-solid fa-trash"></i>
+        </a>
+      </div>
+    </td>
+  </tr>
+  {% endfor %}
+{% endblock %}

@@ -25,7 +25,7 @@ def preguntar_ia(request):
         return JsonResponse({"respuesta": respuesta.choices[0].message.content})
 
 
-LOCAL_HOST = "http://127.0.0.1:8000"
+LOCAL_HOST = os.getenv("APP_HOST", "http://127.0.0.1:8000")
 
 
 def normalizar_ruta(r):

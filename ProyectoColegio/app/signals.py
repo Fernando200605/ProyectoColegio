@@ -6,7 +6,8 @@ from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from email.mime.image import MIMEImage
-from app.models import Usuario, Notificacion ,Curso
+from app.models import Usuario, Notificacion ,Curso,Administrador
+from django.contrib.auth import get_user_model
 import os
 from django.conf import settings
 
@@ -52,7 +53,36 @@ def inicializar_roles(sender, **kwargs):
     # =========================
     acudiente.permissions.clear()
 
+Usuario = get_user_model()
 
+
+@receiver(post_migrate)
+def crear_admin_inicial(sender, **kwargs):
+    if sender.name != "app":
+        return
+
+    if Usuario.objects.filter(email="admin@colegio.com").exists():
+        return
+
+    usuario = Usuario.objects.create_user(
+        email="admin@colegio.com",
+        nombre="Administrador Principal",
+        password="admin123",
+        is_staff=True,
+        is_superuser=True,
+        estado=True
+    )
+
+    # 👇 ASIGNAR GRUPO
+    admin_group = Group.objects.get(name="Administrador")
+    usuario.groups.add(admin_group)
+
+    Administrador.objects.create(
+        usuario=usuario,
+        cargo="Administrador General"
+    )
+
+    print("[OK] Administrador creado correctamente")
 
 @receiver(post_save, sender=Usuario)
 def notificar_usuario(sender, instance, created, **kwargs):
@@ -78,8 +108,8 @@ def notificar_usuario(sender, instance, created, **kwargs):
             titulo=titulo,
             mensaje=mensaje,
             fecha_envio=now().date(),
-            estado='Activo',
-            tipo="Sistema",
+            estado='no_leida',
+            tipo="aviso",
             receptor_id=admin.id
         )
 
@@ -142,8 +172,8 @@ def notificar_curso(sender, instance, created, **kwargs):
             titulo=titulo,
             mensaje=mensaje,
             fecha_envio=now().date(),
-            estado='Activo',
-            tipo="Actualización",
+            estado='no_leida',
+            tipo="actualizacion",
             receptor=admin
         )
 

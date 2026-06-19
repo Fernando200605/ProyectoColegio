@@ -298,7 +298,7 @@ class ExportarMovimientosPDF(DjangoView):
 
         # Preparar los datos en formato de tuplas
         datos = [
-            (mo.id, mo.fecha, mo.cantidad, mo.elementoid, mo.usuarioid, mo.cursoid)
+            (mo.id, mo.fecha, mo.cantidad, mo.elementoId, mo.usuarioId, mo.cursoId)
             for mo in movimiento
         ]
 
@@ -335,7 +335,7 @@ class ExportarMovimientosExcel(DjangoView):
 
         # Preparar los datos en  tuplas
         datos = [
-            (mo.id, mo.fecha, mo.cantidad, mo.elementoid, mo.usuarioid, mo.cursoid)
+            (mo.id, mo.fecha, mo.cantidad, mo.elementoId, mo.usuarioId, mo.cursoId)
             for mo in movimiento
         ]
 
