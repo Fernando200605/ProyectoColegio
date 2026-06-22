@@ -537,45 +537,52 @@ header::before {
    ACCESIBILIDAD
 ================================ */
 .accessibility-button {
-	position: fixed;
-	bottom: 20px;
-	right: 20px;
-	width: 50px;
-	height: 50px;
-	background-color: #ff6b6b;
-	border: none;
-	border-radius: 50%;
-	color: white;
-	font-size: 20px;
-	cursor: pointer;
-	box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-	z-index: 1000;
-	transition: all 0.3s ease;
-	display: flex;
-	align-items: center;
-	justify-content: center;
+	position: fixed !important;
+	bottom: 90px !important; /* Closer to chatbot but still above */
+	right: 20px !important;
+	width: 55px !important;
+	height: 55px !important;
+	background-color: #007bff !important;
+	border: 3px solid #ffffff !important;
+	border-radius: 50% !important;
+	color: #ffffff !important;
+	font-size: 26px !important;
+	cursor: pointer !important;
+	box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4) !important;
+	z-index: 100000 !important;
+	display: flex !important;
+	align-items: center !important;
+	justify-content: center !important;
+	visibility: visible !important;
+	opacity: 1 !important;
+	transition: all 0.3s ease !important;
+}
+
+.accessibility-button.oculto {
+	display: none !important;
 }
 
 .accessibility-button:hover {
-	transform: scale(1.1);
-	background-color: #ff5252;
+	transform: scale(1.1) rotate(15deg);
+	background-color: #1976d2;
 }
 
 .accessibility-panel {
-	position: fixed;
-	bottom: 80px;
+	position: fixed !important;
+	bottom: 155px !important; /* Adjusted to follow the button */
 	right: 20px;
 	display: none;
 	flex-direction: column;
-	gap: 10px;
-	background: #fff;
-	padding: 10px;
-	border-radius: 12px;
-	box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-	z-index: 1001;
+	gap: 12px;
+	background: white;
+	padding: 15px;
+	border-radius: 15px;
+	box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+	z-index: 9998;
 	opacity: 0;
-	transform: translateY(10px);
+	transform: translateY(20px);
 	transition: all 0.3s ease;
+	min-width: 200px;
 }
 
 .accessibility-panel.show {
@@ -601,37 +608,252 @@ header::before {
    MODOS DE ACCESIBILIDAD
 ================================ */
 body.is-high-contrast {
-	background: #000;
-	color: #fff;
+	background: #000 !important;
+	color: #fff !important;
 }
 
-body.is-high-contrast .main-content {
-	background: #000;
-	color: #fff;
+body.is-high-contrast .main-content,
+body.is-high-contrast header,
+body.is-high-contrast .sidebar,
+body.is-high-contrast .info-footer,
+body.is-high-contrast .info-card,
+body.is-high-contrast .guia,
+body.is-high-contrast .modal-content,
+body.is-high-contrast .bg-white,
+body.is-high-contrast .card,
+body.is-high-contrast .card-custom,
+body.is-high-contrast .contenedor-exportar,
+body.is-high-contrast .table-responsive,
+body.is-high-contrast .main-content-glass,
+body.is-high-contrast .role-badge-box,
+body.is-high-contrast .permiso-dropdown,
+body.is-high-contrast .dd-panel,
+body.is-high-contrast .dd-inner {
+	background: #000 !important;
+	color: #fff !important;
+	border: 2px solid #fff !important;
 }
 
-body.is-high-contrast .info-card {
-	background: #333;
-	color: #fff;
+body.is-high-contrast a,
+body.is-high-contrast button:not(.accessibility-button),
+body.is-high-contrast .accessibility-option i,
+body.is-high-contrast i,
+body.is-high-contrast .hamburger i {
+	color: #ffffff !important; /* White for links and icons in high contrast */
 }
 
-body.is-high-contrast .guia {
-	background: #222;
-	color: #fff;
+body.is-high-contrast .hamburger {
+	background-color: #000000 !important;
+	border: 2px solid #ffffff !important;
 }
 
-body.is-large-text {
-	font-size: 1.3em;
+body.is-high-contrast table,
+body.is-high-contrast .table,
+body.is-high-contrast th,
+body.is-high-contrast td,
+body.is-high-contrast .dataTables_wrapper,
+body.is-high-contrast .dataTables_info,
+body.is-high-contrast .dataTables_paginate {
+	background-color: #000000 !important;
+	color: #ffffff !important;
+	border: 1px solid #ffffff !important;
 }
 
-body.is-large-text .info-card .title,
-body.is-large-text .info-card .value {
-	font-size: 1.2em;
+body.is-high-contrast table.dataTable tbody tr {
+    background-color: #000000 !important;
 }
 
-body.is-large-text .guia-item h3,
-body.is-large-text .guia-item p {
-	font-size: 1.1em;
+body.is-high-contrast table.dataTable tbody tr:nth-child(even),
+body.is-high-contrast .table-striped tbody tr:nth-child(odd) {
+    background-color: #1a1a1a !important; /* Zebra striping in dark mode */
+}
+
+body.is-high-contrast input,
+body.is-high-contrast select,
+body.is-high-contrast textarea,
+body.is-high-contrast .form-control {
+	background-color: #000000 !important;
+	color: #ffffff !important;
+	border: 2px solid #ffffff !important;
+}
+
+body.is-high-contrast .btn-pdf,
+body.is-high-contrast .btn-excel,
+body.is-high-contrast .btn-create,
+body.is-high-contrast .btn-primary,
+body.is-high-contrast .btn-sm {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+    border: 2px solid #ffffff !important;
+}
+
+body.is-high-contrast .btn-pdf:hover,
+body.is-high-contrast .btn-excel:hover,
+body.is-high-contrast .btn-create:hover {
+    background-color: #333333 !important;
+}
+
+/* DataTables Pagination */
+body.is-high-contrast .dataTables_paginate .paginate_button {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+    border: 1px solid #ffffff !important;
+    padding: 5px 12px !important;
+    margin: 2px !important;
+}
+
+body.is-high-contrast .dataTables_paginate .paginate_button:hover {
+    background-color: #333333 !important;
+    color: #ffff00 !important;
+}
+
+body.is-high-contrast .dataTables_paginate .paginate_button.current {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    border: 1px solid #ffffff !important;
+}
+
+body.is-high-contrast .dataTables_paginate .paginate_button.disabled {
+    opacity: 0.5 !important;
+    cursor: default !important;
+}
+
+body.is-high-contrast .badge,
+body.is-high-contrast .badge-contador {
+    border: 1px solid #ffffff !important;
+    background-color: #000000 !important;
+    color: #ffffff !important;
+}
+
+body.is-high-contrast .badge-contador.tiene-activos,
+body.is-high-contrast .badge-contador.todos-activos {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+}
+
+body.is-high-contrast .btn-save {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+    border: 3px solid #ffffff !important;
+}
+
+body.is-high-contrast .dd-trigger {
+    color: #ffffff !important;
+}
+
+body.is-high-contrast .dd-trigger:hover,
+body.is-high-contrast .permiso-dropdown.abierto .dd-trigger {
+    background-color: #333333 !important;
+}
+
+body.is-high-contrast .text-primary-custom,
+body.is-high-contrast .permiso-item:has(.form-check-input:checked) {
+    background-color: #333333 !important;
+    border: 1px solid #ffffff !important;
+}
+
+body.is-high-contrast span {
+    color: inherit !important;
+}
+
+body.is-high-contrast .accessibility-panel {
+	background-color: #000000 !important;
+	border: 2px solid #ffffff !important;
+}
+
+body.is-high-contrast .accessibility-option {
+	background-color: #000000 !important;
+	border: 1px solid #ffffff !important;
+	color: #ffffff !important;
+}
+
+body.is-high-contrast .accessibility-option:hover {
+	background-color: #333333 !important;
+	border-color: #ffff00 !important;
+}
+
+body.is-high-contrast .accessibility-option.active {
+	background-color: #ffffff !important;
+	color: #000000 !important;
+}
+
+body.is-high-contrast .accessibility-option.active i {
+	color: #000000 !important;
+}
+
+body.is-size-small { font-size: 0.85rem !important; }
+body.is-size-medium { font-size: 1rem !important; }
+body.is-size-large { font-size: 1.25rem !important; }
+
+body.is-size-large h1 { font-size: 2.5rem !important; }
+body.is-size-large .info-card .title { font-size: 1.5rem !important; }
+body.is-size-large .info-card .value { font-size: 2rem !important; }
+
+body.is-readable-font, 
+body.is-readable-font h1, 
+body.is-readable-font h2, 
+body.is-readable-font h3, 
+body.is-readable-font h4, 
+body.is-readable-font h5, 
+body.is-readable-font h6, 
+body.is-readable-font p, 
+body.is-readable-font span, 
+body.is-readable-font a, 
+body.is-readable-font button,
+body.is-readable-font input,
+body.is-readable-font label {
+	font-family: 'Open Sans', Arial, sans-serif !important;
+}
+
+/* Ensure icons NEVER lose their font */
+body.is-readable-font i, 
+body.is-readable-font .fas, 
+body.is-readable-font .fa {
+	font-family: 'Font Awesome 7 Free', 'Font Awesome 6 Free', 'Font Awesome 5 Free', 'FontAwesome' !important;
+}
+
+.accessibility-panel h4 {
+	margin: 0 0 10px 0;
+	font-size: 16px;
+	color: #1C2E4A;
+	border-bottom: 1px solid #eee;
+	padding-bottom: 5px;
+}
+
+.accessibility-option {
+	display: flex;
+	align-items: center;
+	padding: 10px;
+	background: #f8f9fa;
+	border: 1px solid #eee;
+	border-radius: 8px;
+	cursor: pointer;
+	transition: all 0.2s;
+	font-weight: 600;
+	gap: 10px;
+}
+
+.accessibility-option:hover {
+	background: #e3f2fd;
+	border-color: #2196f3;
+	color: #1976d2;
+}
+
+.accessibility-option.active {
+	background-color: #2196f3;
+	color: white;
+	border-color: #1976d2;
+}
+
+.is-being-read {
+	outline: 3px solid #ffeb3b !important;
+	outline-offset: 2px !important;
+	background-color: rgba(255, 235, 59, 0.2) !important;
+}
+
+.accessibility-option i {
+	width: 20px;
+	text-align: center;
 }
 
 /* ================================
@@ -1372,7 +1594,7 @@ body.is-large-text .guia-item p {
 	border-radius: 25px !important;
 	padding: 10px 20px !important;
 	transition: all 0.3s ease !important;
-	box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !;
+	box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
 	color: #000 !important;
 }
 
@@ -1750,7 +1972,7 @@ button {
     position: absolute;
     bottom: 2px;
     right: 2px;
-    background-color: #007bff; /* Tu azul de edición */
+    background-color: #166bc6c1; /* Tu azul de edición */
     color: #FFFFFF !important;
     width: 28px;
     height: 28px;
