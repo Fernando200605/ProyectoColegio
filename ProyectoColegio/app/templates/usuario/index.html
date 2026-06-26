@@ -18,6 +18,7 @@
     </div>
   </div>
 </div>
+
 <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-3 mb-md-0">
   <div class="card card-stats">
     <div class="card-body">
@@ -26,16 +27,22 @@
           <p class="text-muted mb-1 small">Por rol</p>
           <div class="d-flex gap-1 flex-wrap">
             <span class="badge small" style="background:#1C2E4A;">
-              <i class="fas fa-user-graduate me-1"></i><span class="d-none d-sm-inline">Est:</span>{{ estudiantes_count }}
+              <i class="fas fa-user-graduate me-1"></i>
+              <span class="d-none d-sm-inline">Est:</span>{{ estudiantes_count }}
             </span>
+
             <span class="badge small" style="background:#28a745;">
-              <i class="fas fa-chalkboard-teacher me-1"></i><span class="d-none d-sm-inline">Doc:</span>{{ docentes_count }}
+              <i class="fas fa-chalkboard-teacher me-1"></i>
+              <span class="d-none d-sm-inline">Doc:</span>{{ docentes_count }}
             </span>
+
             <span class="badge small" style="background:#9c27b0;">
-              <i class="fas fa-user-shield me-1"></i><span class="d-none d-sm-inline">Adm:</span>{{ administradores_count }}
+              <i class="fas fa-user-shield me-1"></i>
+              <span class="d-none d-sm-inline">Adm:</span>{{ administradores_count }}
             </span>
           </div>
         </div>
+
         <i class="fa-solid fa-id-card fa-2x text-info d-none d-md-block"></i>
       </div>
     </div>
@@ -46,20 +53,20 @@
 {% block exportar %}
 <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
 
-  <!-- BOTONES EXPORTAR -->
   <div class="d-flex gap-2 flex-wrap">
 
-    <a href="#" class="btn-pdf " id="ExportarPdf">
+    {% if perms.app.view_usuario %}
+    <a href="#" class="btn-pdf" id="ExportarPdf">
       <i class="fas fa-file-pdf me-1"></i> Descargar PDF
     </a>
 
-    <a href="#" class="btn-excel " id="ExportarExcel">
+    <a href="#" class="btn-excel" id="ExportarExcel">
       <i class="fas fa-file-excel me-1"></i> Descargar Excel
     </a>
+    {% endif %}
 
   </div>
 
-  <!-- FILTROS -->
   <div class="d-flex flex-wrap gap-2 align-items-center mt-2 mt-md-0">
 
     <input type="text"
@@ -101,44 +108,84 @@
 {% endblock %}
 
 {% block columns %}
-  <th class="d-none d-md-table-cell"><i class="fas fa-hashtag me-2"></i>ID</th>
-  <th><i class="fas fa-user me-2"></i>Nombre</th>
-  <th class="d-none d-lg-table-cell"><i class="fas fa-envelope me-2"></i>Email</th>
-  <th class="text-center"><i class="fas fa-user-shield me-2"></i>Rol</th>
-  <th class="text-center d-none d-xl-table-cell"><i class="fas fa-circle me-2"></i>Estado</th>
-  <th class="text-center d-none d-sm-table-cell"><i class="fa-regular fa-file-image me-2"></i>Foto</th>
-  <th class="text-center"><i class="fas fa-tools me-2"></i><span class="d-none d-md-inline">Acciones</span></th>
+  <th class="d-none d-md-table-cell">
+    <i class="fas fa-hashtag me-2"></i>ID
+  </th>
+
+  <th>
+    <i class="fas fa-user me-2"></i>Nombre
+  </th>
+
+  <th class="d-none d-lg-table-cell">
+    <i class="fas fa-envelope me-2"></i>Email
+  </th>
+
+  <th class="text-center">
+    <i class="fas fa-user-shield me-2"></i>Rol
+  </th>
+
+  <th class="text-center d-none d-xl-table-cell">
+    <i class="fas fa-circle me-2"></i>Estado
+  </th>
+
+  <th class="text-center d-none d-sm-table-cell">
+    <i class="fa-regular fa-file-image me-2"></i>Foto
+  </th>
+
+  {% if perms.app.view_usuario or perms.app.change_usuario or perms.app.delete_usuario %}
+  <th class="text-center">
+    <i class="fas fa-tools me-2"></i>
+    <span class="d-none d-md-inline">Acciones</span>
+  </th>
+  {% endif %}
 {% endblock %}
 
 {% block rows %}
   {% for usuario in object_list %}
   <tr>
-    <td class="d-none d-md-table-cell">{{ usuario.id }}</td>
-    <td>{{ usuario.nombre|truncatechars:30 }}</td>
-    <td class="d-none d-lg-table-cell">{{ usuario.email }}</td>
+
+    <td class="d-none d-md-table-cell">
+      {{ usuario.id }}
+    </td>
+
+    <td>
+      {{ usuario.nombre|truncatechars:30 }}
+    </td>
+
+    <td class="d-none d-lg-table-cell">
+      {{ usuario.email }}
+    </td>
+
     <td class="text-center">
       {% with rol=usuario.get_rol %}
+
         {% if rol == "Administrador" %}
           <span class="badge small" style="background:#9c27b0;">
-            <i class="fas fa-user-shield me-1 d-none d-sm-inline"></i>Adm
+            <i class="fas fa-user-shield me-1 d-none d-sm-inline"></i>Administrador
           </span>
+
         {% elif rol == "Docente" %}
           <span class="badge small" style="background:#28a745;">
-            <i class="fas fa-chalkboard-teacher me-1 d-none d-sm-inline"></i>Doc
+            <i class="fas fa-chalkboard-teacher me-1 d-none d-sm-inline"></i>Docente
           </span>
+
         {% elif rol == "Estudiante" %}
           <span class="badge small" style="background:#1C2E4A;">
-            <i class="fas fa-user-graduate me-1 d-none d-sm-inline"></i>Est
+            <i class="fas fa-user-graduate me-1 d-none d-sm-inline"></i>Estudiante
           </span>
+
         {% elif rol == "Acudiente" %}
           <span class="badge small" style="background:#e67e22;">
-            <i class="fas fa-user-friends me-1 d-none d-sm-inline"></i>Acu
+            <i class="fas fa-user-friends me-1 d-none d-sm-inline"></i>Acudiente
           </span>
+
         {% else %}
           <span class="badge bg-secondary">{{ rol }}</span>
         {% endif %}
+
       {% endwith %}
     </td>
+
     <td class="text-center d-none d-xl-table-cell">
       {% if usuario.estado %}
         <span class="badge small" style="background:#28a745;">
@@ -150,35 +197,70 @@
         </span>
       {% endif %}
     </td>
+
     <td class="text-center d-none d-sm-table-cell">
       {% if usuario.img_usuario %}
-        <img src="{{ usuario.img_usuario.url }}" alt="" width="40px"
+        <img src="{{ usuario.img_usuario.url }}"
+             alt=""
+             width="40"
              style="border-radius:50%; object-fit:cover; height:40px; border:2px solid #dee2e6;">
       {% else %}
-        <img src="{% static 'img/User.jpg' %}" alt="" width="40px"
+        <img src="{% static 'img/User.jpg' %}"
+             alt=""
+             width="40"
              style="border-radius:50%; object-fit:cover; height:40px; border:2px solid #dee2e6;">
       {% endif %}
     </td>
+
+    {% if perms.app.view_usuario or perms.app.change_usuario or perms.app.delete_usuario %}
     <td class="text-center">
       <div class="d-flex justify-content-center gap-1 flex-wrap">
+
+        {% if perms.app.view_usuario %}
         <button class="btn btn-sm btn-info btn-ver-usuario"
                 data-url="{% url 'app:detalle_usuario' usuario.id %}"
                 title="Ver detalles">
           <i class="fas fa-eye"></i>
         </button>
-        <a href="{% url 'app:editar_usuario' usuario.id %}" class="btn btn-sm"
-           style="background-color:#3054f7; color:#fff; border-radius:8px;" title="Editar">
+        {% endif %}
+
+        {% if perms.app.change_usuario %}
+        <a href="{% url 'app:editar_usuario' usuario.id %}"
+           class="btn btn-sm"
+           style="background-color:#3054f7; color:#fff; border-radius:8px;"
+           title="Editar">
           <i class="fa-solid fa-pen-to-square"></i>
         </a>
-        <a href="{% url 'app:eliminar_usuario' usuario.id %}" class="btn btn-sm"
-           style="background-color:#ff4d4d; color:white; border-radius:8px;" title="Eliminar">
+        {% endif %}
+
+        {% if perms.app.delete_usuario %}
+        <a href="{% url 'app:eliminar_usuario' usuario.id %}"
+           class="btn btn-sm"
+           style="background-color:#ff4d4d; color:white; border-radius:8px;"
+           title="Eliminar">
           <i class="fa-solid fa-trash"></i>
         </a>
-        <a href="{% url 'app:gestionar_permisos' usuario.id %}" class="btn btn-sm d-none d-lg-inline-block"
-           style="background-color:#6f42c1; color:white; border-radius:8px;" title="Gestionar permisos">
+        {% endif %}
+
+        {% if perms.auth.change_permission %}
+        <a href="{% url 'app:gestionar_permisos' usuario.id %}"
+           class="btn btn-sm d-none d-lg-inline-block"
+           style="background-color:#6f42c1; color:white; border-radius:8px;"
+           title="Gestionar permisos">
           <i class="fas fa-key"></i>
         </a>
+        {% endif %}
+
       </div>
+    </td>
+    {% endif %}
+
+  </tr>
+  {% empty %}
+  <tr>
+    <td colspan="{% if perms.app.view_usuario or perms.app.change_usuario or perms.app.delete_usuario %}7{% else %}6{% endif %}"
+        class="text-center text-muted py-4">
+      No hay usuarios registrados.
     </td>
   </tr>
   {% endfor %}

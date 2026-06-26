@@ -6,29 +6,32 @@ from django.urls import reverse_lazy
 from django.contrib import messages
 from django.db import connection
 from django.http import JsonResponse
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 
 
-class TipoElementoListView(ListView):
+class TipoElementoListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
     model = tipoelemento
     template_name = 'TipoElemento/index.html'
     context_object_name = 'tipos'
+    permission_required = 'app.view_tipoelemento'
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['titulo'] = 'Tipos de Elemento'
         context['subtitulo'] = 'Clasificación de inventario'
-        context['crear_url'] = reverse_lazy('app:crear_elemento')
+        context['crear_url'] = reverse_lazy('app:crear_tipo')
         context['limpiar_url'] = reverse_lazy('app:limpiar_tipo')
         context['icon_primary'] = "fa-arrow-up"
         context['icon_secodary'] = "fa-arrow-down"
         return context
 
 
-class TipoElementoCreateView(CreateView):
+class TipoElementoCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
     model = tipoelemento
     form_class = TipoElementoForm
     template_name = 'modals/modals_base.html'
-    success_url = reverse_lazy('app:crear_inventario')
-
+    success_url = reverse_lazy('app:index_tipo')
+    permission_required = 'app.add_tipoelemento'
 
     def form_valid(self, form):
         self.object = form.save()
@@ -54,49 +57,47 @@ class TipoElementoCreateView(CreateView):
         return super().form_invalid(form)
 
 
-class TipoElementoUpdateView(UpdateView):
+class TipoElementoUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     model = tipoelemento
     form_class = TipoElementoForm
     template_name = 'TipoElemento/crear.html'
     success_url = reverse_lazy('app:index_tipo')
+    permission_required = 'app.change_tipoelemento'
+
     def form_valid(self, form):
-        messages.success(self.request, 'Se actualizo con exito')
+        messages.success(self.request, 'Tipo de elemento actualizado correctamente')
         return super().form_valid(form)
 
 
-class TipoElementoDeleteView(DeleteView):
+class TipoElementoDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     model = tipoelemento
     template_name = 'TipoElemento/eliminar.html'
     success_url = reverse_lazy('app:index_tipo')
+    permission_required = 'app.delete_tipoelemento'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['titulo'] = 'Eliminar Tipo De Elemento'
-        context['subtitulo'] = '¿Está seguro de eliminar este Tipo De Elemento?'
+        context['titulo'] = 'Eliminar Tipo de Elemento'
+        context['subtitulo'] = '¿Está seguro de eliminar este tipo de elemento?'
         context['listar_url'] = reverse_lazy('app:index_tipo')
         return context
+
     def form_valid(self, form):
-        messages.success(
-            self.request, 'Tipo de elemento  eliminado exitosamente.')
+        messages.success(self.request, 'Tipo de elemento eliminado exitosamente')
         return super().form_valid(form)
 
-    success_url = reverse_lazy('app:crear_elemento')
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['listar_url'] = reverse_lazy('app:crear_elemento')
-        return context
+class TipoCleandView(LoginRequiredMixin, PermissionRequiredMixin, View):
+    permission_required = 'app.delete_tipoelemento'
 
-
-class TipoCleandView(View):
     def post(self, request, *args, **kwargs):
         tipoelemento.objects.all().delete()
+
         with connection.cursor() as cursor:
             nombre_tabla = tipoelemento._meta.db_table
-            print(nombre_tabla)
             cursor.execute(
-                f"DELETE FROM sqlite_sequence WHERE name='{nombre_tabla}';")
+                f"DELETE FROM sqlite_sequence WHERE name='{nombre_tabla}';"
+            )
 
-        messages.success(
-            self.request, "Todos los cursos han sido eliminados y el ID reiniciado.")
+        messages.success(request, "Todos los tipos de elemento fueron eliminados y el ID reiniciado.")
         return redirect(reverse_lazy('app:index_tipo'))

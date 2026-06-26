@@ -1,7 +1,15 @@
 from django.shortcuts import render, redirect
-from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView , View
+from django.views.generic import (
+    ListView,
+    DetailView,
+    CreateView,
+    UpdateView,
+    DeleteView,
+    View,
+)
 from django.utils.decorators import method_decorator
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
 from datetime import time
@@ -12,174 +20,227 @@ from django.contrib import messages
 from django.db import connection
 from django.http import JsonResponse
 import json
-# Create your views here.
+
+APP = Asistencia._meta.app_label
 
 
+@permission_required(f"{APP}.view_asistencia", raise_exception=True)
 def camara(request):
-    return render(request, 'asistencia/camara.html')
+    return render(request, "asistencia/camara.html")
 
-class AsistenciaQR(View):
-    def post(self,request):
+
+class AsistenciaQR(PermissionRequiredMixin, View):
+
+    permission_required = f"{APP}.add_asistencia"
+    raise_exception = True
+
+    def post(self, request):
+
         data = json.loads(request.body)
-        codigo = data.get('codigo')
-        estudiante = Estudiante.objects.filter(codigo = codigo).first()
+        codigo = data.get("codigo")
+
+        estudiante = Estudiante.objects.filter(codigo=codigo).first()
+
         if estudiante:
+
             fecha_hoy = timezone.localdate()
-            print(fecha_hoy)
+
             asistencia_existe = Asistencia.objects.filter(
-				estudianteid=estudiante,
-				fecha=fecha_hoy
-    
-    
-			).exists()
-            print(asistencia_existe)
+                estudianteid=estudiante, fecha=fecha_hoy
+            ).exists()
+
             if asistencia_existe:
-                return JsonResponse({
-					"status":"error",
-					"mensaje":"La asistencia ya fue registrada"
-				})
+                return JsonResponse(
+                    {"status": "error", "mensaje": "La asistencia ya fue registrada"}
+                )
+
             hora_actual = timezone.localtime().time()
-            if hora_actual > time(7,15):
+
+            if hora_actual > time(7, 15):
                 estado = "Tarde"
             else:
                 estado = "A tiempo"
+
             Asistencia.objects.create(
                 estado=estado,
                 estudianteid=estudiante,
                 fecha=timezone.localdate(),
                 horaentrada=timezone.now(),
                 observaciones="",
-                horasalida=time(13,00)
-			)
-            print("Retornado verdad")
-            return JsonResponse({
-                'status': 'ok',
-                'mensaje': 'Registrado exitosamente',
-			})
-        return JsonResponse({
-			"estatus": "Error",
-			"mensaje": "El estudiante no existe",
-		})
-# Ejemplo Listar_Usuarios
+                horasalida=time(13, 0),
+            )
+
+            return JsonResponse({"status": "ok", "mensaje": "Registrado exitosamente"})
+
+        return JsonResponse({"status": "error", "mensaje": "El estudiante no existe"})
 
 
 def listar_usuario(request):
     usuario = Usuario.objects.all()
-    return render(request, 'usuario/index.html', {'usuarios': usuario})
+    return render(request, "usuario/index.html", {"usuarios": usuario})
 
 
 def listar_asistencia(request):
     asistencia = Asistencia.objects.all()
-    return render(request, 'asistencia/index.html', {'asistencias': asistencia})
+    return render(request, "asistencia/index.html", {"asistencias": asistencia})
 
 
-class AsistenciaListView(ListView):
+class AsistenciaListView(PermissionRequiredMixin, ListView):
+
     model = Asistencia
-    template_name = 'asistencia/index.html'
-    context_object_name = 'asistencias'
-    # Uso de DICCIONARIOS
-    # Metodo Dispatch
-    # @method_decorator(login_required)
+    template_name = "asistencia/index.html"
+    context_object_name = "asistencias"
+
+    permission_required = f"{APP}.view_asistencia"
+    raise_exception = True
 
     def dispatch(self, request, *args, **kwargs):
-        # if request.method == "GET":
-        # return redirect('app:listar_curso')
         return super().dispatch(request, *args, **kwargs)
-# metodo Post
 
     def post(self, request, *args, **kwargs):
         pass
 
     def get_context_data(self, **kwargs):
+
         context = super().get_context_data(**kwargs)
+
         hoy = timezone.localdate()
+
         total = Asistencia.objects.count()
+
         tardanzas = Asistencia.objects.filter(estado="Tarde").count()
+
         hoy_count = Asistencia.objects.filter(fecha=hoy).count()
+
         inasistencias = Asistencia.objects.filter(estado="Inasistencia").count()
 
-        context['titulo'] = 'Listado de Asistencias'
-        context['subtitulo'] = 'Bienvenido al listado de asistencias'
-        context['crear_url'] = reverse_lazy('app:crear_asistencia')
-        context['limpiar_url'] = reverse_lazy('app:limpiar_asistencia')
-        context['total_count'] = total
-        context['total_text'] = "Total de Asistencias"
-        context['text'] = "Tardanzas registradas"
-        context['low_stock'] = tardanzas
-        context['icon_primary'] = "fa-clipboard-check"
-        context['icon_secodary'] = "fa-clock"
-        # Tarjetas extra
-        context['hoy_count'] = hoy_count
-        context['inasistencias'] = inasistencias
+        context["titulo"] = "Listado de Asistencias"
+        context["subtitulo"] = "Bienvenido al listado de asistencias"
+        context["crear_url"] = reverse_lazy("app:crear_asistencia")
+        context["limpiar_url"] = reverse_lazy("app:limpiar_asistencia")
+
+        context["total_count"] = total
+        context["total_text"] = "Total de Asistencias"
+
+        context["text"] = "Tardanzas registradas"
+        context["low_stock"] = tardanzas
+
+        context["icon_primary"] = "fa-clipboard-check"
+        context["icon_secodary"] = "fa-clock"
+
+        context["hoy_count"] = hoy_count
+        context["inasistencias"] = inasistencias
+
         user = self.request.user
-        app_label = self.model._meta.app_label
-        model_name = self.model._meta.model_name
-        context['puede_crear'] = user.has_perm(f'{app_label}.add_{model_name}')
-        context['puede_editar'] = user.has_perm(f'{app_label}.change_{model_name}')
-        context['puede_eliminar'] = user.has_perm(f'{app_label}.delete_{model_name}')
+
+        context["puede_crear"] = user.has_perm(f"{APP}.add_asistencia")
+
+        context["puede_editar"] = user.has_perm(f"{APP}.change_asistencia")
+
+        context["puede_eliminar"] = user.has_perm(f"{APP}.delete_asistencia")
+
         return context
 
 
-class AsistenciaCreateView(CreateView):
+class AsistenciaCreateView(PermissionRequiredMixin, CreateView):
+
     model = Asistencia
     form_class = AsistenciaForm
-    template_name = 'asistencia/crear.html'
+    template_name = "asistencia/crear.html"
 
-    success_url = reverse_lazy('app:index_asistencia')
+    permission_required = f"{APP}.add_asistencia"
+    raise_exception = True
+
+    success_url = reverse_lazy("app:index_asistencia")
 
     def get_context_data(self, **kwargs):
+
         context = super().get_context_data(**kwargs)
-        context['titulo'] = "Crear Asistencia"
-        context['listar_url'] = reverse_lazy('app:index_asistencia')
-        context['btn_name'] = "Guardar"
+
+        context["titulo"] = "Crear Asistencia"
+        context["listar_url"] = reverse_lazy("app:index_asistencia")
+        context["btn_name"] = "Guardar"
+
         return context
 
     def form_valid(self, form):
+
         messages.success(self.request, "Asistencia creada correctamente")
+
         return super().form_valid(form)
 
 
-class AsistenciaupdateView(UpdateView):
+class AsistenciaupdateView(PermissionRequiredMixin, UpdateView):
+
     model = Asistencia
     form_class = AsistenciaForm
-    template_name = 'asistencia/crear.html'
-    success_url = reverse_lazy('app:index_asistencia')
+    template_name = "asistencia/crear.html"
+
+    permission_required = f"{APP}.change_asistencia"
+    raise_exception = True
+
+    success_url = reverse_lazy("app:index_asistencia")
 
     def get_context_data(self, **kwargs):
+
         context = super().get_context_data(**kwargs)
-        context['titulo'] = "Actualizar Asistencia"
-        context['listar_url'] = reverse_lazy('app:index_asistencia')
-        context['btn_name'] = "Actualizar"
+
+        context["titulo"] = "Actualizar Asistencia"
+        context["listar_url"] = reverse_lazy("app:index_asistencia")
+        context["btn_name"] = "Actualizar"
+
         return context
-    
+
     def form_valid(self, form):
-        messages.success(self.request,"Asistencia actualizada correctamente")
+
+        messages.success(self.request, "Asistencia actualizada correctamente")
+
         return super().form_valid(form)
 
 
-class AsistenciaDeleteView(DeleteView):
+class AsistenciaDeleteView(PermissionRequiredMixin, DeleteView):
+
     model = Asistencia
-    template_name = 'asistencia/eliminar.html'
-    success_url = reverse_lazy('app:index_asistencia')
+    template_name = "asistencia/eliminar.html"
+
+    permission_required = f"{APP}.delete_asistencia"
+    raise_exception = True
+
+    success_url = reverse_lazy("app:index_asistencia")
 
     def get_context_data(self, **kwargs):
+
         context = super().get_context_data(**kwargs)
-        context['titulo'] = "Eliminar Asistencia"
-        context['listar_url'] = reverse_lazy('app:index_asistencia')
+
+        context["titulo"] = "Eliminar Asistencia"
+        context["listar_url"] = reverse_lazy("app:index_asistencia")
+
         return context
 
-
     def form_valid(self, form):
+
         messages.success(self.request, "Asistencia eliminada correctamente")
+
         return super().form_valid(form)
 
-class AsistenciaCleandView(View):
-   def post(self, request, *args, **kwargs):
+
+class AsistenciaCleandView(PermissionRequiredMixin, View):
+
+    permission_required = f"{APP}.delete_asistencia"
+    raise_exception = True
+
+    def post(self, request, *args, **kwargs):
+
         Asistencia.objects.all().delete()
+
         with connection.cursor() as cursor:
+
             nombre_tabla = Asistencia._meta.db_table
-            print(nombre_tabla)
-            cursor.execute(f"Alter table {nombre_tabla} auto_increment = 1;")
-        
-        messages.success(self.request, "Todas las asistencias han sido eliminadas y el ID reiniciado.")
-        return redirect(reverse_lazy('app:index_asistencia'))
+
+            cursor.execute(f"ALTER TABLE {nombre_tabla} AUTO_INCREMENT = 1;")
+
+        messages.success(
+            request, "Todas las asistencias han sido eliminadas y el ID reiniciado."
+        )
+
+        return redirect(reverse_lazy("app:index_asistencia"))

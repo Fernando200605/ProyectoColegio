@@ -19,6 +19,7 @@ def inicializar_roles(sender, **kwargs):
     # =========================
     # CREAR GRUPOS
     # =========================
+    print("[INFO] Inicializando roles y permisos...")
     admin, _ = Group.objects.get_or_create(name='Administrador')
     docente, _ = Group.objects.get_or_create(name='Docente')
     estudiante, _ = Group.objects.get_or_create(name='Estudiante')
@@ -39,6 +40,8 @@ def inicializar_roles(sender, **kwargs):
                 'view_usuario',
                 'view_curso',
                 'view_asistencia',
+                'view_notificacion',
+                'view_elemento',
             ]
         )
     )

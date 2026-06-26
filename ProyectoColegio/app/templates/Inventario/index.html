@@ -4,65 +4,148 @@
 {% block subtitulo %}{{ subtitulo }}{% endblock %}
 
 {% block exportar %}
-  <a href="{% url 'app:reporte_inventario_pdf' %}" class="btn-pdf ">
-    <i class="fas fa-file-pdf me-1"></i> <span class="d-none d-sm-inline">Exportar a</span> PDF
+
+  {% if perms.app.view_elementoinventario %}
+  <a href="{% url 'app:reporte_inventario_pdf' %}" class="btn-pdf">
+    <i class="fas fa-file-pdf me-1"></i>
+    <span class="d-none d-sm-inline">Exportar a</span> PDF
   </a>
+
   <a href="{% url 'app:reporte_inventario_excel' %}" class="btn-excel">
-    <i class="fas fa-file-excel me-1"></i> <span class="d-none d-sm-inline">Exportar a</span> Excel
+    <i class="fas fa-file-excel me-1"></i>
+    <span class="d-none d-sm-inline">Exportar a</span> Excel
   </a>
+  {% endif %}
+
   <a href="?bajo_stock=1" class="btn btn-outline-warning" style="border-radius:8px;">
-    <i class="fas fa-exclamation-triangle me-1"></i> <span class="d-none d-sm-inline">Solo</span> Stock bajo
+    <i class="fas fa-exclamation-triangle me-1"></i>
+    <span class="d-none d-sm-inline">Solo</span> Stock bajo
   </a>
+
   {% if request.GET.bajo_stock %}
     <a href="?" class="btn btn-outline-secondary btn-sm" style="border-radius:8px;">
-      <i class="fas fa-times me-1"></i> <span class="d-none d-sm-inline">Quitar filtro</span>
+      <i class="fas fa-times me-1"></i>
+      <span class="d-none d-sm-inline">Quitar filtro</span>
     </a>
   {% endif %}
+
 {% endblock %}
 
 {% block columns %}
-  <th class="d-none d-md-table-cell"><i class="fas fa-hashtag me-2"></i>ID</th>
-  <th><i class="fas fa-box me-2"></i>Nombre</th>
-  <th class="d-none d-lg-table-cell"><i class="fas fa-tag me-2"></i>Marca</th>
-  <th class="d-none d-xl-table-cell"><i class="fas fa-warehouse me-2"></i>Categoría</th>
-  <th><i class="fas fa-cubes me-2"></i>Stock</th>
-  <th class="d-none d-lg-table-cell"><i class="fas fa-map-marker-alt me-2"></i>Ubicación</th>
-  <th class="text-center"><i class="fas fa-tools me-2"></i><span class="d-none d-md-inline">Acciones</span></th>
+  <th class="d-none d-md-table-cell">
+    <i class="fas fa-hashtag me-2"></i>ID
+  </th>
+
+  <th>
+    <i class="fas fa-box me-2"></i>Nombre
+  </th>
+
+  <th class="d-none d-lg-table-cell">
+    <i class="fas fa-tag me-2"></i>Marca
+  </th>
+
+  <th class="d-none d-xl-table-cell">
+    <i class="fas fa-warehouse me-2"></i>Categoría
+  </th>
+
+  <th>
+    <i class="fas fa-cubes me-2"></i>Stock
+  </th>
+
+  <th class="d-none d-lg-table-cell">
+    <i class="fas fa-map-marker-alt me-2"></i>Ubicación
+  </th>
+
+  {% if perms.app.change_elementoinventario or perms.app.delete_elemento %}
+  <th class="text-center">
+    <i class="fas fa-tools me-2"></i>
+    <span class="d-none d-md-inline">Acciones</span>
+  </th>
+  {% endif %}
 {% endblock %}
 
 {% block rows %}
   {% for elemento in object_list %}
   <tr {% if elemento.stockActual <= elemento.stockMinimo %}style="background-color:#fff8e1;"{% endif %}>
-    <td class="d-none d-md-table-cell">{{ elemento.id }}</td>
+
+    <td class="d-none d-md-table-cell">
+      {{ elemento.id }}
+    </td>
+
     <td>
       {{ elemento.nombre|truncatechars:30 }}
+
       {% if elemento.stockActual <= elemento.stockMinimo %}
-        <span class="badge ms-1" style="background-color:#ff9800; font-size:0.65rem;">Bajo</span>
+      <span class="badge ms-1"
+            style="background-color:#ff9800; font-size:0.65rem;">
+        Bajo
+      </span>
       {% endif %}
     </td>
-    <td class="d-none d-lg-table-cell">{{ elemento.marcaId }}</td>
-    <td class="d-none d-xl-table-cell">{{ elemento.categoriaId }}</td>
+
+    <td class="d-none d-lg-table-cell">
+      {{ elemento.marcaId }}
+    </td>
+
+    <td class="d-none d-xl-table-cell">
+      {{ elemento.categoriaId }}
+    </td>
+
     <td>
       {% if elemento.stockActual <= elemento.stockMinimo %}
-        <span class="fw-bold text-danger">{{ elemento.stockActual }}</span>
-        <small class="text-muted d-none d-sm-inline"> / {{ elemento.stockMinimo }}</small>
+        <span class="fw-bold text-danger">
+          {{ elemento.stockActual }}
+        </span>
+        <small class="text-muted d-none d-sm-inline">
+          / {{ elemento.stockMinimo }}
+        </small>
       {% else %}
-        <span class="text-success fw-bold">{{ elemento.stockActual }}</span>
-        <small class="text-muted d-none d-sm-inline"> / {{ elemento.stockMinimo }}</small>
+        <span class="text-success fw-bold">
+          {{ elemento.stockActual }}
+        </span>
+        <small class="text-muted d-none d-sm-inline">
+          / {{ elemento.stockMinimo }}
+        </small>
       {% endif %}
     </td>
-    <td class="d-none d-lg-table-cell">{{ elemento.ubicacion }}</td>
+
+    <td class="d-none d-lg-table-cell">
+      {{ elemento.ubicacion }}
+    </td>
+
+    {% if perms.app.change_elemento or perms.app.delete_elemento %}
     <td class="text-center">
       <div class="d-flex justify-content-center gap-1 flex-nowrap">
-        <a href="{% url 'app:editar_elemento' elemento.id %}" class="btn btn-sm"
-           style="background-color:#3054f7; color:#fff; border-radius:8px;" title="Editar">
+
+        {% if perms.app.change_elemento %}
+        <a href="{% url 'app:editar_elemento' elemento.id %}"
+           class="btn btn-sm"
+           style="background-color:#3054f7; color:#fff; border-radius:8px;"
+           title="Editar">
           <i class="fa-solid fa-pen-to-square"></i>
         </a>
-        <a href="{% url 'app:eliminar_elemento' elemento.id %}" class="btn btn-sm"
-           style="background-color:#ff4d4d; color:white; border-radius:8px;" title="Eliminar">
+        {% endif %}
+
+        {% if perms.app.delete_elemento %}
+        <a href="{% url 'app:eliminar_elemento' elemento.id %}"
+           class="btn btn-sm"
+           style="background-color:#ff4d4d; color:white; border-radius:8px;"
+           title="Eliminar">
           <i class="fa-solid fa-trash"></i>
         </a>
+        {% endif %}
+
       </div>
+    </td>
+    {% endif %}
+
+  </tr>
+
+  {% empty %}
+  <tr>
+    <td colspan="{% if perms.app.change_elementoinventario or perms.app.delete_elemento %}7{% else %}6{% endif %}"
+        class="text-center text-muted py-4">
+      No hay elementos registrados.
     </td>
   </tr>
   {% endfor %}

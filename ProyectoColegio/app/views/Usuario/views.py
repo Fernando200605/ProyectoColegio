@@ -542,6 +542,6 @@ class GestionPermisosUsuarioView(View):
                 delattr(usuario, attr)
 
         # Añadimos un feedback visual para el usuario (¡Muy recomendado!)
-        messages.success(request, f"Permisos actualizados correctamente para {usuario.username}.")
+        messages.success(request, f"Permisos actualizados correctamente para {usuario.nombre}.")
 
         return redirect("app:index_usuario")

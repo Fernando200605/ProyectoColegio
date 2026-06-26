@@ -1,11 +1,11 @@
-from django.shortcuts import render, redirect
-from django.views.generic import ListView, CreateView, UpdateView, DeleteView, View
+from django.shortcuts import render
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from app.models import marca
 from app.forms import MarcaForm
 from django.urls import reverse_lazy
 from django.contrib import messages
-from django.db import connection
 from django.http import JsonResponse
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 
 
 def listar_marca(request):
@@ -13,10 +13,11 @@ def listar_marca(request):
     return render(request, 'Marca/index.html', {'marcas': marcas})
 
 
-class marcaListView(ListView):
+class marcaListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
     model = marca
     template_name = 'Marca/index.html'
     context_object_name = 'marcas'
+    permission_required = 'app.view_marca'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -28,50 +29,60 @@ class marcaListView(ListView):
         return context
 
 
-class marcaCreateView(CreateView):
+class marcaCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
     model = marca
     form_class = MarcaForm
     template_name = 'modals/modals_base.html'
-    success_url = reverse_lazy('app:crear_elemento')
+    success_url = reverse_lazy('app:index_marca')
+    permission_required = 'app.add_marca'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['listar_url'] = reverse_lazy('app:index_unidad')
+        context['listar_url'] = reverse_lazy('app:index_marca')
         context['btn_name'] = "Guardar"
         return context
+
     def form_valid(self, form):
         self.object = form.save()
-        mensaje_texto = 'Se creo un nueva Unidad de Medida'
-        
+        mensaje_texto = 'Se creó una nueva marca'
+
         if self.request.headers.get('x-requested-with') == 'XMLHttpRequest':
             return JsonResponse({
-                'success' : True,
-                'id':self.object.id,
-                'nombre':str(self.object),
-                'message' : mensaje_texto
+                'success': True,
+                'id': self.object.id,
+                'nombre': str(self.object),
+                'message': mensaje_texto
             })
+
+        messages.success(self.request, mensaje_texto)
         return super().form_valid(form)
+
     def form_invalid(self, form):
         if self.request.headers.get('x-requested-with') == 'XMLHttpRequest':
             return JsonResponse({
-                'succes' : False,
+                'success': False,
                 'errors': form.errors
-            },status=400)
+            }, status=400)
         return super().form_invalid(form)
-class marcaUpdateView(UpdateView):
+
+
+class marcaUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     model = marca
     form_class = MarcaForm
     template_name = 'Marca/crear.html'
-    success_url = reverse_lazy('app:crear_elemento')
+    success_url = reverse_lazy('app:index_marca')
+    permission_required = 'app.change_marca'
 
     def form_valid(self, form):
         messages.success(self.request, "Marca actualizada correctamente")
         return super().form_valid(form)
 
-class marcaDeleteView(DeleteView):
+
+class marcaDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     model = marca
     template_name = 'Marca/eliminar.html'
-    success_url = reverse_lazy('app:crear_elemento')
+    success_url = reverse_lazy('app:index_marca')
+    permission_required = 'app.delete_marca'
 
     def form_valid(self, form):
         messages.success(self.request, "Marca eliminada correctamente")

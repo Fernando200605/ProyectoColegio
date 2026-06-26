@@ -25,4 +25,4 @@ __pycache__/
 **/credentials.json
 **/media/usuarios/*
 **/*.md
-
+**/img/**

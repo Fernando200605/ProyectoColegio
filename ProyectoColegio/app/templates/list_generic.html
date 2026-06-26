@@ -93,24 +93,34 @@
         </table>
     </div>
 </div>
-
-<script>
-    $(document).ready(function() {
-        $('#Tabla').DataTable({
-            responsive: true,
-            paging: true,            // Fuerza la activación del paginador
-            pageLength: 10,          // Muestra 10 registros por página por defecto
-            lengthMenu: [5, 10, 25, 50], // Opciones de tamaño de página seleccionables
-            pagingType: "full_numbers", // Muestra: Primero, Anterior, Números, Siguiente, Último
-            destroy: true,           // Evita errores de reinicialización si se recarga el bloque
-            language: {
-                url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json'
-            },
-            drawCallback: function() {
-                $('.dataTables_paginate .paginate_button').addClass('rounded-3 mx-1');
-            }
-        });
-    });
-</script>
 {% endblock %}
+
+{% block js %}
+<script>
+$(document).ready(function () {
+    if ($.fn.DataTable.isDataTable('#Tabla')) {
+        $('#Tabla').DataTable().destroy();
+    }
+
+    $('#Tabla').DataTable({
+        responsive: true,
+        paging: true,
+        pageLength: 10,
+        lengthMenu: [
+            [5, 10, 25, 50, 100],
+            [5, 10, 25, 50, 100]
+        ],
+        ordering: true,
+        searching: true,
+        info: true,
+        autoWidth: false,
+        language: {
+            url: "//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json"
+        }
+    });
+});
+
+</script>
+{% endblock js %}
+
 

@@ -17,6 +17,7 @@
     </div>
   </div>
 </div>
+
 <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-3 mb-md-0">
   <div class="card card-stats" style="background:linear-gradient(135deg,#fff9e6,#fff3cd);">
     <div class="card-body">
@@ -33,29 +34,66 @@
 {% endblock %}
 
 {% block exportar %}
-  <a href="{% url 'app:reporte_movimiento_pdf' %}" class="btn-pdf ">
-    <i class="fas fa-file-pdf me-1"></i> <span class="d-none d-sm-inline">Descargar</span> PDF
+
+  {% if perms.app.view_movimiento %}
+  <a href="{% url 'app:reporte_movimiento_pdf' %}" class="btn-pdf">
+    <i class="fas fa-file-pdf me-1"></i>
+    <span class="d-none d-sm-inline">Descargar</span> PDF
   </a>
+
   <a href="{% url 'app:reporte_movimiento_excel' %}" class="btn-excel">
-    <i class="fas fa-file-excel me-1"></i> <span class="d-none d-sm-inline">Descargar</span> Excel
+    <i class="fas fa-file-excel me-1"></i>
+    <span class="d-none d-sm-inline">Descargar</span> Excel
   </a>
+  {% endif %}
+
 {% endblock %}
 
 {% block columns %}
-  <th class="d-none d-md-table-cell"><i class="fas fa-hashtag me-2"></i>ID</th>
-  <th><i class="fas fa-box me-2"></i>Elemento</th>
-  <th><i class="fas fa-exchange-alt me-2"></i>Tipo</th>
-  <th><i class="fas fa-sort-numeric-up me-2"></i>Cant.</th>
-  <th class="d-none d-lg-table-cell"><i class="fas fa-calendar me-2"></i>Fecha</th>
-  <th class="d-none d-xl-table-cell"><i class="fas fa-comment me-2"></i>Motivo</th>
-  <th class="text-center"><i class="fas fa-tools me-2"></i><span class="d-none d-md-inline">Acciones</span></th>
+  <th class="d-none d-md-table-cell">
+    <i class="fas fa-hashtag me-2"></i>ID
+  </th>
+
+  <th>
+    <i class="fas fa-box me-2"></i>Elemento
+  </th>
+
+  <th>
+    <i class="fas fa-exchange-alt me-2"></i>Tipo
+  </th>
+
+  <th>
+    <i class="fas fa-sort-numeric-up me-2"></i>Cant.
+  </th>
+
+  <th class="d-none d-lg-table-cell">
+    <i class="fas fa-calendar me-2"></i>Fecha
+  </th>
+
+  <th class="d-none d-xl-table-cell">
+    <i class="fas fa-comment me-2"></i>Motivo
+  </th>
+
+  {% if perms.app.change_movimiento or perms.app.delete_movimiento %}
+  <th class="text-center">
+    <i class="fas fa-tools me-2"></i>
+    <span class="d-none d-md-inline">Acciones</span>
+  </th>
+  {% endif %}
 {% endblock %}
 
 {% block rows %}
   {% for movimiento in object_list %}
   <tr>
-    <td class="d-none d-md-table-cell">{{ movimiento.id }}</td>
-    <td>{{ movimiento.elementoId.nombre }}</td>
+
+    <td class="d-none d-md-table-cell">
+      {{ movimiento.id }}
+    </td>
+
+    <td>
+      {{ movimiento.elementoId.nombre }}
+    </td>
+
     <td>
       {% if movimiento.tipo == "Entrada" %}
         <span class="badge" style="background-color:#28a745;">
@@ -66,23 +104,57 @@
           <i class="fas fa-arrow-down me-1 d-none d-sm-inline"></i>Salida
         </span>
       {% else %}
-        <span class="badge bg-secondary">{{ movimiento.tipo }}</span>
+        <span class="badge bg-secondary">
+          {{ movimiento.tipo }}
+        </span>
       {% endif %}
     </td>
-    <td><strong>{{ movimiento.cantidad }}</strong></td>
-    <td class="d-none d-lg-table-cell">{{ movimiento.fecha|date:"d/m/Y H:i" }}</td>
-    <td class="d-none d-xl-table-cell">{{ movimiento.motivo|truncatechars:40 }}</td>
+
+    <td>
+      <strong>{{ movimiento.cantidad }}</strong>
+    </td>
+
+    <td class="d-none d-lg-table-cell">
+      {{ movimiento.fecha|date:"d/m/Y H:i" }}
+    </td>
+
+    <td class="d-none d-xl-table-cell">
+      {{ movimiento.motivo|truncatechars:40 }}
+    </td>
+
+    {% if perms.app.change_movimiento or perms.app.delete_movimiento %}
     <td class="text-center">
       <div class="d-flex justify-content-center gap-1 flex-nowrap">
-        <a href="{% url 'app:editar_movimiento' movimiento.id %}" class="btn btn-sm"
-           style="background-color:#3054f7; color:#fff; border-radius:8px;" title="Editar">
+
+        {% if perms.app.change_movimiento %}
+        <a href="{% url 'app:editar_movimiento' movimiento.id %}"
+           class="btn btn-sm"
+           style="background-color:#3054f7; color:#fff; border-radius:8px;"
+           title="Editar">
           <i class="fa-solid fa-pen-to-square"></i>
         </a>
-        <a href="{% url 'app:eliminar_movimiento' movimiento.id %}" class="btn btn-sm"
-           style="background-color:#ff4d4d; color:white; border-radius:8px;" title="Eliminar">
+        {% endif %}
+
+        {% if perms.app.delete_movimiento %}
+        <a href="{% url 'app:eliminar_movimiento' movimiento.id %}"
+           class="btn btn-sm"
+           style="background-color:#ff4d4d; color:white; border-radius:8px;"
+           title="Eliminar">
           <i class="fa-solid fa-trash"></i>
         </a>
+        {% endif %}
+
       </div>
+    </td>
+    {% endif %}
+
+  </tr>
+
+  {% empty %}
+  <tr>
+    <td colspan="{% if perms.app.change_movimiento or perms.app.delete_movimiento %}7{% else %}6{% endif %}"
+        class="text-center text-muted py-4">
+      No hay movimientos registrados.
     </td>
   </tr>
   {% endfor %}

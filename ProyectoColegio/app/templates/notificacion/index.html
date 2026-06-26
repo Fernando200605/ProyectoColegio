@@ -6,13 +6,18 @@
 
 {% block subtitulo %}
 {{subtitulo}}
-{% endblock subtitulo%}
+{% endblock subtitulo %}
 
 {% block columns %}
     <th><i class="fas fa-hashtag me-2"></i>ID</th>
-    <th><i class="fas fa-book me-2"></i>Titulo</th>
+    <th><i class="fas fa-book me-2"></i>Título</th>
     <th><i class="fas fa-clock me-2"></i>Mensaje</th>
-    <th class="text-center"><i class="fas fa-tools me-2"></i>Acciones</th>
+
+    {% if perms.app.change_notificacion or perms.app.delete_notificacion %}
+    <th class="text-center">
+        <i class="fas fa-tools me-2"></i>Acciones
+    </th>
+    {% endif %}
 {% endblock columns %}
 
 {% block rows %}
@@ -21,13 +26,35 @@
         <td>{{ notificacion.id }}</td>
         <td>{{ notificacion.titulo }}</td>
         <td>{{ notificacion.mensaje }}</td>
+
+        {% if perms.app.change_notificacion or perms.app.delete_notificacion %}
         <td class="text-center">
-            <a href="{% url 'app:editar_notificacion' notificacion.id %}" class="btn btn-sm me-1" style="background-color: #3054f7; color: #ffffff; border-radius: 8px;">
-                            <i class="fa-solid fa-pen-to-square"></i>
+
+            {% if perms.app.change_notificacion %}
+            <a href="{% url 'app:editar_notificacion' notificacion.id %}"
+               class="btn btn-sm me-1"
+               style="background-color: #3054f7; color: #ffffff; border-radius: 8px;">
+                <i class="fa-solid fa-pen-to-square"></i>
             </a>
-            <a href="{% url 'app:eliminar_notificacion' notificacion.id %}" class="btn btn-sm" style="background-color: #ff4d4d; color: white; border-radius: 8px;">
-                            <i class="fa-solid fa-trash"></i>
+            {% endif %}
+
+            {% if perms.app.delete_notificacion %}
+            <a href="{% url 'app:eliminar_notificacion' notificacion.id %}"
+               class="btn btn-sm"
+               style="background-color: #ff4d4d; color: white; border-radius: 8px;">
+                <i class="fa-solid fa-trash"></i>
             </a>
+            {% endif %}
+
+        </td>
+        {% endif %}
+    </tr>
+
+    {% empty %}
+    <tr>
+        <td colspan="{% if perms.app.change_notificacion or perms.app.delete_notificacion %}4{% else %}3{% endif %}"
+            class="text-center text-muted py-4">
+            No hay notificaciones registradas.
         </td>
     </tr>
     {% endfor %}

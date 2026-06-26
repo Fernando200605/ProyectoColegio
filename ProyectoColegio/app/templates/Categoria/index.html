@@ -6,33 +6,48 @@
 
 {% block subtitulo %}
 {{subtitulo}}
-{% endblock subtitulo%}
-
-
-
+{% endblock subtitulo %}
 
 {% block columns %}
-     <tr>
-                    <th><i class="fas fa-hashtag me-2"></i>ID</th>
-                    <th><i class="fas fa-box me-2"></i>Nombre</th>
-                    <th class="text-center"><i class="fas fa-tools me-2"></i>Acciones</th>
-                </tr>
+<tr>
+    <th><i class="fas fa-hashtag me-2"></i>ID</th>
+    <th><i class="fas fa-box me-2"></i>Nombre</th>
+
+    {% if perms.app.change_categoria or perms.app.delete_categoria %}
+    <th class="text-center">
+        <i class="fas fa-tools me-2"></i>Acciones
+    </th>
+    {% endif %}
+</tr>
 {% endblock columns %}
 
 {% block rows %}
-    {% for categoria in object_list %}
-    <tr>
-        <td>{{ categoria.id }}</td>
-        <td>{{ categoria.nombre }}</td>
-        <td class="text-center">
-            <a href="{% url 'app:editar_categoria' categoria.id %}" class="btn btn-sm me-1" style="background-color: #3054f7; color: #ffffff; border-radius: 8px;">
-                            <i class="fa-solid fa-pen-to-square"></i>
-            </a>
-            <a href="{% url 'app:eliminar_categoria' categoria.id %}" class="btn btn-sm" style="background-color: #ff4d4d; color: white; border-radius: 8px;">
-                            <i class="fa-solid fa-trash"></i>
-            </a>
-        </td>
-    </tr>
-    {% endfor %}
-{% endblock rows %}
+{% for categoria in object_list %}
+<tr>
+    <td>{{ categoria.id }}</td>
+    <td>{{ categoria.nombre }}</td>
 
+    {% if perms.app.change_categoria or perms.app.delete_categoria %}
+    <td class="text-center">
+
+        {% if perms.app.change_categoria %}
+        <a href="{% url 'app:editar_categoria' categoria.id %}"
+           class="btn btn-sm me-1"
+           style="background-color: #3054f7; color: #ffffff; border-radius: 8px;">
+            <i class="fa-solid fa-pen-to-square"></i>
+        </a>
+        {% endif %}
+
+        {% if perms.app.delete_categoria %}
+        <a href="{% url 'app:eliminar_categoria' categoria.id %}"
+           class="btn btn-sm"
+           style="background-color: #ff4d4d; color: white; border-radius: 8px;">
+            <i class="fa-solid fa-trash"></i>
+        </a>
+        {% endif %}
+
+    </td>
+    {% endif %}
+</tr>
+{% endfor %}
+{% endblock rows %}

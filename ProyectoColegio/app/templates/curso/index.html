@@ -9,32 +9,48 @@
 {% block exportar %}
 {% if modo == "cursos" %}
 <div class="contenedor-exportar d-flex align-items-center gap-2">
-    
+
     <div class="dropdown">
-        <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="botonSelector" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="border-radius: 8px; min-width: 200px;">
-            <i class="fas fa-graduation-cap me-1"></i> 
+        <button class="btn btn-outline-secondary dropdown-toggle"
+                type="button"
+                id="botonSelector"
+                data-toggle="dropdown"
+                aria-haspopup="true"
+                aria-expanded="false"
+                style="border-radius: 8px; min-width: 200px;">
+            <i class="fas fa-graduation-cap me-1"></i>
             <span id="textoSeleccionado">Seleccionar Curso</span>
         </button>
+
         <div class="dropdown-menu shadow" aria-labelledby="botonSelector">
-            <a class="dropdown-item" href="#" onclick="cambiarCurso('', 'Todos los Cursos')">
+            <a class="dropdown-item"
+               href="#"
+               onclick="cambiarCurso('', 'Todos los Cursos')">
                 <strong>--- Todos los Cursos ---</strong>
             </a>
+
             {% for curso in object_list %}
-                <a class="dropdown-item" href="#" onclick="cambiarCurso('{{ curso.id }}', '{{ curso.get_grado_display }} - {{ curso.codigo }}')">
-                    {{ curso.get_grado_display }} - {{ curso.codigo }}
-                </a>
+            <a class="dropdown-item"
+               href="#"
+               onclick="cambiarCurso('{{ curso.id }}', '{{ curso.get_grado_display }} - {{ curso.codigo }}')">
+                {{ curso.get_grado_display }} - {{ curso.codigo }}
+            </a>
             {% endfor %}
         </div>
     </div>
 
+    {% if perms.app.view_curso %}
     <div class="d-flex gap-2">
         <a href="{% url 'app:exportar_cursos' %}" id="linkPDF" class="btn-pdf">
             <i class="fas fa-file-pdf me-1"></i> PDF
         </a>
+
         <a href="{% url 'app:exportar_cursos_excel' %}" id="linkExcel" class="btn-excel">
             <i class="fas fa-file-excel me-1"></i> Excel
         </a>
     </div>
+    {% endif %}
+
 </div>
 {% endif %}
 {% endblock %}
@@ -58,6 +74,31 @@
     }
 </script>
 {% endif %}
+<script>
+$(document).ready(function () {
+    if ($.fn.DataTable.isDataTable('#Tabla')) {
+        $('#Tabla').DataTable().destroy();
+    }
+
+    $('#Tabla').DataTable({
+        responsive: true,
+        paging: true,
+        pageLength: 10,
+        lengthMenu: [
+            [5, 10, 25, 50, 100],
+            [5, 10, 25, 50, 100]
+        ],
+        ordering: true,
+        searching: true,
+        info: true,
+        autoWidth: false,
+        language: {
+            url: "//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json"
+        }
+    });
+});
+
+</script>
 {% endblock %}
 
 {% block subtitulo %}
@@ -65,67 +106,94 @@
 {% endblock %}
 
 {% block columns %}
-  <th>
+<th>
     <i class="fas fa-hashtag me-2"></i>ID
-  </th>
+</th>
 
-  {% if modo == "cursos" %}
-      <th>
+{% if modo == "cursos" %}
+
+    <th>
         <i class="fas fa-book me-2"></i>Nombre del Curso
-      </th>
-      <th>
+    </th>
+
+    <th>
         <i class="fas fa-chalkboard-teacher me-2"></i>Nombre Docente
-      </th>
-      <th class="text-center">
+    </th>
+
+    {% if perms.app.change_curso or perms.app.delete_curso %}
+    <th class="text-center">
         <i class="fas fa-tools me-2"></i>Acciones
-      </th>
-  {% else %}
-      <th>
+    </th>
+    {% endif %}
+
+{% else %}
+
+    <th>
         <i class="fas fa-user me-2"></i>Nombre del Estudiante
-      </th>
-      <th>
+    </th>
+
+    <th>
         <i class="fas fa-graduation-cap me-2"></i>Estado
-      </th>
-      <th>
+    </th>
+
+    <th>
         <i class="fas fa-book me-2"></i>Curso
-      </th>
-  {% endif %}
+    </th>
+
+{% endif %}
 {% endblock %}
 
 {% block rows %}
 
 {% if modo == "cursos" %}
 
-  {% for curso in object_list %}
+    {% for curso in object_list %}
     <tr>
-      <td>{{ curso.id }}</td>
-      <td>{{ curso.get_grado_display }}</td>
-      <td>{{ curso.docenteid }}</td>
-      <td class="text-center">
-        <a href="{% url 'app:editar_curso' curso.id %}" class="btn btn-sm me-1" style="background-color: #3054f7; color: #ffffff; border-radius: 8px;">
-          <i class="fa-solid fa-pen-to-square"></i>
-        </a>
-        <a href="{% url 'app:eliminar_curso' curso.id %}" class="btn btn-sm" style="background-color: #ff4d4d; color: white; border-radius: 8px;">
-          <i class="fa-solid fa-trash"></i>
-        </a>
-      </td>
+        <td>{{ curso.id }}</td>
+        <td>{{ curso.get_grado_display }}</td>
+        <td>{{ curso.docenteid }}</td>
+
+        {% if perms.app.change_curso or perms.app.delete_curso %}
+        <td class="text-center">
+
+            {% if perms.app.change_curso %}
+            <a href="{% url 'app:editar_curso' curso.id %}"
+               class="btn btn-sm me-1"
+               style="background-color: #3054f7; color: #ffffff; border-radius: 8px;">
+                <i class="fa-solid fa-pen-to-square"></i>
+            </a>
+            {% endif %}
+
+            {% if perms.app.delete_curso %}
+            <a href="{% url 'app:eliminar_curso' curso.id %}"
+               class="btn btn-sm"
+               style="background-color: #ff4d4d; color: white; border-radius: 8px;">
+                <i class="fa-solid fa-trash"></i>
+            </a>
+            {% endif %}
+
+        </td>
+        {% endif %}
+
     </tr>
-  {% endfor %}
+    {% endfor %}
 
 {% else %}
 
-  {% for estudiante in estudiantes %}
+    {% for estudiante in estudiantes %}
     <tr>
-      <td>{{ estudiante.usuario.id}}</td>
-      <td>{{ estudiante.usuario.nombre }}</td>
-      <td>{{estudiante.estadoMatricula}}</td>
-      <td>{{ curso.get_grado_display }}</td>
+        <td>{{ estudiante.usuario.id }}</td>
+        <td>{{ estudiante.usuario.nombre }}</td>
+        <td>{{ estudiante.estadoMatricula }}</td>
+        <td>{{ curso.get_grado_display }}</td>
     </tr>
-  {% empty %}
+    {% empty %}
     <tr>
-      <td colspan="3" class="text-center">No hay estudiantes asignados</td>
+        <td colspan="4" class="text-center">
+            No hay estudiantes asignados
+        </td>
     </tr>
-  {% endfor %}
+    {% endfor %}
 
 {% endif %}
 
