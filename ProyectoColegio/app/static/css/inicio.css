@@ -16,13 +16,9 @@ h1 {
 	font-weight: bold;
 }
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-	font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
 }
 
 body {
@@ -1676,19 +1672,30 @@ body.is-readable-font .fa {
 	margin: 2px 0;
 }
 /* BOTÓN FLOTANTE */
+/* BOTÓN FLOTANTE (Inspirado en el botón circular de la interfaz) */
 .btn-chat {
   position: fixed;
-  bottom: 20px;
-  right: 20px;
-  background: #4CAF50;
+  bottom: 25px;
+  right: 25px;
+  background: #162e4a; /* Azul oscuro corporativo de la barra superior */
   color: white;
   font-size: 20px;
-  padding: 15px;
+  width: 56px;
+  height: 56px;
   border-radius: 50%;
   cursor: pointer;
   z-index: 9999;
-  box-shadow: 0 0 10px rgba(0,0,0,0.3);
-  transition: 0.3s;
+  box-shadow: 0 4px 16px rgba(22, 46, 74, 0.25);
+  transition: all 0.25s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-chat:hover {
+  transform: scale(1.05) translateY(-2px);
+  background: #1f3f63;
+  box-shadow: 0 6px 20px rgba(22, 46, 74, 0.35);
 }
 
 /* Ocultar botón */
@@ -1698,105 +1705,149 @@ body.is-readable-font .fa {
   pointer-events: none;
 }
 
-/* CHAT */
+/* CONTENEDOR DEL CHAT (Elegante y minimalista) */
 .chat-container {
   position: fixed;
-  bottom: 20px;
-  right: 20px;
+  bottom: 95px;
+  right: 25px;
   width: 350px;
-  background: white;
-  border-radius: 10px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.2);
+  height: 480px;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
 
-  /* oculto */
+  /* Animación fluida */
   transform: scale(0);
   transform-origin: bottom right;
-  transition: 0.3s ease;
-
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
   z-index: 9998;
+  border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
-/* Mostrar chat */
 .chat-activo {
   transform: scale(1);
 }
 
-/* Header */
+/* ENCABEZADO (Limpio, usando la tipografía y el azul del sistema) */
 .chat-header {
-  background: #4CAF50;
+  background: #162e4a; 
   color: white;
-  padding: 10px;
+  padding: 16px 20px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
   display: flex;
   justify-content: space-between;
+  align-items: center;
 }
 
-/* Botón cerrar */
 .cerrar {
   cursor: pointer;
+  font-size: 14px;
+  opacity: 0.7;
+  transition: opacity 0.2s;
 }
 
-/* Caja mensajes */
+.cerrar:hover {
+  opacity: 1;
+}
+
+/* CAJA DE MENSAJES (Fondo sutilmente inspirado en el rosa del menú lateral izquierdo) */
 .chat-box {
-  height: 300px;
-  padding: 10px;
+  flex: 1;
+  padding: 20px 15px;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
+  gap: 12px;
+  background: linear-gradient(180deg, #ffffff 0%, #fff0f3 100%); /* Degradado muy suave hacia el rosa del menú */
 }
 
-/* Input */
-.chat-input {
-  display: flex;
-}
-
-input {
-  flex: 1;
-  padding: 10px;
-  border: none;
-}
-
-button {
-  padding: 10px;
-  background: #4CAF50;
-  color: white;
-  border: none;
-}
+/* ESTILO NATIVO DE MENSAJES (Menos "WhatsApp", más app moderna) */
 .mensaje {
-  max-width: 75%;
-  padding: 8px 12px;
-  margin: 5px 0;
-  border-radius: 15px;
-  font-size: 14px;
+  max-width: 78%;
+  padding: 11px 15px;
+  font-size: 13.5px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  line-height: 1.45;
   word-wrap: break-word;
-  animation: aparecer 0.2s ease;
+  animation: aparecer 0.2s ease-out forwards;
 }
 
-/* Usuario (derecha) */
+/* Usuario - Mensaje saliente (Gris/Azul limpio y sobrio) */
 .usuario {
   align-self: flex-end;
-  background: #DCF8C6;
-  color: #000;
-  border-bottom-right-radius: 5px;
-  
+  background: #eef2f7;
+  color: #2c3e50;
+  border-radius: 16px 16px 4px 16px; /* Esquinas asimétricas */
 }
 
-/* Bot (izquierda) */
+/* Bot/Sistema - Mensaje entrante (Usa el color púrpura del tag "Administrador" de la tabla) */
 .bot {
   align-self: flex-start;
-  background: #F1F0F0;
-  color: #000;
-  border-bottom-left-radius: 5px;
+  background: #8338ec;
+  color: white;
+  border-radius: 16px 16px 16px 4px; /* Esquinas asimétricas */
+  box-shadow: 0 2px 8px rgba(131, 56, 236, 0.15);
 }
 
+/* ÁREA DE ESCRITURA (Minimalista) */
+.chat-input {
+  display: flex;
+  padding: 12px 15px;
+  background: #ffffff;
+  border-top: 1px solid #f0f0f0;
+  align-items: center;
+}
+
+.chat-input input {
+  flex: 1;
+  padding: 10px 14px;
+  border: 1px solid #e2e8f0;
+  border-radius: 24px;
+  outline: none;
+  font-size: 13.5px;
+  transition: all 0.2s ease;
+  background: #f8fafc;
+}
+
+.chat-input input:focus {
+  background: #ffffff;
+  border-color: #162e4a;
+  box-shadow: 0 0 0 3px rgba(22, 46, 74, 0.1);
+}
+
+/* Botón enviar (Discreto pero elegante) */
+.chat-input button {
+  padding: 9px 16px;
+  margin-left: 10px;
+  background: #162e4a;
+  color: white;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+
+.chat-input button:hover {
+  background: #1f3f63;
+}
+
+/* ANIMACIÓN APARICIÓN EN PANTALLA */
 @keyframes aparecer {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(8px) scale(0.98);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
   }
 }
 /* Contenedor principal */

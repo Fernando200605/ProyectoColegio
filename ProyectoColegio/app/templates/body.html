@@ -19,18 +19,19 @@
     <div class="btn-chat" id="btnChat"><i class="fa-solid fa-comment"></i></div>
 
     <!-- Chat -->
-    <div class="chat-container" id="chatContainer">
-      <div class="chat-header">🤖 Chatbot
-        <span id="cerrarChat" class="cerrar">✖</span>
-      </div>
+<div class="chat-container" id="chatContainer">
+  <div class="chat-header">
+    <span><i class="fa-solid fa-graduation-cap"></i> Asistente San Nicolás</span>
+    <span id="cerrarChat" class="cerrar">✖</span>
+  </div>
 
-      <div class="chat-box" id="chatBox"></div>
+  <div class="chat-box" id="chatBox"></div>
 
-      <div class="chat-input">
-        <input type="text" id="inputMensaje" placeholder="Escribe un mensaje..." />
-        <button id="btnEnviar">Enviar</button>
-      </div>
-    </div>
+  <div class="chat-input">
+    <input type="text" id="inputMensaje" placeholder="Escribe tu consulta aquí..." autocomplete="off" />
+    <button id="btnEnviar">Enviar</button>
+  </div>
+</div>
     <div class="modal fade" id="modalGeneral" tabindex="-1" aria-hidden="true">
       <div id="contenedorModal"></div>
     </div>
@@ -144,12 +145,11 @@
   <script src="{% static 'Js/modal.js' %}"></script>
   <script src="{% static 'Js/accessibility.js' %}"></script>
 
-  <!-- Botón de Accesibilidad -->
+
   <button class="accessibility-button" id="btnAccessibility" title="Accesibilidad">
     <i class="fas fa-universal-access"></i>
   </button>
 
-  <!-- Panel de Accesibilidad -->
   <div class="accessibility-panel" id="accessibilityPanel">
     <h4>Opciones de Accesibilidad</h4>
     <div class="accessibility-option" id="btnContrast">
