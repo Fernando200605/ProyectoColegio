@@ -438,12 +438,16 @@ const cerrar = document.getElementById("cerrarChat");
 function abrirChat() {
   chatContainer.classList.add("chat-activo");
   btnChat.classList.add("oculto");
+  const accessBtn = document.getElementById('btnAccessibility');
+  if (accessBtn) accessBtn.classList.add('oculto');
 }
 
 // 🔥 Cerrar chat
 function cerrarChat() {
   chatContainer.classList.remove("chat-activo");
   btnChat.classList.remove("oculto");
+  const accessBtn = document.getElementById('btnAccessibility');
+  if (accessBtn) accessBtn.classList.remove('oculto');
 }
 
 // Eventos abrir/cerrar
