@@ -11,10 +11,10 @@
   {# ===== FORMULARIO DE USUARIO — 2 columnas ===== #}
   <div class="row">
 
-    {# Columna izquierda: nombre, email, codigo, foto #}
+    {# Columna izquierda: nombre, email, foto #}
     <div class="col-md-6">
       {% for field in usuario_form.visible_fields %}
-        {% if field.name == 'nombre' or field.name == 'email' or field.name == 'codigo' or field.name == 'img_usuario' %}
+        {% if field.name == 'nombre' or field.name == 'email' or field.name == 'img_usuario' %}
           <div class="mb-3">
             <label class="form-label fw-bold" style="color: #1C2E4A;">{{ field.label }}</label>
             {% if field.name == 'img_usuario' %}

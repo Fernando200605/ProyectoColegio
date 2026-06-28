@@ -37,8 +37,6 @@ def solo_letras(value, campo="Este campo"):
     return value
 
 
-# ── Formulario de Cursos
-
 
 class CursoForm(forms.ModelForm):
 
@@ -251,16 +249,57 @@ class UsuarioEstudianteForm(UsuarioForm):
 class UsuarioUpdateForm(forms.ModelForm):
     class Meta:
         model = Usuario
-        fields = ["nombre", "email", "estado"]
+        fields = ["nombre", "email", "estado", "img_usuario"]
         widgets = {
             "nombre": forms.TextInput(attrs={"class": "form-control"}),
             "email": forms.EmailInput(attrs={"class": "form-control"}),
             "estado": forms.Select(attrs={"class": "form-control"}),
+            "img_usuario": forms.FileInput(attrs={"class": "form-control"}),
         }
 
     def clean_nombre(self):
         nombre = self.cleaned_data.get("nombre", "").strip()
         return solo_letras(nombre, "El nombre")
+
+    def clean_email(self):
+        email = self.cleaned_data.get("email")
+        if not email:
+            return email
+
+        email = email.lower()
+
+        # Validar que no exista otro usuario con el mismo email (excluyendo el actual)
+        if Usuario.objects.filter(email=email).exclude(pk=self.instance.pk).exists():
+            self.fields["email"].widget.attrs["class"] = "form-control is-invalid"
+            raise forms.ValidationError(
+                "Este correo ya se encuentra registrado. Intenta con uno diferente."
+            )
+
+        dominios_permitidos = ["gmail.com", "hotmail.com", "outlook.com", "yahoo.com"]
+        partes = email.split("@")
+        if len(partes) > 1 and partes[1] not in dominios_permitidos:
+            self.fields["email"].widget.attrs["class"] = "form-control is-invalid"
+            raise forms.ValidationError(
+                f"Solo se permiten correos de: {', '.join(dominios_permitidos)}"
+            )
+
+        return email
+
+    def clean_img_usuario(self):
+        imagen = self.cleaned_data.get("img_usuario")
+        if imagen:
+            # Validar tipo de archivo
+            tipos_permitidos = ["image/jpeg", "image/png", "image/webp"]
+            if imagen.content_type not in tipos_permitidos:
+                raise forms.ValidationError(
+                    "Solo se permiten imágenes JPG, PNG o WEBP."
+                )
+            # Validar tamaño (5MB máximo)
+            if imagen.size > 5 * 1024 * 1024:
+                raise forms.ValidationError(
+                    "La imagen no puede superar 5MB."
+                )
+        return imagen
 
 
 # ── Formularios de Roles
@@ -298,15 +337,22 @@ class EstudianteForm(forms.ModelForm):
         fields = ["fechaNacimiento", "estadoMatricula", "fechaIngreso", "cursoId"]
         widgets = {
             "fechaNacimiento": forms.DateInput(
-                attrs={"class": "form-control", "type": "date"}
+                attrs={"type": "date"},
+                format="%Y-%m-%d"
+            ),
+            "fechaIngreso": forms.DateInput(
+                attrs={"type": "date"},
+                format="%Y-%m-%d"
             ),
             "estadoMatricula": forms.Select(attrs={"class": "form-control"}),
-            "fechaIngreso": forms.DateInput(
-                attrs={"class": "form-control", "type": "date"}
-            ),
             "cursoId": forms.Select(attrs={"class": "form-control"}),
         }
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
+        self.fields["fechaNacimiento"].input_formats = ["%Y-%m-%d"]
+        self.fields["fechaIngreso"].input_formats = ["%Y-%m-%d"]
     def clean_fechaNacimiento(self):
         fecha = self.cleaned_data.get("fechaNacimiento")
         if fecha and fecha == timezone.localdate():
@@ -318,6 +364,64 @@ class EstudianteForm(forms.ModelForm):
                 "La fecha de nacimiento no puede ser una fecha futura."
             )
         return fecha
+
+    def clean(self):
+        cleaned_data = super().clean()
+        curso = cleaned_data.get("cursoId")
+        fecha_nacimiento = cleaned_data.get("fechaNacimiento")
+
+        # Validar capacidad del curso
+        if curso:
+            # Contar estudiantes matriculados en el curso (excluyendo el estudiante actual si es edición)
+            estudiantes_en_curso = Estudiante.objects.filter(
+                cursoId=curso,
+                estadoMatricula="Matriculado"
+            )
+            
+            # Si es edición, excluir el estudiante actual del conteo
+            if self.instance.pk:
+                estudiantes_en_curso = estudiantes_en_curso.exclude(pk=self.instance.pk)
+            
+            cantidad_actual = estudiantes_en_curso.count()
+            
+            if cantidad_actual >= curso.capacidad:
+                raise forms.ValidationError(
+                    f"El curso {curso.codigo} ya ha alcanzado su capacidad máxima "
+                    f"({curso.capacidad} estudiantes). Por favor seleccione otro curso."
+                )
+
+        # Validar coherencia entre edad y grado
+        if fecha_nacimiento and curso:
+            from dateutil.relativedelta import relativedelta
+            
+            hoy = timezone.localdate()
+            edad = relativedelta(hoy, fecha_nacimiento).years
+            
+            # Mapeo de edades esperadas por grado
+            edades_esperadas = {
+                "Preescolar": (5, 6),
+                "1": (6, 7),
+                "2": (7, 8),
+                "3": (8, 9),
+                "4": (9, 10),
+                "5": (10, 11),
+                "6": (11, 12),
+                "7": (12, 13),
+                "8": (13, 14),
+                "9": (14, 15),
+                "10": (15, 16),
+                "11": (16, 18),
+            }
+            
+            if curso.grado in edades_esperadas:
+                edad_min, edad_max = edades_esperadas[curso.grado]
+                if edad < edad_min or edad > edad_max:
+                    raise forms.ValidationError(
+                        f"La edad del estudiante ({edad} años) no corresponde al grado {curso.grado}. "
+                        f"Edad esperada: {edad_min} a {edad_max} años."
+                    )
+
+        return cleaned_data
 
 
 class AcudienteForm(forms.ModelForm):

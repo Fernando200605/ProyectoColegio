@@ -276,7 +276,6 @@ class EventoCleandView(
 def listar_eventos(request):
 
     try:
-
         servicio = obtener_servicio()
 
         ahora = datetime.utcnow().isoformat() + "Z"
@@ -293,10 +292,7 @@ def listar_eventos(request):
             .execute()
         )
 
-        eventos = eventos_resultado.get(
-            "items",
-            []
-        )
+        eventos = eventos_resultado.get("items", [])
 
         lista = []
 
@@ -317,15 +313,31 @@ def listar_eventos(request):
                 "descripcion": evento.get("description"),
                 "inicio": inicio,
                 "fin": fin,
+                "origen": "google"
             })
 
         return JsonResponse({
             "eventos": lista
         })
 
-    except HttpError as error:
+    except Exception as error:
 
-        return JsonResponse(
-            {"error": str(error)},
-            status=500
-        )
+        # Fallback a la base de datos
+        eventos_bd = Evento.objects.all().order_by("fecha_inicio")[:10]
+
+        lista = []
+
+        for evento in eventos_bd:
+            lista.append({
+                "titulo": evento.titulo,
+                "descripcion": evento.descripcion,
+                "inicio": evento.fecha_inicio.isoformat(),
+                "fin": evento.fecha_fin.isoformat(),
+                "origen": "base_datos"
+            })
+
+        return JsonResponse({
+            "eventos": lista,
+            "mensaje": "No fue posible consultar Google Calendar. Se muestran los eventos almacenados localmente.",
+            "error_google": str(error)
+        })

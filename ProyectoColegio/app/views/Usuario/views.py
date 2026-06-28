@@ -360,7 +360,20 @@ class UsuarioUpdateView(UpdateView):
                 acu_form = AcudienteForm(self.request.POST, instance=p_acu)
                 if acu_form.is_valid():
                     acu = acu_form.save(commit=False)
-                    acu.usuario = usuario
+                    # Si es un acudiente existente, mantener su usuario original
+                    # Si es nuevo, crear el usuario del acudiente
+                    if not p_acu:
+                        # Crear nuevo usuario para el acudiente
+                        usuario_acu = Usuario.objects.create(
+                            email=acu_form.cleaned_data.get("email_acudiente"),
+                            nombre=acu_form.cleaned_data.get("nombre_acudiente"),
+                            estado=True,
+                        )
+                        usuario_acu.set_unusable_password()
+                        usuario_acu.save()
+                        acu.usuario = usuario_acu
+                        asignar_grupo(usuario_acu, "acudiente")
+                    # Si p_acu existe, NO sobrescribir acu.usuario (ya tiene su usuario asignado)
                     acu.save()
                     # Asegurar vínculo en la tabla intermedia
                     est = Estudiante.objects.get(usuario=usuario)
