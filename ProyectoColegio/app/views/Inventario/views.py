@@ -75,7 +75,13 @@ class ElementoCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateView
     template_name = 'Inventario/crear.html'
     success_url = reverse_lazy('app:index_inventario')
     permission_required = 'app.add_elemento'
-
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(*kwargs)
+        context['titulosi'] = 'Registrar Elemento'
+        context['listar_url'] = reverse_lazy("app:index_inventario")
+        context['btn_name'] = 'Guardar'
+        return context
     def form_valid(self, form):
         messages.success(self.request, "Elemento registrado correctamente")
         return super().form_valid(form)
@@ -87,7 +93,13 @@ class ElementoUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView
     template_name = 'Inventario/crear.html'
     success_url = reverse_lazy('app:index_inventario')
     permission_required = 'app.change_elemento'
-
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(*kwargs)
+        context['titulosi'] = 'Editar Elemento'
+        context['listar_url'] = reverse_lazy("app:index_inventario")
+        context['btn_name'] = 'Actualizar'
+        return context
     def form_valid(self, form):
         messages.success(self.request, "Elemento actualizado correctamente")
         return super().form_valid(form)
@@ -98,7 +110,12 @@ class ElementoDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView
     template_name = 'Inventario/eliminar.html'
     success_url = reverse_lazy('app:index_inventario')
     permission_required = 'app.delete_elemento'
-
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['titulo'] = "Eliminar Elemento"
+        context['listar_url'] = reverse_lazy('app:index_inventario')
+        return context
     def form_valid(self, form):
         messages.success(self.request, "Elemento eliminado correctamente")
         return super().form_valid(form)

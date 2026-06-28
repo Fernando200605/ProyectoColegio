@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block main %}
-<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+<script src='{% static "js/apexcharts.js" %}'></script>
 
 <div class="container-fluid mt-4">
 
@@ -341,9 +341,9 @@
   </div>
 </div>
 
-<script src='https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.20/index.global.min.js'></script>
-<script src='https://cdn.jsdelivr.net/npm/@fullcalendar/daygrid@6.1.20/index.global.min.js'></script>
-<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
+<script src='{% static "js/index.global.min.js" %}'></script>
+<script src='{% static "js/indexgray.global.min.js" %}'></script>
+<script src='{% static "js/indexfull.global.min.js" %}'></script>
 
 <script>
   document.addEventListener('DOMContentLoaded', function () {

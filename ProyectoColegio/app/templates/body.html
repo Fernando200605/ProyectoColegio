@@ -3,10 +3,10 @@
 {% block body %}
 
 <body class="layout-blur">
-  <!-- Botón hamburguesa (fuera de la sidebar para que siempre sea visible) -->
+
   <button class="hamburger" id="hamburger"><i class="fa-solid fa-bars"></i></button>
 
-  <!-- Sidebar -->
+
   {% include 'sidebar.html' %}
 
   <div class="main-content">
@@ -14,11 +14,9 @@
     {% block main %}
     {% include 'main.html' %}
     {% endblock %}
-  
-    <!-- Botón flotante -->
+
     <div class="btn-chat" id="btnChat"><i class="fa-solid fa-comment"></i></div>
 
-    <!-- Chat -->
 <div class="chat-container" id="chatContainer">
   <div class="chat-header">
     <span><i class="fa-solid fa-graduation-cap"></i> Asistente San Nicolás</span>
@@ -39,7 +37,7 @@
   </div>
 
     <!-- jQuery -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="{% static 'Js/jquery-3.6.0.min.js' %}"></script>
 
   <!-- DataTables -->
   <link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}" />
