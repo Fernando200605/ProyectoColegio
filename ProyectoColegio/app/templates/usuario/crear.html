@@ -33,10 +33,22 @@
       {% endfor %}
     </div>
 
-    {# Columna derecha: password + confirmar (ocultos para estudiante) #}
-    <div class="col-md-6" id="col-password">
+    {# Columna derecha: estado siempre visible + password oculto para estudiante/acudiente #}
+    <div class="col-md-6">
+      {# Estado: siempre visible #}
       {% for field in usuario_form.visible_fields %}
-        {% if field.name != 'nombre' and field.name != 'email' and field.name != 'codigo' and field.name != 'img_usuario' %}
+        {% if field.name == 'estado' %}
+          <div class="mb-3">
+            <label class="form-label fw-bold" style="color: #1C2E4A;">{{ field.label }}</label>
+            {{ field|add_class:'form-control form-control-custom' }}
+            <span id="error_estado" class="small d-block mt-1"></span>
+          </div>
+        {% endif %}
+      {% endfor %}
+      {# Password: oculto para estudiante y acudiente #}
+      <div id="col-password">
+      {% for field in usuario_form.visible_fields %}
+        {% if field.name != 'nombre' and field.name != 'email' and field.name != 'codigo' and field.name != 'img_usuario' and field.name != 'estado' %}
           <div class="mb-3">
             <label class="form-label fw-bold" style="color: #1C2E4A;">{{ field.label }}</label>
 
@@ -80,6 +92,7 @@
           {% endif %}
         {% endif %}
       {% endfor %}
+      </div>{# /col-password #}
     </div>
   </div>
 
@@ -91,6 +104,7 @@
       <option value="administrador" {% if rol_actual == 'administrador' %}selected{% endif %}>Administrador</option>
       <option value="docente"       {% if rol_actual == 'docente' %}selected{% endif %}>Docente</option>
       <option value="estudiante"    {% if rol_actual == 'estudiante' %}selected{% endif %}>Estudiante</option>
+      <option value="acudiente"     {% if rol_actual == 'acudiente' %}selected{% endif %}>Acudiente</option>
     </select>
   </div>
 
@@ -239,6 +253,35 @@
 </div>
   </div>
 
+  {# --- Acudiente standalone --- #}
+  <div id="acudiente-form" class="rol-form" style="display:none;">
+    <hr class="my-3">
+    <h6 class="fw-bold mb-3" style="color:#1C2E4A;"><i class="fas fa-user-friends me-2"></i>Datos del Acudiente</h6>
+    <div class="row">
+
+      <div class="col-md-6 mb-3">
+        <label class="form-label fw-bold">Teléfono</label>
+        {{ acudiente_solo_form.telefono|add_class:'form-control' }}
+        {% if acudiente_solo_form.telefono.errors %}
+          {% for error in acudiente_solo_form.telefono.errors %}
+            <div class="text-danger mt-1 small"><i class="fas fa-exclamation-circle me-1"></i> {{ error }}</div>
+          {% endfor %}
+        {% endif %}
+      </div>
+
+      <div class="col-md-6 mb-3">
+        <label class="form-label fw-bold">Dirección</label>
+        {{ acudiente_solo_form.direccion|add_class:'form-control' }}
+        {% if acudiente_solo_form.direccion.errors %}
+          {% for error in acudiente_solo_form.direccion.errors %}
+            <div class="text-danger mt-1 small"><i class="fas fa-exclamation-circle me-1"></i> {{ error }}</div>
+          {% endfor %}
+        {% endif %}
+      </div>
+
+    </div>
+  </div>
+
   <script>
     function togglePassword(inputId, iconId) {
       const input = document.getElementById(inputId);
@@ -288,14 +331,14 @@
       const confirmarInput = document.getElementById('id_confirmar_password');
 
       function toggleRolForm() {
-        const esEstudiante = rolSelect.value === 'estudiante';
+        const sinPassword = rolSelect.value === 'acudiente';
 
-        // Ocultar/mostrar columna de contraseñas completa
-        colPassword.style.display = esEstudiante ? 'none' : '';
+        // Ocultar/mostrar solo el bloque de contraseñas
+        colPassword.style.display = sinPassword ? 'none' : '';
 
         // Deshabilitar inputs ocultos para que no se envíen ni validen
-        if (passwordInput)  passwordInput.disabled  = esEstudiante;
-        if (confirmarInput) confirmarInput.disabled = esEstudiante;
+        if (passwordInput)  passwordInput.disabled  = sinPassword;
+        if (confirmarInput) confirmarInput.disabled = sinPassword;
 
         // Mostrar/ocultar formularios por rol
         rolForms.forEach(div => {
