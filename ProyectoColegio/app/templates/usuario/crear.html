@@ -331,7 +331,7 @@
       const confirmarInput = document.getElementById('id_confirmar_password');
 
       function toggleRolForm() {
-        const sinPassword = rolSelect.value === 'acudiente';
+        const sinPassword = rolSelect.value === 'acudiente' || rolSelect.value === 'estudiante';
 
         // Ocultar/mostrar solo el bloque de contraseñas
         colPassword.style.display = sinPassword ? 'none' : '';
