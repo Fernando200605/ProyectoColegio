@@ -52,7 +52,8 @@ class InventarioListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
         context['subtitulo'] = 'Gestión de elementos del colegio'
         context['crear_url'] = reverse_lazy('app:crear_elemento')
         context['limpiar_url'] = reverse_lazy('app:limpiar_inventario')
-
+        context["total_text"] = "Total de Elementos"
+        context["text"] = "Stock Bajo"
         context['total_count'] = Elemento.objects.count()
         context['stock_bajo'] = Elemento.objects.filter(
             stockActual__lte=F("stockMinimo")

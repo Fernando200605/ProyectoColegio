@@ -4,32 +4,52 @@
 {% block subtitulo %}{{ subtitulo }}{% endblock %}
 
 {% block extra_cards %}
-<div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-3 mb-md-0">
-  <div class="card card-stats" style="background:linear-gradient(135deg,#e8f5e9,#c8e6c9);">
-    <div class="card-body">
-      <div class="d-flex justify-content-between">
-        <div>
-          <p class="text-muted mb-0 small">Entradas</p>
-          <h3 class="fw-bold mb-0" style="color:#2e7d32;">{{ entradas|default:"0" }}</h3>
+<!-- ENTRADAS -->
+<div class="col-12 col-sm-6 col-lg-3">
+    <div class="card card-stats h-100 shadow-sm border-0">
+        <div class="card-body d-flex flex-column justify-content-center py-3">
+            <div class="d-flex justify-content-between align-items-center">
+
+                <div class="pe-2 flex-grow-1">
+                    <p class="text-muted mb-1 small fw-medium text-uppercase tracking-wider">
+                        Entradas
+                    </p>
+                    <h3 class="fw-bold mb-0 fs-2" style="color:#2e7d32;">
+                        {{ entradas|default:"0" }}
+                    </h3>
+                </div>
+
+                <div class="icon-wrapper bg-white bg-opacity-50 p-2 rounded-3">
+                    <i class="fa-solid fa-arrow-up fa-2x" style="color:#2e7d32;"></i>
+                </div>
+
+            </div>
         </div>
-        <i class="fa-solid fa-arrow-up fa-2x" style="color:#2e7d32;"></i>
-      </div>
     </div>
-  </div>
 </div>
 
-<div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-3 mb-md-0">
-  <div class="card card-stats" style="background:linear-gradient(135deg,#fff9e6,#fff3cd);">
-    <div class="card-body">
-      <div class="d-flex justify-content-between">
-        <div>
-          <p class="text-muted mb-0 small">Registrados hoy</p>
-          <h3 class="fw-bold mb-0" style="color:#e67e22;">{{ hoy_count|default:"0" }}</h3>
+<!-- REGISTRADOS HOY -->
+<div class="col-12 col-sm-6 col-lg-3">
+    <div class="card card-stats h-100 shadow-sm border-0">
+        <div class="card-body d-flex flex-column justify-content-center py-3">
+            <div class="d-flex justify-content-between align-items-center">
+
+                <div class="pe-2 flex-grow-1">
+                    <p class="text-muted mb-1 small fw-medium text-uppercase tracking-wider">
+                        Registrados hoy
+                    </p>
+                    <h3 class="fw-bold mb-0 fs-2" style="color:#e67e22;">
+                        {{ hoy_count|default:"0" }}
+                    </h3>
+                </div>
+
+                <div class="icon-wrapper bg-white bg-opacity-50 p-2 rounded-3">
+                    <i class="fa-solid fa-calendar-day fa-2x" style="color:#e67e22;"></i>
+                </div>
+
+            </div>
         </div>
-        <i class="fa-solid fa-calendar-day fa-2x" style="color:#e67e22;"></i>
-      </div>
     </div>
-  </div>
 </div>
 {% endblock %}
 

@@ -87,7 +87,7 @@ def obtener_servicio():
         with open(TOKEN_PATH, "w") as token:
             token.write(creds.to_json())
 
-        print("✅ Token generado correctamente")
+        print("Token generado correctamente")
 
     service = build(
         "calendar",
