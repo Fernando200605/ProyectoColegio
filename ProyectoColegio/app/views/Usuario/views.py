@@ -1,8 +1,8 @@
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.utils import timezone
 from django.db import connection
 from django.views.generic import CreateView
-from django.shortcuts import redirect
+from django.shortcuts import redirect, get_object_or_404
 from django.shortcuts import render, redirect
 from django.views import View
 from django.views.generic import ListView, UpdateView, DeleteView
@@ -497,6 +497,28 @@ from django.shortcuts import render, get_object_or_404, redirect
 from collections import defaultdict
 
 User = get_user_model()
+
+
+class DescargarQRView(LoginRequiredMixin, View):
+    def get(self, request, estudiante_id):
+        # Verificar que el usuario sea administrador
+        if not request.user.groups.filter(name='Administrador').exists():
+            messages.error(request, "No tienes permisos para descargar códigos QR.")
+            return redirect("app:index_usuario")
+        
+        estudiante = get_object_or_404(Estudiante, pk=estudiante_id)
+        
+        if not estudiante.qr:
+            messages.error(request, "El estudiante no tiene código QR generado.")
+            return redirect("app:index_usuario")
+        
+        # Abrir el archivo de imagen
+        ruta_archivo = estudiante.qr.path
+        with open(ruta_archivo, 'rb') as f:
+            response = HttpResponse(f.read(), content_type='image/png')
+            nombre_archivo = f"QR_{estudiante.usuario.nombre.replace(' ', '_')}.png"
+            response['Content-Disposition'] = f'attachment; filename="{nombre_archivo}"'
+            return response
 
 
 class GestionPermisosUsuarioView(View):

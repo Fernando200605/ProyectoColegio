@@ -38,7 +38,7 @@
     function onScanSuccess(decodedText) {
       scanner.clear(); 
 
-      fetch("/ejemplo/registrar_asistencia/", {
+      fetch("/colegio/registrar_asistencia/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

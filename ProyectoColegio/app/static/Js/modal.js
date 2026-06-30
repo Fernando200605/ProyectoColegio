@@ -183,7 +183,7 @@ function abrirPerfil() {
 	const nombre = document.getElementById('name')
 	const img = document.getElementById('img')
 
-	fetch("/ejemplo/usuario/perfil/", {
+	fetch("/colegio/usuario/perfil/", {
 		headers: { 'X-Requested-With': 'XMLHttpRequest' }
 	})
 		.then(res => res.json().catch(() => null)) // intenta parsear JSON
@@ -194,7 +194,7 @@ function abrirPerfil() {
 			}
 
 			// si no es JSON, asumimos HTML (usuario logueado)
-			return fetch("/ejemplo/usuario/perfil/")
+			return fetch("/colegio/usuario/perfil/")
 		})
 		.then(response => response.text())
 		.then(html => {
@@ -314,7 +314,7 @@ async function abrirNotificacion() {
     `;
 
     try {
-        const response = await fetch("/ejemplo/mis_notificaciones/", {
+        const response = await fetch("/colegio/mis_notificaciones/", {
             headers: { "X-Requested-With": "XMLHttpRequest" }
         });
 
@@ -346,7 +346,7 @@ async function abrirNotificacion() {
                 const id = item.dataset.notificacionId;
 
                 try {
-                    const response = await fetch(`/ejemplo/mis_notificaciones/${id}/leer/`, {
+                    const response = await fetch(`/colegio/mis_notificaciones/${id}/leer/`, {
                         method: "POST",
                         headers: {
                             "X-Requested-With": "XMLHttpRequest",
@@ -518,7 +518,7 @@ function enviarMensaje() {
   mostrarEscribiendo();
 
   // Petición al backend
-  fetch('/ejemplo/preguntas1/', {
+  fetch('/colegio/preguntas1/', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

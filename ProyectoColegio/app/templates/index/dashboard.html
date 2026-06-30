@@ -356,7 +356,7 @@
       eventDisplay: 'block',
       displayEventTime: false,
       events: function (info, successCallback, failureCallback) {
-        fetch('/ejemplo/evento/calendario')
+        fetch('/colegio/evento/calendario')
           .then(res => res.json())
           .then(data => {
             const eventos = data.eventos.map(e => ({

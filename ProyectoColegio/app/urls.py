@@ -52,6 +52,7 @@ urlpatterns = [
     path('usuario/limpiar/', UsuarioCleandView.as_view(), name="limpiar_usuario"),
     path('usuario/perfil/',PerfilView.as_view(),name="perfil"),
     path('usuario/<int:user_id>/permisos/', GestionPermisosUsuarioView.as_view(), name='gestionar_permisos'),
+    path('usuario/descargar-qr/<int:estudiante_id>/', DescargarQRView.as_view(), name='descargar_qr'),
     # INVENTARIO
     path('inventario/', InventarioListView.as_view(), name="index_inventario"),
     path('inventario/crear/', ElementoCreateView.as_view(), name="crear_elemento"),
