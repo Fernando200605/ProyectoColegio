@@ -105,6 +105,14 @@ $(document).ready(function () {
     <span>{{ subtitulo }}</span>
 {% endblock %}
 
+{% block breadcrumb_items %}
+{% if modo == "cursos" %}
+<li class="breadcrumb-item active">Cursos</li>
+{% else %}
+<li class="breadcrumb-item active">Estudiantes por Curso</li>
+{% endif %}
+{% endblock %}
+
 {% block columns %}
 <th>
     <i class="fas fa-hashtag me-2"></i>ID
@@ -159,7 +167,8 @@ $(document).ready(function () {
             {% if perms.app.change_curso %}
             <a href="{% url 'app:editar_curso' curso.id %}"
                class="btn btn-sm me-1"
-               style="background-color: #3054f7; color: #ffffff; border-radius: 8px;">
+               style="background-color: #3054f7; color: #ffffff; border-radius: 8px;"
+               title="Editar">
                 <i class="fa-solid fa-pen-to-square"></i>
             </a>
             {% endif %}
@@ -167,7 +176,8 @@ $(document).ready(function () {
             {% if perms.app.delete_curso %}
             <a href="{% url 'app:eliminar_curso' curso.id %}"
                class="btn btn-sm"
-               style="background-color: #ff4d4d; color: white; border-radius: 8px;">
+               style="background-color: #ff4d4d; color: white; border-radius: 8px;"
+               title="Eliminar">
                 <i class="fa-solid fa-trash"></i>
             </a>
             {% endif %}

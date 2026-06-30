@@ -8,6 +8,10 @@
 {{subtitulo}}
 {% endblock subtitulo%}
 
+{% block breadcrumb_items %}
+<li class="breadcrumb-item active">Tipos de Elemento</li>
+{% endblock %}
+
 {% block columns %}
     <th><i class="fas fa-hashtag me-2"></i>ID</th>
     <th><i class="fas fa-book me-2"></i>Nombre Tipo de Elemento</th>
@@ -20,10 +24,10 @@
         <td>{{ tipo.id }}</td>
         <td>{{ tipo.nombre}}
         <td class="text-center">
-            <a href="{% url 'app:actualizar_tipo' tipo.id %}" class="btn btn-sm me-1" style="background-color: #3054f7; color: #ffffff; border-radius: 8px;">
+            <a href="{% url 'app:actualizar_tipo' tipo.id %}" class="btn btn-sm me-1" style="background-color: #3054f7; color: #ffffff; border-radius: 8px;" title="Editar">
                             <i class="fa-solid fa-pen-to-square"></i>
             </a>
-            <a href="{% url 'app:eliminar_tipo' tipo.id %}" class="btn btn-sm" style="background-color: #ff4d4d; color: white; border-radius: 8px;">
+            <a href="{% url 'app:eliminar_tipo' tipo.id %}" class="btn btn-sm" style="background-color: #ff4d4d; color: white; border-radius: 8px;" title="Eliminar">
                             <i class="fa-solid fa-trash"></i>
             </a>
         </td>

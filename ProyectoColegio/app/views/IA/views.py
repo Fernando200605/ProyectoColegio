@@ -25,120 +25,251 @@ def preguntar_ia(request):
         return JsonResponse({"respuesta": respuesta.choices[0].message.content})
 
 
-def normalizar_ruta(r):
-    r = "/" + r.strip("/ \t")
-    r = r.replace("^", "").replace("$", "")
-    return r
-
-
-import json
 import os
 import re
+import json
 import requests
 
 from django.conf import settings
 from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 
-LOCAL_HOST = "http://127.0.0.1:8000"
 
+# ==========================
+# CONFIGURACIÓN
+# ==========================
+
+OLLAMA_URL = "http://localhost:11434/api/generate"
+MODELO_IA = "qwen3:8b"
+
+
+
+def cargar_prompt():
+
+    ruta_prompt = os.path.join(
+        settings.BASE_DIR,
+        "prompt_sistema.txt"
+    )
+
+    try:
+
+        with open(
+            ruta_prompt,
+            "r",
+            encoding="utf-8"
+        ) as archivo:
+
+            return archivo.read()
+
+    except Exception as e:
+
+        print(
+            "Error cargando prompt:",
+            e
+        )
+
+        return ""
+
+
+# ==========================
+# CARGAR BASE DE CONOCIMIENTO
+# ==========================
 
 def cargar_base_conocimiento():
+
     ruta_md = os.path.join(
         settings.BASE_DIR,
         "base_conocimiento_ia.md"
     )
 
     try:
-        with open(ruta_md, "r", encoding="utf-8") as archivo:
+
+        with open(
+            ruta_md,
+            "r",
+            encoding="utf-8"
+        ) as archivo:
+
             return archivo.read()
+
     except Exception as e:
-        print("Error leyendo markdown:", e)
+
+        print(
+            "Error leyendo base conocimiento:",
+            e
+        )
+
         return ""
 
 
-def buscar_fragmentos(texto, consulta, max_fragmentos=3):
-    """
-    Busca fragmentos relevantes dentro del markdown.
-    """
+# ==========================
+# NORMALIZAR TEXTO
+# ==========================
 
-    consulta = consulta.lower()
+def limpiar_texto(texto):
 
-    bloques = texto.split("\n## ")
+    texto = texto.lower()
 
-    puntuados = []
+    texto = re.sub(
+        r"[^\w\s]",
+        " ",
+        texto
+    )
 
-    palabras = consulta.split()
+    return texto
+
+
+# ==========================
+# BÚSQUEDA DE CONTEXTO
+# ==========================
+
+def buscar_fragmentos(
+    texto,
+    consulta,
+    max_fragmentos=5
+):
+
+    consulta_limpia = limpiar_texto(
+        consulta
+    )
+
+    palabras = {
+
+        palabra
+
+        for palabra in consulta_limpia.split()
+
+        if len(palabra) > 2
+
+    }
+
+    bloques = texto.split("---")
+
+    resultados = []
 
     for bloque in bloques:
 
+        contenido = limpiar_texto(
+            bloque
+        )
+
         score = 0
 
-        contenido = bloque.lower()
-
         for palabra in palabras:
+
             if palabra in contenido:
                 score += 1
 
         if score > 0:
-            puntuados.append((score, bloque))
 
-    puntuados.sort(reverse=True)
+            resultados.append(
+                (
+                    score,
+                    bloque.strip()
+                )
+            )
 
-    seleccionados = []
+    resultados.sort(
+        key=lambda x: x[0],
+        reverse=True
+    )
 
-    for _, bloque in puntuados[:max_fragmentos]:
-        seleccionados.append(bloque)
+    return "\n\n".join(
+        bloque
+        for _, bloque in resultados[
+            :max_fragmentos
+        ]
+    )
 
-    return "\n\n".join(seleccionados)
+
+# ==========================
+# CHAT IA
+# ==========================
 
 @csrf_exempt
 def preguntar_ia_local(request):
 
     if request.method != "POST":
+
         return JsonResponse(
-            {"error": "Método no permitido"},
+            {
+                "error":
+                "Método no permitido"
+            },
             status=405
         )
 
     try:
 
-        data = json.loads(request.body)
+        data = json.loads(
+            request.body
+        )
 
-        mensaje = data.get("mensaje", "").strip()
+        mensaje = data.get(
+            "mensaje",
+            ""
+        ).strip()
 
         if not mensaje:
+
             return JsonResponse(
-                {"respuesta": "Debe escribir una pregunta."},
+                {
+                    "respuesta":
+                    "Debe escribir una pregunta."
+                },
                 status=400
             )
 
-        rutas_validas = obtener_rutas()
+        prompt_sistema = (
+            cargar_prompt()
+        )
 
-        rutas_normalizadas = [
-            normalizar_ruta(r)
-            for r in rutas_validas
-        ]
+        conocimiento = (
+            cargar_base_conocimiento()
+        )
 
-        conocimiento = cargar_base_conocimiento()
+        if not conocimiento:
+
+            return JsonResponse(
+                {
+                    "respuesta":
+                    "No se encontró la base de conocimiento."
+                },
+                status=500
+            )
 
         contexto = buscar_fragmentos(
             conocimiento,
             mensaje,
-            max_fragmentos=3
+            max_fragmentos=5
         )
 
+        print("\n" + "=" * 80)
+        print("PREGUNTA:")
+        print(mensaje)
+        print("=" * 80)
+
+        print("CONTEXTO:")
+        print(contexto)
+
+        print("=" * 80)
+        print(
+            "TAMAÑO CONTEXTO:",
+            len(contexto)
+        )
+        print("=" * 80)
+
+        if not contexto.strip():
+
+            return JsonResponse(
+                {
+                    "respuesta":
+                    "No se encontró información relacionada con esa consulta."
+                }
+            )
+
         prompt_completo = f"""
-Eres el asistente oficial del sistema.
-
-Debes responder únicamente utilizando la información suministrada.
-
-Si la respuesta no existe dentro del contexto responde:
-
-"No se encontró información relacionada con esa consulta."
-
-RUTAS DISPONIBLES:
-
-{', '.join(rutas_normalizadas)}
+{prompt_sistema}
 
 CONTEXTO:
 
@@ -151,19 +282,16 @@ PREGUNTA:
 RESPUESTA:
 """
 
-        print("Tamaño contexto:", len(contexto))
-        print("Pregunta:", mensaje)
-
         respuesta = requests.post(
-            "http://localhost:11434/api/generate",
+            OLLAMA_URL,
             json={
-                "model": "qwen2.5-coder:1.5b-base",
+                "model": MODELO_IA,
                 "prompt": prompt_completo,
                 "stream": False,
                 "options": {
-                    "temperature": 0.2,
-                    "top_k": 40,
-                    "num_predict": 300,
+                    "temperature": 0,
+                    "top_p": 0.8,
+                    "num_predict": 350,
                 },
             },
             timeout=120,
@@ -175,55 +303,67 @@ RESPUESTA:
 
         ia_texto = resultado.get(
             "response",
-            "No se obtuvo respuesta."
+            ""
+        ).strip()
+
+        if not ia_texto:
+
+            ia_texto = (
+                "No se encontró información relacionada con esa consulta."
+            )
+
+        ia_texto = re.sub(
+            r"^(respuesta:|answer:)",
+            "",
+            ia_texto,
+            flags=re.IGNORECASE
+        ).strip()
+
+        # Protección básica
+        respuesta_normalizada = (
+            ia_texto.lower()
         )
 
-        rutas_detectadas = re.findall(
-            r"`(/[^`]+)`",
-            ia_texto
+        patrones_prohibidos = [
+            "http://",
+            "https://",
+            "/usuario/",
+            "/curso/",
+            "/inventario/",
+            "/dashboard/",
+            "/login/"
+        ]
+
+        for patron in patrones_prohibidos:
+
+            if patron in respuesta_normalizada:
+
+                ia_texto = (
+                    "No se encontró información relacionada con esa consulta."
+                )
+
+                break
+
+        if len(ia_texto) > 1500:
+
+            ia_texto = (
+                ia_texto[:1500]
+                + "..."
+            )
+
+        return JsonResponse(
+            {
+                "respuesta":
+                ia_texto
+            }
         )
-
-        for ruta in set(rutas_detectadas):
-
-            ruta_limpia = normalizar_ruta(ruta)
-
-            ruta_match = None
-
-            if ruta_limpia in rutas_normalizadas:
-                ruta_match = ruta_limpia
-
-            elif ruta_limpia + "/" in rutas_normalizadas:
-                ruta_match = ruta_limpia + "/"
-
-            elif ruta_limpia.rstrip("/") in rutas_normalizadas:
-                ruta_match = ruta_limpia.rstrip("/")
-
-            if ruta_match:
-
-                url_completa = (
-                    f"{LOCAL_HOST}{ruta_match}"
-                )
-
-                link_html = (
-                    f'<a href="{url_completa}" '
-                    f'target="_blank">{ruta_match}</a>'
-                )
-
-                ia_texto = ia_texto.replace(
-                    f"`{ruta}`",
-                    link_html
-                )
-
-        return JsonResponse({
-            "respuesta": ia_texto
-        })
 
     except requests.exceptions.RequestException as e:
 
-        print("Error Ollama:", e)
-
-        if hasattr(e, "response") and e.response:
-            print(e.response.text)
+        print(
+            "Error Ollama:",
+            e
+        )
 
         return JsonResponse(
             {
@@ -235,7 +375,10 @@ RESPUESTA:
 
     except Exception as e:
 
-        print("Error:", e)
+        print(
+            "Error general:",
+            e
+        )
 
         return JsonResponse(
             {

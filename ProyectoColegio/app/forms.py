@@ -80,6 +80,14 @@ class AsistenciaForm(forms.ModelForm):
     class Meta:
         model = Asistencia
         fields = "__all__"
+        labels = {
+            "estudianteid": "Estudiante",
+            "horaentrada": "Hora de Entrada",
+            "horasalida": "Hora de Salida",
+            "observaciones": "Observaciones",
+            "fecha": "Fecha",
+            "estado": "Estado",
+        }
         widgets = {
             "estudianteid": forms.Select(attrs={"class": "form-control"}),
             "horaentrada": forms.TimeInput(
@@ -335,6 +343,12 @@ class EstudianteForm(forms.ModelForm):
     class Meta:
         model = Estudiante
         fields = ["fechaNacimiento", "estadoMatricula", "fechaIngreso", "cursoId"]
+        labels = {
+            "fechaNacimiento": "Fecha de Nacimiento",
+            "estadoMatricula": "Estado de Matrícula",
+            "fechaIngreso": "Fecha de Ingreso",
+            "cursoId": "Curso",
+        }
         widgets = {
             "fechaNacimiento": forms.DateInput(
                 attrs={"type": "date"},
@@ -561,6 +575,18 @@ class ElementoForm(forms.ModelForm):
     class Meta:
         model = Elemento
         fields = "__all__"
+        labels = {
+            "nombre": "Nombre",
+            "cantidad": "Cantidad",
+            "marcaId": "Marca",
+            "tipoElementoId": "Tipo de Elemento",
+            "unidadMedidaId": "Unidad de Medida",
+            "categoriaId": "Categoría",
+            "descripcion": "Descripción",
+            "stockActual": "Stock Actual",
+            "stockMinimo": "Stock Mínimo",
+            "ubicacion": "Ubicación",
+        }
         widgets = {
             "nombre": forms.TextInput(attrs={"class": "form-control"}),
             "cantidad": forms.NumberInput(attrs={"class": "form-control"}),
@@ -680,6 +706,15 @@ class MovimientoForm(forms.ModelForm):
     class Meta:
         model = Movimiento
         fields = "__all__"
+        labels = {
+            "tipo": "Tipo de Movimiento",
+            "codigo": "Código",
+            "cantidad": "Cantidad",
+            "docenteid": "Docente",
+            "fecha": "Fecha",
+            "motivo": "Motivo",
+            "elementoId": "Elemento",
+        }
         widgets = {
             "tipo": forms.Select(attrs={"class": "form-control"}),
             "codigo": forms.TextInput(attrs={"class": "form-control"}),
@@ -697,6 +732,27 @@ class MovimientoForm(forms.ModelForm):
         if cantidad < 0:
             raise forms.ValidationError("No se puede tener una cantidad negativa")
         return cantidad
+
+    def clean(self):
+        cleaned_data = super().clean()
+        tipo = cleaned_data.get("tipo")
+        cantidad = cleaned_data.get("cantidad")
+        elemento = cleaned_data.get("elementoId")
+
+        if tipo == "Salida" and elemento and cantidad:
+            # Si es edición, considerar el stock actual más la cantidad original del movimiento
+            stock_disponible = elemento.stockActual
+            if self.instance.pk:
+                stock_disponible += self.instance.cantidad
+
+            if cantidad > stock_disponible:
+                self.add_error(
+                    "cantidad",
+                    f"La cantidad ({cantidad}) supera el stock disponible del elemento "
+                    f"'{elemento.nombre}' ({stock_disponible} unidades).",
+                )
+
+        return cleaned_data
 
     def clean_motivo(self):
         motivo = self.cleaned_data.get("motivo")
@@ -805,6 +861,15 @@ class NotificacionForm(forms.ModelForm):
     class Meta:
         model = Notificacion
         fields = "__all__"
+        labels = {
+            "titulo": "Título",
+            "mensaje": "Mensaje",
+            "fecha_envio": "Fecha de Envío",
+            "estado": "Estado",
+            "tipo": "Tipo",
+            "receptor": "Receptor",
+            "evento": "Evento",
+        }
         widgets = {
             "titulo": forms.TextInput(attrs={"class": "form-control"}),
             "mensaje": forms.TextInput(attrs={"class": "form-control"}),

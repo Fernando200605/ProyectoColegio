@@ -65,7 +65,7 @@ class AsistenciaQR(PermissionRequiredMixin, View):
                 estado=estado,
                 estudianteid=estudiante,
                 fecha=timezone.localdate(),
-                horaentrada=timezone.now(),
+                horaentrada=hora_actual,
                 observaciones="",
                 horasalida=time(13, 0),
             )

@@ -23,13 +23,15 @@ class InventarioListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
     model = Elemento
     template_name = 'Inventario/index.html'
     context_object_name = 'elementos'
-    paginate_by = 10
     permission_required = 'app.view_elemento'
 
     def get_queryset(self):
         queryset = Elemento.objects.select_related(
-            "tipoElementoId", "categoriaId", "marcaId", "unidadMedidaId"
-        ).all()
+            "tipoElementoId",
+            "categoriaId",
+            "marcaId",
+            "unidadMedidaId"
+        ).order_by("-id")
 
         buscar = self.request.GET.get("buscar")
         if buscar:
@@ -41,7 +43,9 @@ class InventarioListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
 
         bajo_stock = self.request.GET.get("bajo_stock")
         if bajo_stock == "1":
-            queryset = queryset.filter(stockActual__lte=F("stockMinimo"))
+            queryset = queryset.filter(
+                stockActual__lte=F("stockMinimo")
+            )
 
         return queryset
 
@@ -54,7 +58,9 @@ class InventarioListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
         context['limpiar_url'] = reverse_lazy('app:limpiar_inventario')
         context["total_text"] = "Total de Elementos"
         context["text"] = "Stock Bajo"
+
         context['total_count'] = Elemento.objects.count()
+
         context['stock_bajo'] = Elemento.objects.filter(
             stockActual__lte=F("stockMinimo")
         ).count()
@@ -63,12 +69,19 @@ class InventarioListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
         app_label = self.model._meta.app_label
         model_name = self.model._meta.model_name
 
-        context['puede_crear'] = user.has_perm(f'{app_label}.add_{model_name}')
-        context['puede_editar'] = user.has_perm(f'{app_label}.change_{model_name}')
-        context['puede_eliminar'] = user.has_perm(f'{app_label}.delete_{model_name}')
+        context['puede_crear'] = user.has_perm(
+            f'{app_label}.add_{model_name}'
+        )
+
+        context['puede_editar'] = user.has_perm(
+            f'{app_label}.change_{model_name}'
+        )
+
+        context['puede_eliminar'] = user.has_perm(
+            f'{app_label}.delete_{model_name}'
+        )
 
         return context
-
 
 class ElementoCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
     model = Elemento

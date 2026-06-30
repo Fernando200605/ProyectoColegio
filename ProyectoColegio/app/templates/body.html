@@ -11,6 +11,18 @@
 
   <div class="main-content">
     {% include 'header.html' %}
+    {% block breadcrumb %}
+    <nav aria-label="breadcrumb" class="breadcrumb-container">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+          <a href="{% url 'app:dashboard' %}">
+            <i class="fas fa-home me-1"></i>Inicio
+          </a>
+        </li>
+        {% block breadcrumb_items %}{% endblock %}
+      </ol>
+    </nav>
+    {% endblock %}
     {% block main %}
     {% include 'main.html' %}
     {% endblock %}

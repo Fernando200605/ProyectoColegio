@@ -1,4 +1,9 @@
 {% extends "create_generic.html" %}
+{% block breadcrumb_list %}Cursos{% endblock %}
+{% block breadcrumb_active %}
+{% if object %}Editar Curso{% else %}Nuevo Curso{% endif %}
+{% endblock %}
+
 {% block titulo %}
 Crear Curso
 {% endblock titulo %}

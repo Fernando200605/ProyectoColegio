@@ -527,7 +527,7 @@ User = get_user_model()
 
 class DescargarQRView(LoginRequiredMixin, View):
     def get(self, request, estudiante_id):
-        # Verificar que el usuario sea administrador
+
         if not request.user.groups.filter(name='Administrador').exists():
             messages.error(request, "No tienes permisos para descargar códigos QR.")
             return redirect("app:index_usuario")
@@ -538,7 +538,6 @@ class DescargarQRView(LoginRequiredMixin, View):
             messages.error(request, "El estudiante no tiene código QR generado.")
             return redirect("app:index_usuario")
         
-        # Abrir el archivo de imagen
         ruta_archivo = estudiante.qr.path
         with open(ruta_archivo, 'rb') as f:
             response = HttpResponse(f.read(), content_type='image/png')
@@ -589,20 +588,20 @@ class GestionPermisosUsuarioView(View):
     def post(self, request, user_id):
         usuario = get_object_or_404(User, id=user_id)
         
-        # Validamos y convertimos a enteros de forma segura en una sola línea
+
         grupos_ids = [int(g) for g in request.POST.getlist("grupos") if g.isdigit()]
         permisos_ids = [int(p) for p in request.POST.getlist("permisos") if p.isdigit()]
         
-        # Asignación masiva en base de datos
+
         usuario.groups.set(grupos_ids)
         usuario.user_permissions.set(permisos_ids)
 
-        # Limpieza manual del caché de permisos internos de Django
+
         for attr in ("_perm_cache", "_user_perm_cache", "_group_perm_cache"):
             if hasattr(usuario, attr):
                 delattr(usuario, attr)
 
-        # Añadimos un feedback visual para el usuario (¡Muy recomendado!)
+  
         messages.success(request, f"Permisos actualizados correctamente para {usuario.nombre}.")
 
         return redirect("app:index_usuario")

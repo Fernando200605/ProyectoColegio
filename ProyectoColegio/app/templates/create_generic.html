@@ -2,6 +2,22 @@
 {% load widget_tweaks %}
 {% load static %}
 
+{% block breadcrumb %}
+<nav aria-label="breadcrumb" class="breadcrumb-container">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item">
+      <a href="{% url 'app:dashboard' %}">
+        <i class="fas fa-home me-1"></i>Inicio
+      </a>
+    </li>
+    <li class="breadcrumb-item">
+      <a href="{{ listar_url }}">{% block breadcrumb_list %}{% endblock %}</a>
+    </li>
+    <li class="breadcrumb-item active">{% block breadcrumb_active %}{% endblock %}</li>
+  </ol>
+</nav>
+{% endblock %}
+
 {% block main %}
 <div class="container py-4 edit">
     <a href="{{ listar_url }}" class="btn btn-back mb-4 shadow-sm" style="position: relative; z-index: 1050;">

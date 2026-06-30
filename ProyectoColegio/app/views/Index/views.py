@@ -73,6 +73,7 @@ class DashboardView(LoginRequiredMixin,RolMixin, TemplateView):
 
             datos_inventario = (
                 Elemento.objects
+                .exclude(categoriaId__isnull=True)
                 .values('categoriaId__nombre')
                 .annotate(total=Sum('stockActual'))
                 .order_by('categoriaId__nombre')

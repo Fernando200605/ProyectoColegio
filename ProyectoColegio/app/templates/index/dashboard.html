@@ -383,7 +383,10 @@
     });
     calendar.render();
   });
-
+  console.log("labels:", {{ labels|safe }});
+console.log("data:", {{ data|safe }});
+console.log("labels_elemento:", {{ labels_elemento|safe }});
+console.log("datos_elemento:", {{ datos_elemento|safe }});
   new ApexCharts(document.querySelector('#graficaAsistencias'), {
     chart: { type: 'area', height: 230, toolbar: { show: false }, sparkline: { enabled: false } },
     series: [{ name: 'Asistencias', data: {{ data|safe }} }],
