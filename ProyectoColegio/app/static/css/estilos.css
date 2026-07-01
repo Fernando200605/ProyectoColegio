@@ -40,7 +40,7 @@ body {
   position: absolute;
   width: 200px;
   height: 100px;
-  background-color: #667eea;
+  background-color: #1C2E4A;
   align-items: center;
   justify-content: center;
   border-radius: 10px;
@@ -351,7 +351,7 @@ input:focus::placeholder {
 .pass {
   position: absolute;
   top: 28%;
-  background-color: #34d399;
+  background-color: #1976d2;
   /* verde éxito */
   color: #fff;
   padding: 12px 20px;
