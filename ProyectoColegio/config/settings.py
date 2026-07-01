@@ -84,9 +84,9 @@ WSGI_APPLICATION = 'config.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': '',
+        'NAME': 'colegio_db',
         'USER': 'root',
-        'PASSWORD': ''
+        'PASSWORD': 'mamitas39'
     }
 }
 
