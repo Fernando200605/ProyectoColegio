@@ -700,7 +700,7 @@ body.is-high-contrast .dataTables_paginate .paginate_button {
 
 body.is-high-contrast .dataTables_paginate .paginate_button:hover {
     background-color: #333333 !important;
-    color: #ffff00 !important;
+    color: #ff4d4d !important;
 }
 
 body.is-high-contrast .dataTables_paginate .paginate_button.current {
@@ -765,7 +765,7 @@ body.is-high-contrast .accessibility-option {
 
 body.is-high-contrast .accessibility-option:hover {
 	background-color: #333333 !important;
-	border-color: #ffff00 !important;
+	border-color: #ff4d4d !important;
 }
 
 body.is-high-contrast .accessibility-option.active {
@@ -842,9 +842,9 @@ body.is-readable-font .fa {
 }
 
 .is-being-read {
-	outline: 3px solid #ffeb3b !important;
+	outline: 3px solid #ff4d4d !important;
 	outline-offset: 2px !important;
-	background-color: rgba(255, 235, 59, 0.2) !important;
+	background-color: rgba(255, 77, 77, 0.2) !important;
 }
 
 .accessibility-option i {
@@ -875,7 +875,7 @@ body.is-readable-font .fa {
 	position: fixed;
 	top: 20px;
 	right: 40px;
-	background-color: #34d399;
+	background-color: #1976d2;
 	/* verde éxito */
 	color: #fff;
 	padding: 12px 20px;
@@ -1293,7 +1293,7 @@ body.is-readable-font .fa {
 
 .btn-pastel-secondary {
 	background-color: #bae1ff !important;
-	box-shadow: 0 4px 10px rgba(117, 126, 255, 0.253) !important;
+	box-shadow: 0 4px 10px rgba(28, 46, 74, 0.253) !important;
 	color: #f7f7f7 !important;
 	border-radius: 12px !important;
 	padding: 10px 20px !important;
@@ -1306,10 +1306,10 @@ body.is-readable-font .fa {
 }
 
 .reference-box {
-	background-color: #e0f7fa !important;
+	background-color: #e3f2fd !important;
 	border-radius: 15px !important;
-	border: 1px solid #b2ebf2 !important;
-	color: #00838f !important;
+	border: 1px solid #bae1ff !important;
+	color: #1976d2 !important;
 }
 
 /* Botones de paginación generales */
@@ -1344,7 +1344,7 @@ body.is-readable-font .fa {
 	border-radius: 10px !important;
 	padding: 5px 15px !important;
 	outline: none !important;
-	color: #8884d8;
+	color: #1976d2;
 }
 
 .dataTables_filter input:focus {
@@ -1516,29 +1516,29 @@ body.is-readable-font .fa {
 
     padding: 10px 18px;
     background: white;
-    color: #0de906;
+    color: #1976d2;
     font-weight: 600;
     font-size: 14px;
     text-decoration: none;
 
     border-radius: 10px;
-    border: 2px solid #0de906;
+    border: 2px solid #1976d2;
 
-    box-shadow: 0 4px 10px rgba(27, 94, 32, 0.3);
+    box-shadow: 0 4px 10px rgba(25, 118, 210, 0.3);
     transition: all 0.3s ease;
     cursor: pointer;
 }
 
 .btn-excel:hover {
-    background: linear-gradient(135deg, #23b82f, #32d43d);
+    background: linear-gradient(135deg, #1976d2, #2196f3);
     transform: translateY(-2px);
-    box-shadow: 0 6px 14px rgba(27, 94, 32, 0.4);
+    box-shadow: 0 6px 14px rgba(25, 118, 210, 0.4);
     color: white;
 }
 
 .btn-excel:active {
     transform: translateY(0);
-    box-shadow: 0 3px 8px rgba(27, 94, 32, 0.3);
+    box-shadow: 0 3px 8px rgba(25, 118, 210, 0.3);
 }
 
 /* ==============================
@@ -1647,9 +1647,9 @@ body.is-readable-font .fa {
 }
 
 .pass-box {
-	background-color: #8ae90d;
-	border: 1px solid #83ee08;
-	color: #33a100;
+	background-color: #d1e7f2;
+	border: 1px solid #1976d2;
+	color: #1C2E4A;
 	border-radius: 8px;
 	padding: 10px;
 	font-size: 13px;
@@ -1789,10 +1789,10 @@ body.is-readable-font .fa {
 /* Bot/Sistema - Mensaje entrante (Usa el color púrpura del tag "Administrador" de la tabla) */
 .bot {
   align-self: flex-start;
-  background: #8338ec;
+  background: #1C2E4A;
   color: white;
   border-radius: 16px 16px 16px 4px; /* Esquinas asimétricas */
-  box-shadow: 0 2px 8px rgba(131, 56, 236, 0.15);
+  box-shadow: 0 2px 8px rgba(28, 46, 74, 0.15);
 }
 
 /* ÁREA DE ESCRITURA (Minimalista) */
@@ -2087,7 +2087,43 @@ body.is-readable-font .fa {
 }
 
 .btn-profile-notif i {
-    color: #DEA900; /* Un dorado un poco más oscuro y elegante para la campana */
+    color: #1C2E4A; /* Azul oscuro institucional para la campana */
+}
+
+/* ==============================
+   PALETA UNIFICADA: AZUL / BLANCO / ROJO
+   Sobrescribe las clases de Bootstrap (verde, amarillo, cian)
+   para que todo el sistema use solo la paleta establecida.
+============================== */
+body .text-success {
+    color: #1976d2 !important;
+}
+body .text-warning {
+    color: #d3204a !important;
+}
+body .text-info {
+    color: #1976d2 !important;
+}
+body .btn-info {
+    color: #fff !important;
+    background-color: #1976d2 !important;
+    border-color: #1976d2 !important;
+}
+body .btn-info:hover {
+    background-color: #1C2E4A !important;
+    border-color: #1C2E4A !important;
+}
+body .bg-success,
+body .bg-info,
+body .bg-warning {
+    background-color: #1976d2 !important;
+    color: #fff !important;
+}
+body .badge-success,
+body .badge-info,
+body .badge-warning {
+    background-color: #1976d2 !important;
+    color: #fff !important;
 }
 
 .btn-profile-notif:hover {

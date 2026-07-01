@@ -21,7 +21,7 @@ load_dotenv(BASE_DIR / '.env')
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "`"
+SECRET_KEY = ""
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
@@ -84,7 +84,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'colegio_db',
         'USER': 'root',
-        'PASSWORD': '1055962626'
+        'PASSWORD': ''
     }
 }
 
