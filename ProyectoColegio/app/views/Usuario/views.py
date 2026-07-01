@@ -137,6 +137,7 @@ class UsuarioCreateView(View):
             "docente_form": DocenteForm(),
             "estudiante_form": EstudianteForm(),
             "acudiente_form": AcudienteForm(),
+            "acudiente_solo_form": AcudienteForm(),
             "titulo": "Crear Usuario",
             "listar_url": reverse_lazy("app:index_usuario"),
             "rol_actual": "",
@@ -163,6 +164,14 @@ class UsuarioCreateView(View):
             acudiente_form_post = None
         elif rol == "administrador":
             rol_form = AdministradorForm(request.POST, request.FILES)
+            acudiente_form_post = None
+        elif rol == "acudiente":
+            usuario_form = UsuarioEstudianteForm(request.POST, request.FILES)
+            # Inyectamos nombre y email del usuario principal al AcudienteForm
+            data_acudiente = request.POST.copy()
+            data_acudiente['nombre_acudiente'] = request.POST.get('nombre', '')
+            data_acudiente['email_acudiente'] = request.POST.get('email', '')
+            rol_form = AcudienteForm(data_acudiente)
             acudiente_form_post = None
         else:
             rol_form = None
@@ -192,7 +201,7 @@ class UsuarioCreateView(View):
             # =========================
             usuario = usuario_form.save(commit=False)
 
-            if rol in ["estudiante"]:
+            if rol in ["estudiante", "acudiente"]:
                 usuario.set_unusable_password()
             else:
                 usuario.set_password(usuario_form.cleaned_data["password"])
@@ -205,6 +214,22 @@ class UsuarioCreateView(View):
             perfil = rol_form.save(commit=False)
             perfil.usuario = usuario
             perfil.save()
+
+            # =========================
+            # ACUDIENTE STANDALONE
+            # =========================
+            if rol == "acudiente":
+                usuario_acu = usuario
+                usuario_acu.set_unusable_password()
+                usuario_acu.save()
+
+                acu = rol_form.save(commit=False)
+                acu.usuario = usuario_acu
+                acu.save()
+
+                asignar_grupo(usuario_acu, "acudiente")
+                messages.success(request, "Acudiente creado correctamente")
+                return redirect(self.success_url)
 
             # =========================
             # ESTUDIANTE → ACUDIENTE
@@ -243,6 +268,7 @@ class UsuarioCreateView(View):
                 usuario_form=usuario_form,
                 rol_actual=rol,
                 acudiente_form=acudiente_form_post,
+                acudiente_solo_form=rol_form if rol == "acudiente" else AcudienteForm(),
                 estudiante_form=rol_form if rol == "estudiante" else EstudianteForm(),
                 docente_form=rol_form if rol == "docente" else DocenteForm(),
                 admin_form=rol_form if rol == "administrador" else AdministradorForm(),
