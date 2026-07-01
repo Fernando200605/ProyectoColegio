@@ -26,3 +26,6 @@ __pycache__/
 **/media/usuarios/*
 **/*.md
 **/img/**
+docker-compose.yml
+requirements.txt
+prompt_sistema.txt
