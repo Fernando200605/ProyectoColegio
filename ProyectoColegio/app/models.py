@@ -198,7 +198,7 @@ class Estudiante(models.Model):
 
 
 class Asistencia(models.Model):
-    choise = [
+    choices = [
         ("A tiempo", "A tiempo"),
         ("Tarde", "Tarde"),
         ("Inasistencia", "Inasistencia"),
@@ -208,7 +208,7 @@ class Asistencia(models.Model):
     fecha = models.DateField(auto_now=True)
     horaentrada = models.TimeField()
     horasalida = models.TimeField(null=True, blank=True)
-    estado = models.CharField(max_length=20, choices=choise)
+    estado = models.CharField(max_length=20, choices=choices)
     observaciones = models.TextField(blank=True, default="")
 
     class Meta:
@@ -220,10 +220,10 @@ class Asistencia(models.Model):
 class Acudiente(models.Model):
     usuario = models.OneToOneField(Usuario, on_delete=models.CASCADE, primary_key=True)
     telefono = models.TextField(
-        max_length=10, null=True, blank=True, verbose_name="Telefono"
+        max_length=10, null=True, blank=True, verbose_name="Teléfono"
     )
     direccion = models.TextField(
-        max_length=150, null=True, blank=True, verbose_name="Direccion"
+        max_length=150, null=True, blank=True, verbose_name="Dirección"
     )
 
     def __str__(self):
@@ -319,11 +319,11 @@ class Elemento(models.Model):
 
 
 class Movimiento(models.Model):
-    choise = [
+    choices = [
         ("Entrada", "Entrada"),
         ("Salida", "Salida"),
     ]
-    tipo = models.CharField(max_length=50, choices=choise)
+    tipo = models.CharField(max_length=50, choices=choices)
     fecha = models.DateTimeField(auto_now=True)
     cantidad = models.IntegerField()
     elementoId = models.ForeignKey(Elemento, on_delete=models.CASCADE)

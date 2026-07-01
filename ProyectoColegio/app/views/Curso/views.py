@@ -11,7 +11,7 @@ from django.db import connection
 from django.http import Http404
 # Create your views here.
 from django.contrib.auth.mixins import PermissionRequiredMixin
-
+from django.db.models import Q
 
 def index(request):
     return render(request, 'index.html')
@@ -53,9 +53,18 @@ class CursoListView(PermissionRequiredMixin, ListView):
             rol = None
 
         if rol == "Administrador":
-            return Curso.objects.select_related("docenteid__usuario").all()
+            queryset = Curso.objects.select_related("docenteid__usuario").all()
+        else:
+            queryset = Curso.objects.filter(docenteid__usuario=user)
 
-        return Curso.objects.filter(docenteid__usuario=user)
+        buscar = self.request.GET.get("buscar")
+        if buscar:
+            queryset = queryset.filter(
+                Q(grado__icontains=buscar) |
+                Q(docenteid__usuario__nombre__icontains=buscar)
+            )
+
+        return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

@@ -35,8 +35,27 @@ class NotificacionListView(LoginRequiredMixin, PermissionRequiredMixin, ListView
         rol = usuario.get_rol()
 
         if rol == "Administrador":
-            return Notificacion.objects.all()
-        return Notificacion.objects.filter(receptor=usuario.id)
+            queryset = Notificacion.objects.all()
+        else:
+            queryset = Notificacion.objects.filter(receptor=usuario.id)
+
+        buscar = self.request.GET.get("buscar")
+        if buscar:
+            queryset = queryset.filter(
+                titulo__icontains=buscar
+            ) | queryset.filter(
+                mensaje__icontains=buscar
+            )
+
+        estado = self.request.GET.get("estado")
+        if estado:
+            queryset = queryset.filter(estado=estado)
+
+        tipo = self.request.GET.get("tipo")
+        if tipo:
+            queryset = queryset.filter(tipo=tipo)
+
+        return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

@@ -60,17 +60,70 @@
 {% block exportar %}
 
   {% if perms.app.view_movimiento %}
-  <a href="{% url 'app:reporte_movimiento_pdf' %}" class="btn-pdf">
+  <a href="#" class="btn-pdf" id="ExportarPdf">
     <i class="fas fa-file-pdf me-1"></i>
     <span class="d-none d-sm-inline">Descargar</span> PDF
   </a>
 
-  <a href="{% url 'app:reporte_movimiento_excel' %}" class="btn-excel">
+  <a href="#" class="btn-excel" id="ExportarExcel">
     <i class="fas fa-file-excel me-1"></i>
     <span class="d-none d-sm-inline">Descargar</span> Excel
   </a>
   {% endif %}
 
+{% endblock %}
+
+{% block filtros_adicionales %}
+<div class="card card-custom mb-3 p-3 shadow-sm border-0 rounded-4" style="background: #f8f9fa;">
+  <div class="d-flex flex-wrap gap-2 align-items-center">
+    <i class="fas fa-filter me-2 text-muted"></i>
+    <span class="fw-semibold text-muted small">Filtros:</span>
+    
+    <input type="text"
+           id="buscar"
+           name="buscar"
+           placeholder="Buscar por elemento..."
+           class="form-control form-control-sm"
+           style="min-width: 200px;"
+           value="{{ request.GET.buscar|default:'' }}">
+
+    <select id="filtro_tipo"
+            name="tipo"
+            class="form-select form-select-sm"
+            style="min-width: 150px;">
+      <option value="">Todos los tipos</option>
+      <option value="Entrada" {% if request.GET.tipo == 'Entrada' %}selected{% endif %}>Entrada</option>
+      <option value="Salida" {% if request.GET.tipo == 'Salida' %}selected{% endif %}>Salida</option>
+    </select>
+
+    <input type="date"
+           id="filtro_fecha"
+           name="fecha"
+           class="form-control form-control-sm"
+           style="min-width: 160px;"
+           value="{{ request.GET.fecha|default:'' }}">
+
+    <select id="filtro_elemento"
+            name="elemento"
+            class="form-select form-select-sm"
+            style="min-width: 200px;">
+      <option value="">Todos los elementos</option>
+      {% for elemento in elementos %}
+      <option value="{{ elemento.id }}" {% if request.GET.elemento == elemento.id|stringformat:"i" %}selected{% endif %}>
+        {{ elemento.nombre }}
+      </option>
+      {% endfor %}
+    </select>
+
+    <button type="button" id="btn_filtrar" class="btn btn-sm btn-primary">
+      <i class="fas fa-search me-1"></i> Filtrar
+    </button>
+
+    <a href="?" class="btn btn-sm btn-outline-secondary">
+      <i class="fas fa-undo me-1"></i> Limpiar
+    </a>
+  </div>
+</div>
 {% endblock %}
 
 {% block columns %}
@@ -182,4 +235,63 @@
     </td>
   </tr>
   {% endfor %}
+{% endblock %}
+
+{% block js %}
+<script>
+  $(document).ready(function () {
+    const tabla = $('#Tabla').DataTable();
+
+    document.getElementById('btn_filtrar').addEventListener('click', function () {
+      const buscar = document.getElementById('buscar').value;
+      const tipo = document.getElementById('filtro_tipo').value;
+      const fecha = document.getElementById('filtro_fecha').value;
+      const elemento = document.getElementById('filtro_elemento').value;
+
+      let url = window.location.pathname + '?';
+
+      if (buscar) url += `buscar=${encodeURIComponent(buscar)}&`;
+      if (tipo) url += `tipo=${encodeURIComponent(tipo)}&`;
+      if (fecha) url += `fecha=${fecha}&`;
+      if (elemento) url += `elemento=${elemento}&`;
+
+      window.location.href = url;
+    });
+
+    const urlPdf = "{% url 'app:reporte_movimiento_pdf' %}";
+    const urlExcel = "{% url 'app:reporte_movimiento_excel' %}";
+
+    document.getElementById("ExportarPdf").addEventListener("click", function(e) {
+      e.preventDefault();
+      const buscar = document.getElementById("buscar").value;
+      const tipo = document.getElementById("filtro_tipo").value;
+      const fecha = document.getElementById("filtro_fecha").value;
+      const elemento = document.getElementById("filtro_elemento").value;
+      
+      let url = `${urlPdf}?`;
+      if (buscar) url += `buscar=${encodeURIComponent(buscar)}&`;
+      if (tipo) url += `tipo=${encodeURIComponent(tipo)}&`;
+      if (fecha) url += `fecha=${fecha}&`;
+      if (elemento) url += `elemento=${elemento}&`;
+      
+      window.location.href = url;
+    });
+
+    document.getElementById("ExportarExcel").addEventListener("click", function(e) {
+      e.preventDefault();
+      const buscar = document.getElementById("buscar").value;
+      const tipo = document.getElementById("filtro_tipo").value;
+      const fecha = document.getElementById("filtro_fecha").value;
+      const elemento = document.getElementById("filtro_elemento").value;
+      
+      let url = `${urlExcel}?`;
+      if (buscar) url += `buscar=${encodeURIComponent(buscar)}&`;
+      if (tipo) url += `tipo=${encodeURIComponent(tipo)}&`;
+      if (fecha) url += `fecha=${fecha}&`;
+      if (elemento) url += `elemento=${elemento}&`;
+      
+      window.location.href = url;
+    });
+  });
+</script>
 {% endblock %}

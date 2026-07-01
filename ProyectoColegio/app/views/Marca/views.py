@@ -19,6 +19,15 @@ class marcaListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
     context_object_name = 'marcas'
     permission_required = 'app.view_marca'
 
+    def get_queryset(self):
+        queryset = marca.objects.all().order_by("nombre")
+
+        buscar = self.request.GET.get("buscar")
+        if buscar:
+            queryset = queryset.filter(nombre__icontains=buscar)
+
+        return queryset
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['titulo'] = 'Listado de Marcas'

@@ -100,6 +100,31 @@ class AsistenciaListView(PermissionRequiredMixin, ListView):
     def post(self, request, *args, **kwargs):
         pass
 
+    def get_queryset(self):
+        queryset = Asistencia.objects.select_related("estudianteid").order_by("-fecha", "-horaentrada")
+
+        buscar = self.request.GET.get("buscar")
+        if buscar:
+            queryset = queryset.filter(
+                estudianteid__usuario__nombre__icontains=buscar
+            )
+
+        fecha = self.request.GET.get("fecha")
+        if fecha:
+            queryset = queryset.filter(fecha=fecha)
+
+        estado = self.request.GET.get("estado")
+        if estado:
+            queryset = queryset.filter(estado=estado)
+
+        curso = self.request.GET.get("curso")
+        if curso:
+            queryset = queryset.filter(
+                estudianteid__cursoId_id=curso
+            )
+
+        return queryset
+
     def get_context_data(self, **kwargs):
 
         context = super().get_context_data(**kwargs)
@@ -130,6 +155,9 @@ class AsistenciaListView(PermissionRequiredMixin, ListView):
 
         context["hoy_count"] = hoy_count
         context["inasistencias"] = inasistencias
+
+        from app.models import Curso
+        context['cursos'] = Curso.objects.all()
 
         user = self.request.user
 

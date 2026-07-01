@@ -156,6 +156,10 @@ class UsuarioForm(forms.ModelForm):
     class Meta:
         model = Usuario
         fields = ["nombre", "email", "password", "estado", "img_usuario"]
+        labels = {
+            "email": "Correo Electrónico",
+            "img_usuario": "Imagen de Perfil",
+        }
         widgets = {
             "nombre": forms.TextInput(
                 attrs={"class": "form-control", "placeholder": "Nombre completo"}
@@ -545,7 +549,7 @@ class TipoElementoForm(forms.ModelForm):
         if exist:
             self.fields["nombre"].widget.attrs["class"] = "form-control-invalid"
             raise forms.ValidationError(
-                "Este Tipo De Elemento ya se encuentra Registrado"
+                "Este tipo de elemento ya se encuentra registrado"
             )
         return nombre
 
@@ -566,7 +570,7 @@ class UnidadMedidaForm(forms.ModelForm):
         if exist:
             self.fields["nombre"].widget.attrs["class"] = "form-control-invalid"
             raise forms.ValidationError(
-                "Esta Unidad de Medida ya se encuentra Registrado"
+                "Esta unidad de medida ya se encuentra registrada"
             )
         return nombre
 
@@ -714,6 +718,8 @@ class MovimientoForm(forms.ModelForm):
             "fecha": "Fecha",
             "motivo": "Motivo",
             "elementoId": "Elemento",
+            "usuarioId": "Usuario",
+            "cursoId": "Curso",
         }
         widgets = {
             "tipo": forms.Select(attrs={"class": "form-control"}),

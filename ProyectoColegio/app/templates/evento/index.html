@@ -27,17 +27,49 @@
 {% block exportar %}
 
     {% if perms.app.view_evento %}
-    <a href="{% url 'app:reporte_evento_pdf' %}" class="btn-pdf">
+    <a href="#" class="btn-pdf" id="ExportarPdf">
         <i class="fas fa-file-pdf me-1"></i>
         Descargar PDF
     </a>
 
-    <a href="{% url 'app:reporte_evento_excel' %}" class="btn-excel">
+    <a href="#" class="btn-excel" id="ExportarExcel">
         <i class="fas fa-file-excel me-1"></i>
         Descargar Excel
     </a>
     {% endif %}
 
+{% endblock %}
+
+{% block filtros_adicionales %}
+<div class="card card-custom mb-3 p-3 shadow-sm border-0 rounded-4" style="background: #f8f9fa;">
+  <div class="d-flex flex-wrap gap-2 align-items-center">
+    <i class="fas fa-filter me-2 text-muted"></i>
+    <span class="fw-semibold text-muted small">Filtros:</span>
+    
+    <input type="text"
+           id="buscar"
+           name="buscar"
+           placeholder="Buscar evento..."
+           class="form-control form-control-sm"
+           style="min-width: 200px;"
+           value="{{ request.GET.buscar|default:'' }}">
+
+    <input type="date"
+           id="filtro_fecha"
+           name="fecha"
+           class="form-control form-control-sm"
+           style="min-width: 160px;"
+           value="{{ request.GET.fecha|default:'' }}">
+
+    <button type="button" id="btn_filtrar" class="btn btn-sm btn-primary">
+      <i class="fas fa-search me-1"></i> Filtrar
+    </button>
+
+    <a href="?" class="btn btn-sm btn-outline-secondary">
+      <i class="fas fa-undo me-1"></i> Limpiar
+    </a>
+  </div>
+</div>
 {% endblock %}
 
 {% block rows %}
@@ -81,3 +113,50 @@
     </tr>
     {% endfor %}
 {% endblock rows %}
+
+{% block js %}
+<script>
+  $(document).ready(function () {
+    const tabla = $('#Tabla').DataTable();
+
+    document.getElementById('btn_filtrar').addEventListener('click', function () {
+      const buscar = document.getElementById('buscar').value;
+      const fecha = document.getElementById('filtro_fecha').value;
+
+      let url = window.location.pathname + '?';
+
+      if (buscar) url += `buscar=${encodeURIComponent(buscar)}&`;
+      if (fecha) url += `fecha=${fecha}&`;
+
+      window.location.href = url;
+    });
+
+    const urlPdf = "{% url 'app:reporte_evento_pdf' %}";
+    const urlExcel = "{% url 'app:reporte_evento_excel' %}";
+
+    document.getElementById("ExportarPdf").addEventListener("click", function(e) {
+      e.preventDefault();
+      const buscar = document.getElementById("buscar").value;
+      const fecha = document.getElementById("filtro_fecha").value;
+      
+      let url = `${urlPdf}?`;
+      if (buscar) url += `buscar=${encodeURIComponent(buscar)}&`;
+      if (fecha) url += `fecha=${fecha}&`;
+      
+      window.location.href = url;
+    });
+
+    document.getElementById("ExportarExcel").addEventListener("click", function(e) {
+      e.preventDefault();
+      const buscar = document.getElementById("buscar").value;
+      const fecha = document.getElementById("filtro_fecha").value;
+      
+      let url = `${urlExcel}?`;
+      if (buscar) url += `buscar=${encodeURIComponent(buscar)}&`;
+      if (fecha) url += `fecha=${fecha}&`;
+      
+      window.location.href = url;
+    });
+  });
+</script>
+{% endblock %}

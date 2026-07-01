@@ -19,6 +19,15 @@ class CategoriaListView(PermissionRequiredMixin, ListView):
     permission_required = f'{APP}.view_categoria'
     raise_exception = True
 
+    def get_queryset(self):
+        queryset = categoria.objects.all().order_by("nombre")
+
+        buscar = self.request.GET.get("buscar")
+        if buscar:
+            queryset = queryset.filter(nombre__icontains=buscar)
+
+        return queryset
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 

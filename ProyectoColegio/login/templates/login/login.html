@@ -58,7 +58,14 @@
             {% endif %}
 
             <!-- Label -->
-            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+            <label for="{{ field.id_for_label }}">
+                  {% if field.name == 'username' %}
+                    Correo electrónico
+                  {% else %}
+                   {{ field.label }}
+                   
+                  {% endif %}
+            </label>
 
             <!-- Input -->
             {{ field }}

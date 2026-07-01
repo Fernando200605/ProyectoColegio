@@ -93,6 +93,34 @@ class UsuarioListView(ListView):
     model = Usuario
     template_name = "usuario/index.html"
 
+    def get_queryset(self):
+        queryset = Usuario.objects.all().order_by("-id")
+
+        buscar = self.request.GET.get("buscar")
+        if buscar:
+            queryset = queryset.filter(nombre__icontains=buscar)
+
+        rol = self.request.GET.get("rol")
+        if rol:
+            if rol == "Administrador":
+                queryset = queryset.filter(administrador__isnull=False)
+            elif rol == "Docente":
+                queryset = queryset.filter(docente__isnull=False)
+            elif rol == "Estudiante":
+                queryset = queryset.filter(estudiante__isnull=False)
+            elif rol == "Acudiente":
+                queryset = queryset.filter(acudiente__isnull=False)
+
+        estado = self.request.GET.get("estado")
+        if estado:
+            queryset = queryset.filter(estado=(estado == '1'))
+
+        curso = self.request.GET.get("curso")
+        if curso:
+            queryset = queryset.filter(estudiante__cursoId_id=curso)
+
+        return queryset
+
     def get_context_data(self, **kwargs):
         user = self.request.user
         context = super().get_context_data(**kwargs)
@@ -123,6 +151,10 @@ class UsuarioListView(ListView):
         context["puede_crear"] = user.has_perm(f"{app_label}.add_{model_name}")
         context["puede_editar"] = user.has_perm(f"{app_label}.change_{model_name}")
         context["puede_eliminar"] = user.has_perm(f"{app_label}.delete_{model_name}")
+
+        from app.models import Curso
+        context['cursos'] = Curso.objects.all()
+
         return context
 
 

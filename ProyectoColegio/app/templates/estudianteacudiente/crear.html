@@ -1,7 +1,10 @@
 {% extends 'create_generic.html' %}
 {% load widget_tweaks %}
 {% load static %}
-
+{% block breadcrumb_list %}Estudiante Acudiente{% endblock %}
+{% block breadcrumb_active %}
+{% if object %}Editar Relación{% else %}Nueva Relación{% endif %}
+{% endblock %}
 {% block titulo %}
   {{ titulo }}
 {% endblock %}

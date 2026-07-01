@@ -35,6 +35,23 @@ class EventoListView(
     permission_required = "app.view_evento"
     raise_exception = True
 
+    def get_queryset(self):
+        queryset = Evento.objects.all().order_by("fecha_inicio")
+
+        buscar = self.request.GET.get("buscar")
+        if buscar:
+            queryset = queryset.filter(
+                titulo__icontains=buscar
+            ) | queryset.filter(
+                descripcion__icontains=buscar
+            )
+
+        fecha = self.request.GET.get("fecha")
+        if fecha:
+            queryset = queryset.filter(fecha_inicio__date=fecha)
+
+        return queryset
+
     def post(self, request, *args, **kwargs):
         pass
 

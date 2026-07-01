@@ -64,21 +64,6 @@
                     <span class="d-inline d-sm-none">Nuevo</span>
                 </a>
                 {% endif %}
-                <!-- Botón de vaciar lista -->
-                {% comment %}
-    Botón para vaciar todos los registros de la lista.
-    Solo se muestra a usuarios con permisos de eliminación.
-{% if puede_eliminar %}
-<form action="{{ limpiar_url }}" method="post" id="Eliminar_Todo" class="d-inline flex-grow-1 flex-sm-grow-0">
-    {% csrf_token %}
-    <button type="submit" class="btn btn-outline-danger btn-rounded-custom btn-sm w-100 d-inline-flex align-items-center justify-content-center">
-        <i class="fas fa-trash-alt me-1"></i>
-        <span class="d-none d-sm-inline">Vaciar Lista</span>
-        <span class="d-inline d-sm-none">Vaciar</span>
-    </button>
-</form>
-{% endif %}
-{% endcomment %}
                 {% endblock options %}
             </div>
         </div>
@@ -87,6 +72,8 @@
     <div class="contenedor-exportar mb-3">
         {% block exportar %}{% endblock exportar %}
     </div>
+
+    {% block filtros_adicionales %}{% endblock %}
 
     <div class="table-responsive bg-white rounded-4 shadow-sm p-2 p-sm-3 border border-light">
         <table class="table table-hover align-middle mb-0 responsive nowrap" id="Tabla" style="width:100%;">
@@ -130,5 +117,3 @@ $(document).ready(function () {
 
 </script>
 {% endblock js %}
-
-

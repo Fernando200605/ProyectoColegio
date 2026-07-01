@@ -41,11 +41,33 @@ class InventarioListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
                 Q(ubicacion__icontains=buscar)
             )
 
+        categoria = self.request.GET.get("categoria")
+        if categoria:
+            queryset = queryset.filter(categoriaId_id=categoria)
+
+        marca = self.request.GET.get("marca")
+        if marca:
+            queryset = queryset.filter(marcaId_id=marca)
+
+        stock = self.request.GET.get("stock")
+        if stock == "bajo":
+            queryset = queryset.filter(stockActual__lte=F("stockMinimo"))
+        elif stock == "normal":
+            queryset = queryset.filter(stockActual__gt=F("stockMinimo"))
+
         bajo_stock = self.request.GET.get("bajo_stock")
         if bajo_stock == "1":
             queryset = queryset.filter(
                 stockActual__lte=F("stockMinimo")
             )
+
+        tipo = self.request.GET.get("tipo")
+        if tipo:
+            queryset = queryset.filter(tipoElementoId_id=tipo)
+
+        unidad = self.request.GET.get("unidad")
+        if unidad:
+            queryset = queryset.filter(unidadMedidaId_id=unidad)
 
         return queryset
 
@@ -64,6 +86,12 @@ class InventarioListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
         context['stock_bajo'] = Elemento.objects.filter(
             stockActual__lte=F("stockMinimo")
         ).count()
+
+        from app.models import categoria, marca, tipoelemento, UnidadMedida
+        context['categorias'] = categoria.objects.all()
+        context['marcas'] = marca.objects.all()
+        context['tipos'] = tipoelemento.objects.all()
+        context['unidades'] = UnidadMedida.objects.all()
 
         user = self.request.user
         app_label = self.model._meta.app_label

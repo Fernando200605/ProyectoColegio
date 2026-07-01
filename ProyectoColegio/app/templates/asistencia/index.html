@@ -60,7 +60,7 @@
 {% block exportar %}
 
   {% if perms.app.view_asistencia %}
-  <a href="{% url 'app:reporte_asistencia_pdf' %}" class="btn-pdf">
+  <a href="#" class="btn-pdf" id="ExportarPdf">
     <i class="fas fa-file-pdf me-1"></i>
     <span class="d-none d-sm-inline">Descargar</span> PDF
   </a>
@@ -74,12 +74,66 @@
   {% endif %}
 
   {% if perms.app.view_asistencia %}
-  <a href="{% url 'app:reporte_asistencia_excel' %}" class="btn-excel">
+  <a href="#" class="btn-excel" id="ExportarExcel">
     <i class="fas fa-file-excel me-1"></i>
     <span class="d-none d-sm-inline">Descargar</span> Excel
   </a>
   {% endif %}
 
+{% endblock %}
+
+{% block filtros_adicionales %}
+<div class="card card-custom mb-3 p-3 shadow-sm border-0 rounded-4" style="background: #f8f9fa;">
+  <div class="d-flex flex-wrap gap-2 align-items-center">
+    <i class="fas fa-filter me-2 text-muted"></i>
+    <span class="fw-semibold text-muted small">Filtros:</span>
+    
+    <input type="text"
+           id="buscar"
+           name="buscar"
+           placeholder="Buscar por estudiante..."
+           class="form-control form-control-sm"
+           style="min-width: 200px;"
+           value="{{ request.GET.buscar|default:'' }}">
+
+    <input type="date"
+           id="filtro_fecha"
+           name="fecha"
+           class="form-control form-control-sm"
+           style="min-width: 160px;"
+           value="{{ request.GET.fecha|default:'' }}">
+
+    <select id="filtro_estado"
+            name="estado"
+            class="form-select form-select-sm"
+            style="min-width: 150px;">
+      <option value="">Todos los estados</option>
+      <option value="A tiempo" {% if request.GET.estado == 'A tiempo' %}selected{% endif %}>A tiempo</option>
+      <option value="Tarde" {% if request.GET.estado == 'Tarde' %}selected{% endif %}>Tarde</option>
+      <option value="Inasistencia" {% if request.GET.estado == 'Inasistencia' %}selected{% endif %}>Inasistencia</option>
+    </select>
+
+    <select id="filtro_curso"
+            name="curso"
+            class="form-select form-select-sm"
+            style="min-width: 180px;">
+      <option value="">Todos los cursos</option>
+      {% for curso in cursos %}
+      <option value="{{ curso.id }}" {% if request.GET.curso == curso.id|stringformat:"i" %}selected{% endif %}>
+        {{ curso.codigo}}
+      </option>
+      {% endfor %}
+    </select>
+
+    <button type="button" id="btn_filtrar" class="btn btn-sm btn-primary">
+      <i class="fas fa-search me-1"></i> Filtrar
+    </button>
+
+    <a href="?" class="btn btn-sm btn-outline-secondary">
+      <i class="fas fa-undo me-1"></i> Limpiar
+    </a>
+  </div>
+</div>
 {% endblock %}
 
 {% block columns %}
@@ -194,4 +248,63 @@
 
   </tr>
   {% endfor %}
+{% endblock %}
+
+{% block js %}
+<script>
+  $(document).ready(function () {
+    const tabla = $('#Tabla').DataTable();
+
+    document.getElementById('btn_filtrar').addEventListener('click', function () {
+      const buscar = document.getElementById('buscar').value;
+      const fecha = document.getElementById('filtro_fecha').value;
+      const estado = document.getElementById('filtro_estado').value;
+      const curso = document.getElementById('filtro_curso').value;
+
+      let url = window.location.pathname + '?';
+
+      if (buscar) url += `buscar=${encodeURIComponent(buscar)}&`;
+      if (fecha) url += `fecha=${fecha}&`;
+      if (estado) url += `estado=${encodeURIComponent(estado)}&`;
+      if (curso) url += `curso=${curso}&`;
+
+      window.location.href = url;
+    });
+
+    const urlPdf = "{% url 'app:reporte_asistencia_pdf' %}";
+    const urlExcel = "{% url 'app:reporte_asistencia_excel' %}";
+
+    document.getElementById("ExportarPdf").addEventListener("click", function(e) {
+      e.preventDefault();
+      const buscar = document.getElementById("buscar").value;
+      const fecha = document.getElementById("filtro_fecha").value;
+      const estado = document.getElementById("filtro_estado").value;
+      const curso = document.getElementById("filtro_curso").value;
+      
+      let url = `${urlPdf}?`;
+      if (buscar) url += `buscar=${encodeURIComponent(buscar)}&`;
+      if (fecha) url += `fecha=${fecha}&`;
+      if (estado) url += `estado=${encodeURIComponent(estado)}&`;
+      if (curso) url += `curso=${curso}&`;
+      
+      window.location.href = url;
+    });
+
+    document.getElementById("ExportarExcel").addEventListener("click", function(e) {
+      e.preventDefault();
+      const buscar = document.getElementById("buscar").value;
+      const fecha = document.getElementById("filtro_fecha").value;
+      const estado = document.getElementById("filtro_estado").value;
+      const curso = document.getElementById("filtro_curso").value;
+      
+      let url = `${urlExcel}?`;
+      if (buscar) url += `buscar=${encodeURIComponent(buscar)}&`;
+      if (fecha) url += `fecha=${fecha}&`;
+      if (estado) url += `estado=${encodeURIComponent(estado)}&`;
+      if (curso) url += `curso=${curso}&`;
+      
+      window.location.href = url;
+    });
+  });
+</script>
 {% endblock %}

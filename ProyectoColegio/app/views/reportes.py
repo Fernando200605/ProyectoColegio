@@ -3,7 +3,7 @@ from django.views.generic import View
 from django.views import View as DjangoView
 from django.http import HttpResponse
 from app.models import *
-from django.db.models import Q
+from django.db.models import Q, F
 from app.utils import exportar_pdf, exportar_excel
 from datetime import datetime
 from django.contrib import messages
@@ -22,7 +22,10 @@ class ExportarUsuarioPDF(DjangoView):
             return redirect('app:index_usuario')
         buscar = request.GET.get('buscar', '').strip()
         rol = request.GET.get('rol', '').strip()
+
         estado = request.GET.get('estado', '').strip()
+
+        curso = request.GET.get('curso', '').strip()
 
         # ===== BUSQUEDA =====
         if buscar:
@@ -33,7 +36,7 @@ class ExportarUsuarioPDF(DjangoView):
 
         # ===== ESTADO =====
         if estado in ['0', '1']:
-            usuarios = usuarios.filter(estado=estado)
+            usuarios = usuarios.filter(estado=(estado == '1'))
 
         # ===== ROL =====
         if rol == "administrador":
@@ -44,6 +47,10 @@ class ExportarUsuarioPDF(DjangoView):
 
         elif rol == "estudiante":
             usuarios = usuarios.filter(estudiante__isnull=False)
+
+        # ===== CURSO =====
+        if curso:
+            usuarios = usuarios.filter(estudiante__cursoId_id=curso)
 
         # ===== VALIDAR RESULTADOS =====
         if not usuarios.exists():
@@ -91,6 +98,7 @@ class ExportarUsuarioExcel(DjangoView):
         buscar = request.GET.get('buscar', '').strip()
         rol = request.GET.get('rol', '').strip()
         estado = request.GET.get('estado', '').strip()
+        curso = request.GET.get('curso', '').strip()
 
         # ===== BUSQUEDA =====
         if buscar:
@@ -101,7 +109,7 @@ class ExportarUsuarioExcel(DjangoView):
 
         # ===== ESTADO =====
         if estado in ['0', '1']:
-            usuarios = usuarios.filter(estado=estado)
+            usuarios = usuarios.filter(estado=(estado == '1'))
 
         # ===== ROL =====
         if rol == "administrador":
@@ -112,6 +120,10 @@ class ExportarUsuarioExcel(DjangoView):
 
         elif rol == "estudiante":
             usuarios = usuarios.filter(estudiante__isnull=False)
+
+        # ===== CURSO =====
+        if curso:
+            usuarios = usuarios.filter(estudiante__cursoId_id=curso)
 
         # ===== VALIDAR RESULTADOS =====
         if not usuarios.exists():
@@ -144,23 +156,49 @@ class ExportarUsuarioExcel(DjangoView):
 
 class ExportarAsistenciaPDF(DjangoView):
     """
-    VISTA PARA EXPORTAR CATEGORIAS A PDF
-    Obtiene todas las categorías y las exporta en formato PDF
+    VISTA PARA EXPORTAR ASISTENCIAS A PDF
+    Obtiene las asistencias filtradas y las exporta en formato PDF
     """
 
     def get(self, request):
-        # Obtener todas las categorias
-        asistencia = Asistencia.objects.all()
+        # Obtener todas las asistencias
+        asistencia = Asistencia.objects.select_related("estudianteid").all()
         if not asistencia.exists():
             messages.warning(
                 request, "No existen asistencias registrados en el sistema.")
             return redirect('app:index_asistencia')
+        
+        # Aplicar filtros
+        buscar = request.GET.get('buscar', '').strip()
+        fecha = request.GET.get('fecha', '').strip()
+        estado = request.GET.get('estado', '').strip()
+        curso = request.GET.get('curso', '').strip()
+
+        if buscar:
+            asistencia = asistencia.filter(
+                estudianteid__usuario__nombre__icontains=buscar
+            )
+
+        if fecha:
+            asistencia = asistencia.filter(fecha=fecha)
+
+        if estado:
+            asistencia = asistencia.filter(estado=estado)
+
+        if curso:
+            asistencia = asistencia.filter(estudianteid__cursoId_id=curso)
+
+        # Validar resultados
+        if not asistencia.exists():
+            messages.warning(request, "No existen asistencias con ese filtro")
+            return redirect('app:index_asistencia')
+        
         # Definir las columnas que se muestran en el reporte
-        columnas = ['ID', 'NOMBRE DEL ESTUDIANTE', 'FECHA', 'OBSERVACIONES']
+        columnas = ['ID', 'NOMBRE DEL ESTUDIANTE', 'FECHA', 'HORA', 'ESTADO', 'OBSERVACIONES']
 
         # Preparar los datos en formato de tuplas
         datos = [
-            (asi.id, asi.estudianteid, asi.fecha, asi.observaciones)
+            (asi.id, asi.estudianteid.usuario.nombre, asi.fecha, asi.horaentrada.strftime('%H:%M'), asi.estado, asi.observaciones)
             for asi in asistencia
         ]
 
@@ -174,29 +212,54 @@ class ExportarAsistenciaPDF(DjangoView):
             columnas=columnas,
             datos=datos,
             nombre_archivo=nombre_archivo,
-
         )
 
 
 class ExportarAsistenciaExcel(DjangoView):
     """
-    VISTA PARA EXPORTAR CATEGORIAS A EXCEL
-    Obtiene todas las categorias y las exporta en formato Excel
+    VISTA PARA EXPORTAR ASISTENCIAS A EXCEL
+    Obtiene las asistencias filtradas y las exporta en formato Excel
     """
 
     def get(self, request):
-        # Obtener todas las categorias
-        asistencia = Asistencia.objects.all()
+        # Obtener todas las asistencias
+        asistencia = Asistencia.objects.select_related("estudianteid").all()
         if not asistencia.exists():
             messages.warning(
                 request, "No existen asistencias registrados en el sistema.")
             return redirect('app:index_asistencia')
+        
+        # Aplicar filtros
+        buscar = request.GET.get('buscar', '').strip()
+        fecha = request.GET.get('fecha', '').strip()
+        estado = request.GET.get('estado', '').strip()
+        curso = request.GET.get('curso', '').strip()
+
+        if buscar:
+            asistencia = asistencia.filter(
+                estudianteid__usuario__nombre__icontains=buscar
+            )
+
+        if fecha:
+            asistencia = asistencia.filter(fecha=fecha)
+
+        if estado:
+            asistencia = asistencia.filter(estado=estado)
+
+        if curso:
+            asistencia = asistencia.filter(estudianteid__cursoId_id=curso)
+
+        # Validar resultados
+        if not asistencia.exists():
+            messages.warning(request, "No existen asistencias con ese filtro")
+            return redirect('app:index_asistencia')
+        
         # Definir las columnas que se mostraran en el reporte
-        columnas = ['ID', 'NOMBRE DEL ESTUDIANTE', 'FECHA', 'OBSERVACIONES']
+        columnas = ['ID', 'NOMBRE DEL ESTUDIANTE', 'FECHA', 'HORA', 'ESTADO', 'OBSERVACIONES']
 
         # Preparar los datos en  tuplas
         datos = [
-            (asi.id, asi.estudianteid, asi.fecha, asi.observaciones)
+            (asi.id, asi.estudianteid.usuario.nombre, asi.fecha, asi.horaentrada.strftime('%H:%M'), asi.estado, asi.observaciones)
             for asi in asistencia
         ]
 
@@ -214,24 +277,43 @@ class ExportarAsistenciaExcel(DjangoView):
 
 class ExportarEventosPDF(DjangoView):
     """
-    VISTA PARA EXPORTAR CATEGORIAS A PDF
-    Obtiene todas las categorías y las exporta en formato PDF
+    VISTA PARA EXPORTAR EVENTOS A PDF
+    Obtiene los eventos filtrados y los exporta en formato PDF
     """
 
     def get(self, request):
-        # Obtener todas las categorias
+        # Obtener todos los eventos
         evento = Evento.objects.all()
         if not evento.exists():
             messages.warning(
                 request, "No existen eventos registrados en el sistema.")
             return redirect('app:index_evento')
+        
+        # Aplicar filtros
+        buscar = request.GET.get('buscar', '').strip()
+        fecha = request.GET.get('fecha', '').strip()
+
+        if buscar:
+            evento = evento.filter(
+                Q(titulo__icontains=buscar) |
+                Q(descripcion__icontains=buscar)
+            )
+
+        if fecha:
+            evento = evento.filter(fecha_inicio__date=fecha)
+
+        # Validar resultados
+        if not evento.exists():
+            messages.warning(request, "No existen eventos con ese filtro")
+            return redirect('app:index_evento')
+        
         # Definir las columnas que se muestran en el reporte
-        columnas = ['ID', 'TITULO', 'DESCRIPCION']
+        columnas = ['ID', 'TITULO', 'DESCRIPCION', 'FECHA INICIO', 'FECHA FIN']
 
         # Preparar los datos en formato de tuplas
         datos = [
-            (us.id, us.titulo, us.descripcion)
-            for us in evento
+            (ev.id, ev.titulo, ev.descripcion, ev.fecha_inicio.strftime('%d/%m/%Y %H:%M'), ev.fecha_fin.strftime('%d/%m/%Y %H:%M'))
+            for ev in evento
         ]
 
         # Generar nombre del archivo con timestamp
@@ -244,66 +326,108 @@ class ExportarEventosPDF(DjangoView):
             columnas=columnas,
             datos=datos,
             nombre_archivo=nombre_archivo,
-
         )
 
 
 class ExportarEventosExcel(DjangoView):
 
     def get(self, request):
-        # Obtener todas las categorias
+        # Obtener todos los eventos
         evento = Evento.objects.all()
         if not evento.exists():
             messages.warning(
                 request, "No existen eventos registrados en el sistema.")
             return redirect('app:index_evento')
+        
+        # Aplicar filtros
+        buscar = request.GET.get('buscar', '').strip()
+        fecha = request.GET.get('fecha', '').strip()
+
+        if buscar:
+            evento = evento.filter(
+                Q(titulo__icontains=buscar) |
+                Q(descripcion__icontains=buscar)
+            )
+
+        if fecha:
+            evento = evento.filter(fecha_inicio__date=fecha)
+
+        # Validar resultados
+        if not evento.exists():
+            messages.warning(request, "No existen eventos con ese filtro")
+            return redirect('app:index_evento')
+        
         # Definir las columnas que se muestran en el reporte
-        columnas = ['ID', 'TITULO', 'DESCRIPCION']
+        columnas = ['ID', 'TITULO', 'DESCRIPCION', 'FECHA INICIO', 'FECHA FIN']
 
         # Preparar los datos en formato de tuplas
         datos = [
-            (us.id, us.titulo, us.descripcion)
-            for us in evento
+            (ev.id, ev.titulo, ev.descripcion, ev.fecha_inicio.strftime('%d/%m/%Y %H:%M'), ev.fecha_fin.strftime('%d/%m/%Y %H:%M'))
+            for ev in evento
         ]
 
         # Generar nombre del archivo con timestamp
         nombre_archivo = f'Reporte_Eventos_{datetime.now().strftime("%d_%m_%Y")}'
 
-        # Llamar funcion de exportacion a PDF
+        # Llamar funcion de exportacion a Excel
         return exportar_excel(
             titulo='REPORTE DE EVENTOS',
             columnas=columnas,
             datos=datos,
             nombre_archivo=nombre_archivo,
-
         )
 
 
 class ExportarMovimientosPDF(DjangoView):
     """
-    VISTA PARA EXPORTAR Movimientos A PDF
-    Obtiene todas los movimientos y los exporta en formato PDF
+    VISTA PARA EXPORTAR MOVIMIENTOS A PDF
+    Obtiene los movimientos filtrados y los exporta en formato PDF
     """
 
     def get(self, request):
-        # Obtener todas las categorias
-        movimiento = Movimiento.objects.all()
+        # Obtener todos los movimientos
+        movimiento = Movimiento.objects.select_related("elementoId").all()
         if not movimiento.exists():
             messages.warning(
                 request, "No existen movimientos registrados en el sistema.")
             return redirect('app:index_movimiento')
+        
+        # Aplicar filtros
+        buscar = request.GET.get('buscar', '').strip()
+        tipo = request.GET.get('tipo', '').strip()
+        fecha = request.GET.get('fecha', '').strip()
+        elemento = request.GET.get('elemento', '').strip()
+
+        if buscar:
+            movimiento = movimiento.filter(
+                elementoId__nombre__icontains=buscar
+            )
+
+        if tipo:
+            movimiento = movimiento.filter(tipo=tipo)
+
+        if fecha:
+            movimiento = movimiento.filter(fecha__date=fecha)
+
+        if elemento:
+            movimiento = movimiento.filter(elementoId_id=elemento)
+
+        # Validar resultados
+        if not movimiento.exists():
+            messages.warning(request, "No existen movimientos con ese filtro")
+            return redirect('app:index_movimiento')
+        
         # Definir las columnas que se muestran en el reporte
-        columnas = ["id", "fecha", 'cantidad',
-                    "elementoid", "usuarioid", "cursoid"]
+        columnas = ['ID', 'ELEMENTO', 'TIPO', 'CANTIDAD', 'FECHA', 'MOTIVO']
 
         # Preparar los datos en formato de tuplas
         datos = [
-            (mo.id, mo.fecha, mo.cantidad, mo.elementoId, mo.usuarioId, mo.cursoId)
+            (mo.id, mo.elementoId.nombre, mo.tipo, mo.cantidad, mo.fecha.strftime('%d/%m/%Y %H:%M'), mo.motivo)
             for mo in movimiento
         ]
 
         # Generar nombre del archivo con timestamp
-        nombre_archivo = f'Reporte_movimientos_{datetime.now().strftime("%d_%m_%Y")}'
+        nombre_archivo = f'Reporte_Movimientos_{datetime.now().strftime("%d_%m_%Y")}'
 
         # Llamar funcion de exportacion a PDF
         return exportar_pdf(
@@ -312,35 +436,59 @@ class ExportarMovimientosPDF(DjangoView):
             columnas=columnas,
             datos=datos,
             nombre_archivo=nombre_archivo,
-
         )
 
 
 class ExportarMovimientosExcel(DjangoView):
     """
     VISTA PARA EXPORTAR MOVIMIENTOS A EXCEL
-    Obtiene todos los movimientos y los exporta en formato Excel
+    Obtiene los movimientos filtrados y los exporta en formato Excel
     """
 
     def get(self, request):
-        # Obtener todas las categorias
-        movimiento = Movimiento.objects.all()
+        # Obtener todos los movimientos
+        movimiento = Movimiento.objects.select_related("elementoId").all()
         if not movimiento.exists():
             messages.warning(
                 request, "No existen movimientos registrados en el sistema.")
             return redirect('app:index_movimiento')
+        
+        # Aplicar filtros
+        buscar = request.GET.get('buscar', '').strip()
+        tipo = request.GET.get('tipo', '').strip()
+        fecha = request.GET.get('fecha', '').strip()
+        elemento = request.GET.get('elemento', '').strip()
+
+        if buscar:
+            movimiento = movimiento.filter(
+                elementoId__nombre__icontains=buscar
+            )
+
+        if tipo:
+            movimiento = movimiento.filter(tipo=tipo)
+
+        if fecha:
+            movimiento = movimiento.filter(fecha__date=fecha)
+
+        if elemento:
+            movimiento = movimiento.filter(elementoId_id=elemento)
+
+        # Validar resultados
+        if not movimiento.exists():
+            messages.warning(request, "No existen movimientos con ese filtro")
+            return redirect('app:index_movimiento')
+        
         # Definir las columnas que se mostraran en el reporte
-        columnas = ["id", 'fecha', 'cantidad',
-                    "elementoid", "usuarioid", "cursoid"]
+        columnas = ['ID', 'ELEMENTO', 'TIPO', 'CANTIDAD', 'FECHA', 'MOTIVO']
 
         # Preparar los datos en  tuplas
         datos = [
-            (mo.id, mo.fecha, mo.cantidad, mo.elementoId, mo.usuarioId, mo.cursoId)
+            (mo.id, mo.elementoId.nombre, mo.tipo, mo.cantidad, mo.fecha.strftime('%d/%m/%Y %H:%M'), mo.motivo)
             for mo in movimiento
         ]
 
         # Generar nombre del archivo con timestamp
-        nombre_archivo = f'Reporte_movimientos_{datetime.now().strftime("%d_%m_%Y")}'
+        nombre_archivo = f'Reporte_Movimientos_{datetime.now().strftime("%d_%m_%Y")}'
 
         # Llamar funcion de exportacion a Excel
         return exportar_excel(
@@ -353,20 +501,63 @@ class ExportarMovimientosExcel(DjangoView):
 
 class ExportarInventarioPDF(DjangoView):
     def get(self, request):
-        inventario = Elemento.objects.all()
+        inventario = Elemento.objects.select_related(
+            'marcaId', 'categoriaId', 'tipoElementoId', 'unidadMedidaId'
+        ).all()
         if not inventario.exists():
             messages.warning(
-                request, "No existen inventario registrados en el sistema.")
+                request, "No existen elementos registrados en el sistema.")
             return redirect('app:index_inventario')
-        columnas = ['ID', 'Nombre', 'Marca', 'Categoría', 'Stock', 'Ubicación']
+        
+        # Aplicar filtros
+        buscar = request.GET.get('buscar', '').strip()
+        categoria = request.GET.get('categoria', '').strip()
+        marca = request.GET.get('marca', '').strip()
+        stock = request.GET.get('stock', '').strip()
+        tipo = request.GET.get('tipo', '').strip()
+        unidad = request.GET.get('unidad', '').strip()
+
+        if buscar:
+            inventario = inventario.filter(
+                Q(nombre__icontains=buscar) |
+                Q(descripcion__icontains=buscar) |
+                Q(ubicacion__icontains=buscar)
+            )
+
+        if categoria:
+            inventario = inventario.filter(categoriaId_id=categoria)
+
+        if marca:
+            inventario = inventario.filter(marcaId_id=marca)
+
+        if stock == 'bajo':
+            inventario = inventario.filter(stockActual__lte=F('stockMinimo'))
+        elif stock == 'normal':
+            inventario = inventario.filter(stockActual__gt=F('stockMinimo'))
+
+        if tipo:
+            inventario = inventario.filter(tipoElementoId_id=tipo)
+
+        if unidad:
+            inventario = inventario.filter(unidadMedidaId_id=unidad)
+
+        # Validar resultados
+        if not inventario.exists():
+            messages.warning(request, "No existen elementos con ese filtro")
+            return redirect('app:index_inventario')
+        
+        columnas = ['ID', 'Nombre', 'Marca', 'Categoría', 'Tipo', 'Unidad', 'Stock Actual', 'Stock Mínimo', 'Ubicación']
 
         datos = [
             (
                 inv.id,
                 inv.nombre,
-                inv.marcaId.nombre,        # FK → marca.nombre
-                inv.categoriaId.nombre,    # FK → categoria.nombre
+                inv.marcaId.nombre if inv.marcaId else 'N/A',
+                inv.categoriaId.nombre if inv.categoriaId else 'N/A',
+                inv.tipoElementoId.nombre if inv.tipoElementoId else 'N/A',
+                inv.unidadMedidaId.nombre if inv.unidadMedidaId else 'N/A',
                 inv.stockActual,
+                inv.stockMinimo,
                 inv.ubicacion
             )
             for inv in inventario
@@ -386,19 +577,61 @@ class ExportarInventarioPDF(DjangoView):
 class ExportarInventarioExcel(DjangoView):
     def get(self, request):
         inventario = Elemento.objects.select_related(
-            'marcaId', 'categoriaId').all()
+            'marcaId', 'categoriaId', 'tipoElementoId', 'unidadMedidaId'
+        ).all()
         if not inventario.exists():
-            messages.warning(request, "No existen inventario registrados en el sistema.")
+            messages.warning(request, "No existen elementos registrados en el sistema.")
             return redirect('app:index_inventario')
-        columnas = ['ID', 'Nombre', 'Marca', 'Categoría', 'Stock', 'Ubicación']
+        
+        # Aplicar filtros
+        buscar = request.GET.get('buscar', '').strip()
+        categoria = request.GET.get('categoria', '').strip()
+        marca = request.GET.get('marca', '').strip()
+        stock = request.GET.get('stock', '').strip()
+        tipo = request.GET.get('tipo', '').strip()
+        unidad = request.GET.get('unidad', '').strip()
+
+        if buscar:
+            inventario = inventario.filter(
+                Q(nombre__icontains=buscar) |
+                Q(descripcion__icontains=buscar) |
+                Q(ubicacion__icontains=buscar)
+            )
+
+        if categoria:
+            inventario = inventario.filter(categoriaId_id=categoria)
+
+        if marca:
+            inventario = inventario.filter(marcaId_id=marca)
+
+        if stock == 'bajo':
+            inventario = inventario.filter(stockActual__lte=F('stockMinimo'))
+        elif stock == 'normal':
+            inventario = inventario.filter(stockActual__gt=F('stockMinimo'))
+
+        if tipo:
+            inventario = inventario.filter(tipoElementoId_id=tipo)
+
+        if unidad:
+            inventario = inventario.filter(unidadMedidaId_id=unidad)
+
+        # Validar resultados
+        if not inventario.exists():
+            messages.warning(request, "No existen elementos con ese filtro")
+            return redirect('app:index_inventario')
+        
+        columnas = ['ID', 'Nombre', 'Marca', 'Categoría', 'Tipo', 'Unidad', 'Stock Actual', 'Stock Mínimo', 'Ubicación']
 
         datos = [
             (
                 inv.id,
                 inv.nombre,
-                inv.marcaId.nombre,        # FK → marca.nombre
-                inv.categoriaId.nombre,    # FK → categoria.nombre
+                inv.marcaId.nombre if inv.marcaId else 'N/A',
+                inv.categoriaId.nombre if inv.categoriaId else 'N/A',
+                inv.tipoElementoId.nombre if inv.tipoElementoId else 'N/A',
+                inv.unidadMedidaId.nombre if inv.unidadMedidaId else 'N/A',
                 inv.stockActual,
+                inv.stockMinimo,
                 inv.ubicacion
             )
             for inv in inventario
@@ -416,71 +649,84 @@ class ExportarInventarioExcel(DjangoView):
 
 class ExportarCursoPDF(DjangoView):
     def get(self, request):
-        # 1. Capturamos el ID que viene del selector del HTML
-        curso_id = request.GET.get('curso_id')
 
-        # 2. Si hay un ID, filtramos. Si no, traemos todos.
-        if curso_id:
-            cursos = Curso.objects.filter(id=curso_id)
-            curso_obj = cursos.first()
-            grado_nombre = curso_obj.get_grado_display() if curso_obj else curso_id
-            titulo_reporte = f'REPORTE DEL CURSO: {grado_nombre}'
+        buscar = request.GET.get("buscar", "").strip()
+
+        cursos = Curso.objects.select_related("docenteid__usuario")
+
+        if buscar:
+            cursos = cursos.filter(
+                Q(grado__icontains=buscar) |
+                Q(docenteid__usuario__nombre__icontains=buscar)
+            )
+            titulo_reporte = f"REPORTE DE CURSOS - Filtro: {buscar}"
         else:
-            cursos = Curso.objects.all()
-            if not cursos.exists():
-                messages.warning(request, "No existen cursos registrados en el sistema.")
-                return redirect('app:index_curso')
-            titulo_reporte = 'REPORTE GENERAL DE CURSOS'
+            titulo_reporte = "REPORTE GENERAL DE CURSOS"
 
-        columnas = ['ID', 'Grado', 'Código', 'Capacidad']
+        if not cursos.exists():
+            messages.warning(request, "No se encontraron cursos.")
+            return redirect("app:index_curso")
 
-        # 3. Preparamos los datos usando la variable 'cursos' (ya filtrada)
+        columnas = ["ID", "Grado", "Código", "Docente", "Capacidad"]
+
         datos = [
-            (c.id, c.grado, c.codigo, c.capacidad)
+            (
+                c.id,
+                c.get_grado_display(),
+                c.codigo,
+                c.docenteid.usuario.nombre,
+                c.capacidad,
+            )
             for c in cursos
         ]
 
-        nombre_archivo = f'Reporte_Cursos_{datetime.now().strftime("%d_%m_%Y")}'
-
-        # 4. Retornamos la función que genera el PDF
         return exportar_pdf(
             request,
             titulo=titulo_reporte,
             columnas=columnas,
             datos=datos,
-            nombre_archivo=nombre_archivo
+            nombre_archivo="Reporte_Cursos"
         )
 
 
 class ExportarCursoExcel(DjangoView):
     def get(self, request):
-        # 1. Capturamos el ID que viene del selector del HTML
-        curso_id = request.GET.get('curso_id')
 
-        # 2. Si hay un ID, filtramos. Si no, traemos todos.
-        if curso_id:
-            cursos = Curso.objects.filter(id=curso_id)
-            titulo_reporte = f'REPORTE DEL CURSO #{curso_id}'
+        buscar = request.GET.get("buscar", "").strip()
+
+        cursos = Curso.objects.select_related("docenteid__usuario")
+
+        if buscar:
+            cursos = cursos.filter(
+                Q(grado__icontains=buscar) |
+                Q(docenteid__usuario__nombre__icontains=buscar)
+            )
+            titulo_reporte = f"REPORTE DE CURSOS - Filtro: {buscar}"
         else:
-            cursos = Curso.objects.all()
-            if not cursos.exists():
-                messages.warning(request, "No existen cursos registrados en el sistema.")
-                return redirect('app:index_curso')
-            titulo_reporte = 'REPORTE GENERAL DE CURSOS'
+            titulo_reporte = "REPORTE GENERAL DE CURSOS"
 
-        columnas = ['ID', 'Grado', 'Código', 'Capacidad']
+        if not cursos.exists():
+            messages.warning(request, "No se encontraron cursos.")
+            return redirect("app:index_curso")
 
-        # Usamos la variable 'cursos' que ya está filtrada arriba
+        columnas = ["ID", "Grado", "Código", "Docente", "Capacidad"]
+
         datos = [
-            (c.id, c.grado, c.codigo, c.capacidad)
+            (
+                c.id,
+                c.get_grado_display(),
+                c.codigo,
+                c.docenteid.usuario.nombre,
+                c.capacidad,
+            )
             for c in cursos
         ]
-
-        nombre_archivo = f'Reporte_Cursos_{datetime.now().strftime("%d_%m_%Y")}'
 
         return exportar_excel(
             titulo=titulo_reporte,
             columnas=columnas,
             datos=datos,
-            nombre_archivo=nombre_archivo
+            nombre_archivo="Reporte_Cursos"
         )
+
+

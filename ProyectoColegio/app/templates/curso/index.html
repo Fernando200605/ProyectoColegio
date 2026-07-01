@@ -41,11 +41,11 @@
 
     {% if perms.app.view_curso %}
     <div class="d-flex gap-2">
-        <a href="{% url 'app:exportar_cursos' %}" id="linkPDF" class="btn-pdf">
+        <a href="#" id="linkPDF" class="btn-pdf">
             <i class="fas fa-file-pdf me-1"></i> PDF
         </a>
 
-        <a href="{% url 'app:exportar_cursos_excel' %}" id="linkExcel" class="btn-excel">
+        <a href="#" id="linkExcel" class="btn-excel">
             <i class="fas fa-file-excel me-1"></i> Excel
         </a>
     </div>
@@ -60,6 +60,7 @@
 <script>
     function cambiarCurso(id, nombre) {
         document.getElementById('textoSeleccionado').innerText = nombre;
+        document.getElementById('textoSeleccionado').setAttribute('data-curso-id', id);
 
         let urlPDF = "{% url 'app:exportar_cursos' %}";
         let urlExcel = "{% url 'app:exportar_cursos_excel' %}";
@@ -72,6 +73,49 @@
         document.getElementById('linkPDF').setAttribute('href', urlPDF);
         document.getElementById('linkExcel').setAttribute('href', urlExcel);
     }
+</script>
+
+<script>
+  $(document).ready(function () {
+    const tabla = $('#Tabla').DataTable();
+
+    document.getElementById('btn_filtrar').addEventListener('click', function () {
+      const buscar = document.getElementById('buscar').value;
+
+      let url = window.location.pathname + '?';
+
+      if (buscar) url += `buscar=${encodeURIComponent(buscar)}&`;
+
+      window.location.href = url;
+    });
+
+    const urlPdf = "{% url 'app:exportar_cursos' %}";
+    const urlExcel = "{% url 'app:exportar_cursos_excel' %}";
+
+    document.getElementById("linkPDF").addEventListener("click", function(e) {
+      e.preventDefault();
+      const buscar = document.getElementById("buscar").value;
+      const cursoId = document.getElementById("textoSeleccionado").getAttribute("data-curso-id");
+      
+      let url = `${urlPdf}?`;
+      if (buscar) url += `buscar=${encodeURIComponent(buscar)}&`;
+      if (cursoId) url += `curso_id=${cursoId}&`;
+      
+      window.location.href = url;
+    });
+
+    document.getElementById("linkExcel").addEventListener("click", function(e) {
+      e.preventDefault();
+      const buscar = document.getElementById("buscar").value;
+      const cursoId = document.getElementById("textoSeleccionado").getAttribute("data-curso-id");
+      
+      let url = `${urlExcel}?`;
+      if (buscar) url += `buscar=${encodeURIComponent(buscar)}&`;
+      if (cursoId) url += `curso_id=${cursoId}&`;
+      
+      window.location.href = url;
+    });
+  });
 </script>
 {% endif %}
 <script>
@@ -110,6 +154,33 @@ $(document).ready(function () {
 <li class="breadcrumb-item active">Cursos</li>
 {% else %}
 <li class="breadcrumb-item active">Estudiantes por Curso</li>
+{% endif %}
+{% endblock %}
+
+{% block filtros_adicionales %}
+{% if modo == "cursos" %}
+<div class="card card-custom mb-3 p-3 shadow-sm border-0 rounded-4" style="background: #f8f9fa;">
+  <div class="d-flex flex-wrap gap-2 align-items-center">
+    <i class="fas fa-filter me-2 text-muted"></i>
+    <span class="fw-semibold text-muted small">Filtros:</span>
+    
+    <input type="text"
+           id="buscar"
+           name="buscar"
+           placeholder="Buscar curso o docente..."
+           class="form-control form-control-sm"
+           style="min-width: 200px;"
+           value="{{ request.GET.buscar|default:'' }}">
+
+    <button type="button" id="btn_filtrar" class="btn btn-sm btn-primary">
+      <i class="fas fa-search me-1"></i> Filtrar
+    </button>
+
+    <a href="?" class="btn btn-sm btn-outline-secondary">
+      <i class="fas fa-undo me-1"></i> Limpiar
+    </a>
+  </div>
+</div>
 {% endif %}
 {% endblock %}
 

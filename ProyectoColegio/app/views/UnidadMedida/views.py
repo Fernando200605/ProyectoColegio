@@ -14,6 +14,15 @@ class UnidadMedidaListView(LoginRequiredMixin, PermissionRequiredMixin, ListView
     context_object_name = 'unidades'
     permission_required = 'app.view_unidadmedida'
 
+    def get_queryset(self):
+        queryset = UnidadMedida.objects.all().order_by("nombre")
+
+        buscar = self.request.GET.get("buscar")
+        if buscar:
+            queryset = queryset.filter(nombre__icontains=buscar)
+
+        return queryset
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['titulo'] = 'Unidades de Medida'

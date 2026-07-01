@@ -6,17 +6,19 @@
 {% block breadcrumb_items %}
 <li class="breadcrumb-item active">Inventario</li>
 {% endblock %}
+
 {% block extra_cards %}
 {% endblock %}
+
 {% block exportar %}
 
   {% if perms.app.view_elementoinventario %}
-  <a href="{% url 'app:reporte_inventario_pdf' %}" class="btn-pdf">
+  <a href="#" class="btn-pdf" id="ExportarPdf">
     <i class="fas fa-file-pdf me-1"></i>
     <span class="d-none d-sm-inline">Exportar a</span> PDF
   </a>
 
-  <a href="{% url 'app:reporte_inventario_excel' %}" class="btn-excel">
+  <a href="#" class="btn-excel" id="ExportarExcel">
     <i class="fas fa-file-excel me-1"></i>
     <span class="d-none d-sm-inline">Exportar a</span> Excel
   </a>
@@ -34,6 +36,88 @@
     </a>
   {% endif %}
 
+{% endblock %}
+
+{% block filtros_adicionales %}
+<div class="card card-custom mb-3 p-3 shadow-sm border-0 rounded-4" style="background: #f8f9fa;">
+  <div class="d-flex flex-wrap gap-2 align-items-center">
+    <i class="fas fa-filter me-2 text-muted"></i>
+    <span class="fw-semibold text-muted small">Filtros:</span>
+    
+    <input type="text"
+           id="buscar"
+           name="buscar"
+           placeholder="Buscar por nombre, descripción o ubicación..."
+           class="form-control form-control-sm"
+           style="min-width: 250px;"
+           value="{{ request.GET.buscar|default:'' }}">
+
+    <select id="filtro_categoria"
+            name="categoria"
+            class="form-select form-select-sm"
+            style="min-width: 180px;">
+      <option value="">Todas las categorías</option>
+      {% for cat in categorias %}
+      <option value="{{ cat.id }}" {% if request.GET.categoria == cat.id|stringformat:"i" %}selected{% endif %}>
+        {{ cat.nombre }}
+      </option>
+      {% endfor %}
+    </select>
+
+    <select id="filtro_marca"
+            name="marca"
+            class="form-select form-select-sm"
+            style="min-width: 180px;">
+      <option value="">Todas las marcas</option>
+      {% for marca in marcas %}
+      <option value="{{ marca.id }}" {% if request.GET.marca == marca.id|stringformat:"i" %}selected{% endif %}>
+        {{ marca.nombre }}
+      </option>
+      {% endfor %}
+    </select>
+
+    <select id="filtro_stock"
+            name="stock"
+            class="form-select form-select-sm"
+            style="min-width: 160px;">
+      <option value="">Todo el stock</option>
+      <option value="bajo" {% if request.GET.stock == 'bajo' %}selected{% endif %}>Stock bajo</option>
+      <option value="normal" {% if request.GET.stock == 'normal' %}selected{% endif %}>Stock normal</option>
+    </select>
+
+    <select id="filtro_tipo"
+            name="tipo"
+            class="form-select form-select-sm"
+            style="min-width: 180px;">
+      <option value="">Todos los tipos</option>
+      {% for tipo in tipos %}
+      <option value="{{ tipo.id }}" {% if request.GET.tipo == tipo.id|stringformat:"i" %}selected{% endif %}>
+        {{ tipo.nombre }}
+      </option>
+      {% endfor %}
+    </select>
+
+    <select id="filtro_unidad"
+            name="unidad"
+            class="form-select form-select-sm"
+            style="min-width: 180px;">
+      <option value="">Todas las unidades</option>
+      {% for unidad in unidades %}
+      <option value="{{ unidad.id }}" {% if request.GET.unidad == unidad.id|stringformat:"i" %}selected{% endif %}>
+        {{ unidad.nombre }}
+      </option>
+      {% endfor %}
+    </select>
+
+    <button type="button" id="btn_filtrar" class="btn btn-sm btn-primary">
+      <i class="fas fa-search me-1"></i> Filtrar
+    </button>
+
+    <a href="?" class="btn btn-sm btn-outline-secondary">
+      <i class="fas fa-undo me-1"></i> Limpiar
+    </a>
+  </div>
+</div>
 {% endblock %}
 
 {% block columns %}
@@ -154,4 +238,75 @@
     </td>
   </tr>
   {% endfor %}
+{% endblock %}
+
+{% block js %}
+<script>
+  $(document).ready(function () {
+    const tabla = $('#Tabla').DataTable();
+
+    document.getElementById('btn_filtrar').addEventListener('click', function () {
+      const buscar = document.getElementById('buscar').value;
+      const categoria = document.getElementById('filtro_categoria').value;
+      const marca = document.getElementById('filtro_marca').value;
+      const stock = document.getElementById('filtro_stock').value;
+      const tipo = document.getElementById('filtro_tipo').value;
+      const unidad = document.getElementById('filtro_unidad').value;
+
+      let url = window.location.pathname + '?';
+
+      if (buscar) url += `buscar=${encodeURIComponent(buscar)}&`;
+      if (categoria) url += `categoria=${categoria}&`;
+      if (marca) url += `marca=${marca}&`;
+      if (stock) url += `stock=${stock}&`;
+      if (tipo) url += `tipo=${tipo}&`;
+      if (unidad) url += `unidad=${unidad}&`;
+
+      window.location.href = url;
+    });
+
+    const urlPdf = "{% url 'app:reporte_inventario_pdf' %}";
+    const urlExcel = "{% url 'app:reporte_inventario_excel' %}";
+
+    document.getElementById("ExportarPdf").addEventListener("click", function(e) {
+      e.preventDefault();
+      const buscar = document.getElementById("buscar").value;
+      const categoria = document.getElementById("filtro_categoria").value;
+      const marca = document.getElementById("filtro_marca").value;
+      const stock = document.getElementById("filtro_stock").value;
+      const tipo = document.getElementById("filtro_tipo").value;
+      const unidad = document.getElementById("filtro_unidad").value;
+      
+      let url = `${urlPdf}?`;
+      if (buscar) url += `buscar=${encodeURIComponent(buscar)}&`;
+      if (categoria) url += `categoria=${categoria}&`;
+      if (marca) url += `marca=${marca}&`;
+      if (stock) url += `stock=${stock}&`;
+      if (tipo) url += `tipo=${tipo}&`;
+      if (unidad) url += `unidad=${unidad}&`;
+      
+      window.location.href = url;
+    });
+
+    document.getElementById("ExportarExcel").addEventListener("click", function(e) {
+      e.preventDefault();
+      const buscar = document.getElementById("buscar").value;
+      const categoria = document.getElementById("filtro_categoria").value;
+      const marca = document.getElementById("filtro_marca").value;
+      const stock = document.getElementById("filtro_stock").value;
+      const tipo = document.getElementById("filtro_tipo").value;
+      const unidad = document.getElementById("filtro_unidad").value;
+      
+      let url = `${urlExcel}?`;
+      if (buscar) url += `buscar=${encodeURIComponent(buscar)}&`;
+      if (categoria) url += `categoria=${categoria}&`;
+      if (marca) url += `marca=${marca}&`;
+      if (stock) url += `stock=${stock}&`;
+      if (tipo) url += `tipo=${tipo}&`;
+      if (unidad) url += `unidad=${unidad}&`;
+      
+      window.location.href = url;
+    });
+  });
+</script>
 {% endblock %}

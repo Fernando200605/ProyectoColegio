@@ -32,6 +32,29 @@ class MovimientoListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
     context_object_name = 'movimientos'
     permission_required = 'app.view_movimiento'
 
+    def get_queryset(self):
+        queryset = Movimiento.objects.select_related("elementoId").order_by("-fecha")
+
+        buscar = self.request.GET.get("buscar")
+        if buscar:
+            queryset = queryset.filter(
+                elementoId__nombre__icontains=buscar
+            )
+
+        tipo = self.request.GET.get("tipo")
+        if tipo:
+            queryset = queryset.filter(tipo=tipo)
+
+        fecha = self.request.GET.get("fecha")
+        if fecha:
+            queryset = queryset.filter(fecha__date=fecha)
+
+        elemento = self.request.GET.get("elemento")
+        if elemento:
+            queryset = queryset.filter(elementoId_id=elemento)
+
+        return queryset
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
@@ -55,6 +78,9 @@ class MovimientoListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
 
         context['entradas'] = entradas
         context['hoy_count'] = hoy
+
+        from app.models import Elemento
+        context['elementos'] = Elemento.objects.all()
 
         user = self.request.user
         app_label = self.model._meta.app_label

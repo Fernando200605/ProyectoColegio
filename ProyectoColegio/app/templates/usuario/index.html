@@ -87,14 +87,22 @@
 
   </div>
 
-  <div class="d-flex flex-wrap gap-2 align-items-center mt-2 mt-md-0">
+</div>
+{% endblock %}
 
+{% block filtros_adicionales %}
+<div class="card card-custom mb-3 p-3 shadow-sm border-0 rounded-4" style="background: #f8f9fa;">
+  <div class="d-flex flex-wrap gap-2 align-items-center">
+    <i class="fas fa-filter me-2 text-muted"></i>
+    <span class="fw-semibold text-muted small">Filtros:</span>
+    
     <input type="text"
            id="buscar"
            name="buscar"
-           placeholder="Buscar usuario"
+           placeholder="Buscar usuario..."
            class="form-control form-control-sm"
-           style="min-width: 180px;">
+           style="min-width: 200px;"
+           value="{{ request.GET.buscar|default:'' }}">
 
     <select id="rol"
             name="rol"
@@ -102,10 +110,10 @@
             style="min-width: 160px;">
 
       <option value="">Todos los roles</option>
-      <option value="Administrador">Administrador</option>
-      <option value="Docente">Docente</option>
-      <option value="Estudiante">Estudiante</option>
-      <option value="Acudiente">Acudiente</option>
+      <option value="Administrador" {% if request.GET.rol == 'Administrador' %}selected{% endif %}>Administrador</option>
+      <option value="Docente" {% if request.GET.rol == 'Docente' %}selected{% endif %}>Docente</option>
+      <option value="Estudiante" {% if request.GET.rol == 'Estudiante' %}selected{% endif %}>Estudiante</option>
+      <option value="Acudiente" {% if request.GET.rol == 'Acudiente' %}selected{% endif %}>Acudiente</option>
     </select>
 
     <select id="estado"
@@ -114,16 +122,30 @@
             style="min-width: 140px;">
 
       <option value="">Todos</option>
-      <option value="1">Activo</option>
-      <option value="0">Inactivo</option>
+      <option value="1" {% if request.GET.estado == '1' %}selected{% endif %}>Activo</option>
+      <option value="0" {% if request.GET.estado == '0' %}selected{% endif %}>Inactivo</option>
     </select>
 
-    <button type="button" id="filtrar" class="btn btn-sm btn-primary">
-      Filtrar
+    <select id="filtro_curso"
+            name="curso"
+            class="form-select form-select-sm"
+            style="min-width: 180px;">
+      <option value="">Todos los cursos</option>
+      {% for curso in cursos %}
+      <option value="{{ curso.id }}" {% if request.GET.curso == curso.id|stringformat:"i" %}selected{% endif %}>
+        {{ curso.codigo }}
+      </option>
+      {% endfor %}
+    </select>
+
+    <button type="button" id="btn_filtrar" class="btn btn-sm btn-primary">
+      <i class="fas fa-search me-1"></i> Filtrar
     </button>
 
+    <a href="?" class="btn btn-sm btn-outline-secondary">
+      <i class="fas fa-undo me-1"></i> Limpiar
+    </a>
   </div>
-
 </div>
 {% endblock %}
 
@@ -343,31 +365,43 @@
 
   $(document).ready(function () {
     const tabla = $('#Tabla').DataTable();
-    document.getElementById('filtrar').addEventListener('click', function () {
+
+    document.getElementById('btn_filtrar').addEventListener('click', function () {
       const buscar = document.getElementById('buscar').value;
-      const rol    = document.getElementById('rol').value;
-      tabla.search(buscar).draw();
-      tabla.column(3).search(rol).draw();
+      const rol = document.getElementById('rol').value;
+      const estado = document.getElementById('estado').value;
+      const curso = document.getElementById('filtro_curso').value;
+
+      let url = window.location.pathname + '?';
+
+      if (buscar) url += `buscar=${encodeURIComponent(buscar)}&`;
+      if (rol) url += `rol=${encodeURIComponent(rol)}&`;
+      if (estado) url += `estado=${estado}&`;
+      if (curso) url += `curso=${curso}&`;
+
+      window.location.href = url;
     });
-  });
 
-  const urlPdf   = "{% url 'app:reporte_usuario_pdf' %}";
-  const urlExcel = "{% url 'app:reporte_usuario_excel' %}";
+    const urlPdf   = "{% url 'app:reporte_usuario_pdf' %}";
+    const urlExcel = "{% url 'app:reporte_usuario_excel' %}";
 
-  document.getElementById("ExportarPdf").addEventListener("click", function(e) {
-    e.preventDefault();
-    const buscar = document.getElementById("buscar").value;
-    const rol    = document.getElementById("rol").value;
-    const estado = document.getElementById("estado").value;
-    window.location.href = `${urlPdf}?buscar=${buscar}&rol=${rol}&estado=${estado}`;
-  });
+    document.getElementById("ExportarPdf").addEventListener("click", function(e) {
+      e.preventDefault();
+      const buscar = document.getElementById("buscar").value;
+      const rol    = document.getElementById("rol").value;
+      const estado = document.getElementById("estado").value;
+      const curso  = document.getElementById("filtro_curso").value;
+      window.location.href = `${urlPdf}?buscar=${encodeURIComponent(buscar)}&rol=${encodeURIComponent(rol)}&estado=${estado}&curso=${curso}`;
+    });
 
-  document.getElementById("ExportarExcel").addEventListener("click", function(e) {
-    e.preventDefault();
-    const buscar = document.getElementById("buscar").value;
-    const rol    = document.getElementById("rol").value;
-    const estado = document.getElementById("estado").value;
-    window.location.href = `${urlExcel}?buscar=${buscar}&rol=${rol}&estado=${estado}`;
+    document.getElementById("ExportarExcel").addEventListener("click", function(e) {
+      e.preventDefault();
+      const buscar = document.getElementById("buscar").value;
+      const rol    = document.getElementById("rol").value;
+      const estado = document.getElementById("estado").value;
+      const curso  = document.getElementById("filtro_curso").value;
+      window.location.href = `${urlExcel}?buscar=${encodeURIComponent(buscar)}&rol=${encodeURIComponent(rol)}&estado=${estado}&curso=${curso}`;
+    });
   });
 </script>
 {% endblock %}
