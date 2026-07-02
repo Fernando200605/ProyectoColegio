@@ -90,7 +90,7 @@ jobs:
 
       - name: Ejecutar migraciones
         working-directory: ProyectoColegio
-        run: python manage.py migrate app
+        run: python manage.py migrate
 
       - name: Ejecutar pruebas
         working-directory: ProyectoColegio
