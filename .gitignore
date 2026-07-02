@@ -1,30 +1,59 @@
+# =====================
 # Entorno virtual
+# =====================
 .venv/
+venv/
+env/
 
-# Archivos de Python
+# =====================
+# Python
+# =====================
 __pycache__/
 *.py[cod]
 *$py.class
 
-# Archivos de log
+# =====================
+# Logs
+# =====================
 *.log
 
-# Archivos de base de datos SQLite
+# =====================
+# Base de datos
+# =====================
 *.sqlite3
 
-# Archivos de migraciones de Django (opcional ignorarlos si los generas en equipo)
-# Puedes dejar estos si deseas compartir las migraciones
-**/migrations/*.py
-**/migrations/__pycache__/
+# =====================
+# Django media (archivos subidos por usuarios)
+# =====================
+media/
 
-# Archivos de configuración de IDE
+# =====================
+# Archivos sensibles
+# =====================
+.env
+token.json
+credentials.json
+
+# =====================
+# IDEs
+# =====================
 .vscode/
 .idea/
-**/.env
-**/token.json
-**/credentials.json
-**/media/usuarios/*
-**/*.md
+
+# =====================
+# Archivos del sistema
+# =====================
+.DS_Store
+
+# =====================
+# Archivos generados por el sistema
+# =====================
+staticfiles/
+
+# =====================
+# Opcional (solo si trabajas solo)
+# =====================
+# migrations/__pycache__/
+# *.pyc
+
 **/img/**
-docker-compose.yml
-prompt_sistema.txt
