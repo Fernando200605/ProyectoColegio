@@ -10,7 +10,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     gcc \
     pkg-config \
-    default-libmysqlclient-dev \
     libcairo2-dev \
     libpango-1.0-0 \
     libharfbuzz0b \

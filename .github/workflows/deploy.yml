@@ -16,29 +16,8 @@ jobs:
 
     runs-on: ubuntu-latest
 
-    services:
-      mysql:
-        image: mysql:8.0
-        env:
-          MYSQL_ROOT_PASSWORD: root
-          MYSQL_DATABASE: colegio_db
-        ports:
-          - 3306:3306
-        options: >-
-          --health-cmd="mysqladmin ping -h127.0.0.1 -uroot -proot"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=10
-
     env:
       SECRET_KEY: ${{ secrets.SECRET_KEY }}
-
-      MYSQL_DATABASE: colegio_db
-      MYSQL_USER: root
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_HOST: 127.0.0.1
-      MYSQL_PORT: 3306
-
       EMAIL_HOST_USER: ${{ secrets.EMAIL_HOST_USER }}
       EMAIL_HOST_PASSWORD: ${{ secrets.EMAIL_HOST_PASSWORD }}
       KEY_PASSWORD_IA: ${{ secrets.KEY_PASSWORD_IA }}
@@ -75,18 +54,6 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-
-      - name: Esperar MySQL
-        run: |
-          until mysqladmin ping -h127.0.0.1 -uroot -proot --silent
-          do
-            echo "Esperando MySQL..."
-            sleep 2
-          done
-
-      - name: Verificar bases de datos
-        run: |
-          mysql -h127.0.0.1 -uroot -proot -e "SHOW DATABASES;"
 
       - name: Ver estructura del proyecto
         working-directory: ProyectoColegio
