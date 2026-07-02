@@ -20,12 +20,12 @@ jobs:
       mysql:
         image: mysql:8.0
         env:
-          MYSQL_DATABASE: colegio_db
-          MYSQL_ROOT_PASSWORD: 1055962626
+          MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
+          MYSQL_DATABASE: ${{ secrets.MYSQL_DATABASE }}
         ports:
           - 3306:3306
         options: >-
-          --health-cmd="mysqladmin ping -h 127.0.0.1 -p1055962626"
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -uroot -p${{ secrets.MYSQL_ROOT_PASSWORD }}"
           --health-interval=10s
           --health-timeout=5s
           --health-retries=10
@@ -61,6 +61,7 @@ jobs:
             pkg-config \
             python3-dev \
             default-libmysqlclient-dev \
+            mysql-client \
             libcairo2-dev \
             libpango1.0-dev \
             libharfbuzz-dev \
@@ -76,15 +77,30 @@ jobs:
 
       - name: Esperar a MySQL
         run: |
-          until mysqladmin ping -h 127.0.0.1 -uroot -p${{ secrets.MYSQL_ROOT_PASSWORD }} --silent; do
-            echo "Esperando MySQL..."
+          until mysqladmin ping \
+            -h127.0.0.1 \
+            -uroot \
+            -p${{ secrets.MYSQL_ROOT_PASSWORD }} \
+            --silent
+          do
+            echo "Esperando a MySQL..."
             sleep 2
           done
 
+      - name: Verificar bases de datos
+        run: |
+          mysql \
+            -h127.0.0.1 \
+            -uroot \
+            -p${{ secrets.MYSQL_ROOT_PASSWORD }} \
+            -e "SHOW DATABASES;"
+
       - name: Ejecutar migraciones
         working-directory: ProyectoColegio
-        run: python manage.py migrate
+        run: |
+          python manage.py migrate
 
       - name: Ejecutar pruebas
         working-directory: ProyectoColegio
-        run: python manage.py test
+        run: |
+          python manage.py test
