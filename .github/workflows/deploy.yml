@@ -3,8 +3,13 @@ name: Integración Continua
 on:
   push:
     branches:
-      - master
       - main
+      - master
+
+  pull_request:
+    branches:
+      - main
+      - master
 
 jobs:
   test:
@@ -23,6 +28,12 @@ jobs:
       - name: Obtener código
         uses: actions/checkout@v4
 
+      - name: Mostrar estructura del proyecto
+        run: |
+          pwd
+          ls -la
+          find . -maxdepth 3
+
       - name: Configurar Python
         uses: actions/setup-python@v5
         with:
@@ -34,9 +45,11 @@ jobs:
           pip install -r requirements.txt
 
       - name: Ejecutar migraciones
+        working-directory: ProyectoColegio
         run: |
           python manage.py migrate
 
       - name: Ejecutar pruebas
+        working-directory: ProyectoColegio
         run: |
           python manage.py test
