@@ -1,6 +1,9 @@
 {% extends 'create_generic.html' %}
 {% load widget_tweaks %}
-
+{% block breadcrumb_list %}Usuario{% endblock %}
+{% block breadcrumb_active %}
+{% if object %}Editar Usuario{% else %}Nuevo Usuario{% endif %}
+{% endblock %}
 {% block titulo %}
   {{ titulo }}
 {% endblock %}

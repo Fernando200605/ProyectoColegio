@@ -403,7 +403,7 @@ console.log("datos_elemento:", {{ datos_elemento|safe }});
     chart: { type: 'bar', height: 230, toolbar: { show: false } },
     series: [{ name: 'Stock', data: {{ datos_elemento|safe }} }],
     xaxis: { categories: {{ labels_elemento|safe }} },
-    colors: ['#198754'],
+    colors: ['#0051ff'],
     dataLabels: { enabled: false },
     plotOptions: { bar: { borderRadius: 6, columnWidth: '50%' } },
     tooltip: { theme: 'light' }

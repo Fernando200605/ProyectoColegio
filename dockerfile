@@ -5,7 +5,7 @@ ENV PYTHONUNBUFFERED=1
 
 WORKDIR /app
 
-# Agregamos las librerías necesarias para WeasyPrint
+# Dependencias del sistema
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     gcc \
@@ -18,8 +18,15 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libpangocairo-1.0-0 \
     && rm -rf /var/lib/apt/lists/*
 
-COPY requirements.txt .
-
+# Instalar dependencias de Python
+COPY requirements.txt /app/
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY . .
+# Copiar el proyecto
+COPY . /app/
+
+# Exponer el puerto
+EXPOSE 8000
+
+# Iniciar la aplicación
+CMD ["python", "ProyectoColegio/manage.py", "runserver", "0.0.0.0:8000"]

@@ -25,7 +25,7 @@ load_dotenv(BASE_DIR / '.env')
 SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
@@ -87,8 +87,6 @@ DATABASES = {
         'NAME': 'colegio_db',
         'USER': 'root',
         'PASSWORD': '1055962626',
-        'HOST': 'db',    # <--- Agrega esto: es el nombre del servicio en tu docker-compose.yml
-        'PORT': '3306',  # <--- Agrega esto: puerto interno de la red de Docker
     }
 }
 

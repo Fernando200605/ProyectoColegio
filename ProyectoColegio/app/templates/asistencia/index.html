@@ -252,59 +252,92 @@
 
 {% block js %}
 <script>
-  $(document).ready(function () {
-    const tabla = $('#Tabla').DataTable();
+$(document).ready(function () {
 
-    document.getElementById('btn_filtrar').addEventListener('click', function () {
-      const buscar = document.getElementById('buscar').value;
-      const fecha = document.getElementById('filtro_fecha').value;
-      const estado = document.getElementById('filtro_estado').value;
-      const curso = document.getElementById('filtro_curso').value;
+  // =========================
+  // LIMITAR FECHA AL AÑO ACTUAL
+  // =========================
+  const fechaInput = document.getElementById('filtro_fecha');
+  const añoActual = new Date().getFullYear();
+  fechaInput.min = `${añoActual}-01-01`;
+  fechaInput.max = `${añoActual}-12-31`;
 
-      let url = window.location.pathname + '?';
-
-      if (buscar) url += `buscar=${encodeURIComponent(buscar)}&`;
-      if (fecha) url += `fecha=${fecha}&`;
-      if (estado) url += `estado=${encodeURIComponent(estado)}&`;
-      if (curso) url += `curso=${curso}&`;
-
-      window.location.href = url;
-    });
-
-    const urlPdf = "{% url 'app:reporte_asistencia_pdf' %}";
-    const urlExcel = "{% url 'app:reporte_asistencia_excel' %}";
-
-    document.getElementById("ExportarPdf").addEventListener("click", function(e) {
-      e.preventDefault();
-      const buscar = document.getElementById("buscar").value;
-      const fecha = document.getElementById("filtro_fecha").value;
-      const estado = document.getElementById("filtro_estado").value;
-      const curso = document.getElementById("filtro_curso").value;
-      
-      let url = `${urlPdf}?`;
-      if (buscar) url += `buscar=${encodeURIComponent(buscar)}&`;
-      if (fecha) url += `fecha=${fecha}&`;
-      if (estado) url += `estado=${encodeURIComponent(estado)}&`;
-      if (curso) url += `curso=${curso}&`;
-      
-      window.location.href = url;
-    });
-
-    document.getElementById("ExportarExcel").addEventListener("click", function(e) {
-      e.preventDefault();
-      const buscar = document.getElementById("buscar").value;
-      const fecha = document.getElementById("filtro_fecha").value;
-      const estado = document.getElementById("filtro_estado").value;
-      const curso = document.getElementById("filtro_curso").value;
-      
-      let url = `${urlExcel}?`;
-      if (buscar) url += `buscar=${encodeURIComponent(buscar)}&`;
-      if (fecha) url += `fecha=${fecha}&`;
-      if (estado) url += `estado=${encodeURIComponent(estado)}&`;
-      if (curso) url += `curso=${curso}&`;
-      
-      window.location.href = url;
-    });
+  // =========================
+  // DATATABLE EN ESPAÑOL
+  // =========================
+  const tabla = $('#Tabla').DataTable({
+    language: {
+      url: "https://cdn.datatables.net/plug-ins/1.13.8/i18n/es-ES.json"
+    }
   });
+
+  // =========================
+  // FILTRO GENERAL
+  // =========================
+  document.getElementById('btn_filtrar').addEventListener('click', function () {
+    const buscar = document.getElementById('buscar').value;
+    const fecha = document.getElementById('filtro_fecha').value;
+    const estado = document.getElementById('filtro_estado').value;
+    const curso = document.getElementById('filtro_curso').value;
+
+    let url = window.location.pathname + '?';
+
+    if (buscar) url += `buscar=${encodeURIComponent(buscar)}&`;
+    if (fecha) url += `fecha=${fecha}&`;
+    if (estado) url += `estado=${encodeURIComponent(estado)}&`;
+    if (curso) url += `curso=${curso}&`;
+
+    window.location.href = url;
+  });
+
+  // =========================
+  // URLS EXPORTACIÓN (DJANGO)
+  // =========================
+  const urlPdf = "{% url 'app:reporte_asistencia_pdf' %}";
+  const urlExcel = "{% url 'app:reporte_asistencia_excel' %}";
+
+  // =========================
+  // EXPORTAR PDF
+  // =========================
+  document.getElementById("ExportarPdf").addEventListener("click", function(e) {
+    e.preventDefault();
+
+    const buscar = document.getElementById("buscar").value;
+    const fecha = document.getElementById("filtro_fecha").value;
+    const estado = document.getElementById("filtro_estado").value;
+    const curso = document.getElementById("filtro_curso").value;
+
+    let url = `${urlPdf}?`;
+
+    if (buscar) url += `buscar=${encodeURIComponent(buscar)}&`;
+    if (fecha) url += `fecha=${fecha}&`;
+    if (estado) url += `estado=${encodeURIComponent(estado)}&`;
+    if (curso) url += `curso=${curso}&`;
+
+    window.location.href = url;
+  });
+
+  // =========================
+  // EXPORTAR EXCEL
+  // =========================
+  document.getElementById("ExportarExcel").addEventListener("click", function(e) {
+    e.preventDefault();
+
+    const buscar = document.getElementById("buscar").value;
+    const fecha = document.getElementById("filtro_fecha").value;
+    const estado = document.getElementById("filtro_estado").value;
+    const curso = document.getElementById("filtro_curso").value;
+
+    let url = `${urlExcel}?`;
+
+    if (buscar) url += `buscar=${encodeURIComponent(buscar)}&`;
+    if (fecha) url += `fecha=${fecha}&`;
+    if (estado) url += `estado=${encodeURIComponent(estado)}&`;
+    if (curso) url += `curso=${curso}&`;
+
+    window.location.href = url;
+  });
+
+});
 </script>
 {% endblock %}
