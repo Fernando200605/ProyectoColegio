@@ -24,7 +24,6 @@ app_name = 'app'
 urlpatterns = [
 
     path('dashboard/', DashboardView.as_view(), name="dashboard"),
-    path('preguntas/',preguntar_ia,name="preguntar"),
     path('preguntas1/',preguntar_ia_local,name="preguntar2" ),
     path('mis_notificaciones/',NotificacionesView.as_view(),name="mis_notificaciones"),
     path("mis_notificaciones/<int:pk>/leer/", MarcarComoleidasNotificaciones.as_view(), name="notificacion_leida"),
