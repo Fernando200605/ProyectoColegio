@@ -88,10 +88,42 @@ jobs:
         run: |
           mysql -h127.0.0.1 -uroot -proot -e "SHOW DATABASES;"
 
+      - name: Ver estructura del proyecto
+        working-directory: ProyectoColegio
+        run: |
+          echo "=== Directorio actual ==="
+          pwd
+          echo ""
+          echo "=== Archivos ==="
+          ls -la
+          echo ""
+          echo "=== Carpeta app ==="
+          ls -la app
+          echo ""
+          echo "=== Migraciones ==="
+          ls -la app/migrations
+
+      - name: Ver apps instaladas
+        working-directory: ProyectoColegio
+        run: |
+          python manage.py shell -c "from django.conf import settings; print('INSTALLED_APPS:'); print(settings.INSTALLED_APPS)"
+
+      - name: Ver migraciones detectadas
+        working-directory: ProyectoColegio
+        run: |
+          python manage.py showmigrations
+
+      - name: Verificar modelo de usuario
+        working-directory: ProyectoColegio
+        run: |
+          python manage.py shell -c "from django.conf import settings; print('AUTH_USER_MODEL =', settings.AUTH_USER_MODEL)"
+
       - name: Ejecutar migraciones
         working-directory: ProyectoColegio
-        run: python manage.py migrate
+        run: |
+          python manage.py migrate --verbosity 3
 
       - name: Ejecutar pruebas
         working-directory: ProyectoColegio
-        run: python manage.py test
+        run: |
+          python manage.py test
