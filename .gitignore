@@ -27,5 +27,4 @@ __pycache__/
 **/*.md
 **/img/**
 docker-compose.yml
-requirements.txt
 prompt_sistema.txt
