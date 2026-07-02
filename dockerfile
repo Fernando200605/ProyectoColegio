@@ -28,4 +28,4 @@ COPY . /app/
 EXPOSE 8000
 
 # Iniciar la aplicación
-CMD ["python", "ProyectoColegio/manage.py", "runserver", "0.0.0.0:8000"]
+CMD sh -c "python ProyectoColegio/manage.py migrate && python ProyectoColegio/manage.py runserver 0.0.0.0:8000"
