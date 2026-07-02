@@ -11,7 +11,7 @@ from app.views.Movimiento.views import *
 from app.views.Evento.views import *
 from app.views.Notificacion.views import *
 from app.views.Index.views import DashboardView , NotificacionesView,MarcarComoleidasNotificaciones
-from app.views.IA.views import preguntar_ia,preguntar_ia_local
+from app.views.IA.views import preguntar_ia_local
 from app.views.EstudianteAcudiente.views import (
     EstudianteAcudienteListView,
     EstudianteAcudienteCreateView,
